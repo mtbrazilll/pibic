@@ -27,7 +27,7 @@ public:
 
 class ComponentManager {
 public:
-    std::unordered_map<int, Component> components;
+    std::map<int, Component> components;
     void addComponent(const Component& component);
     bool removeComponent(int id);
     Component* getComponent(int id);

@@ -22,7 +22,7 @@ using std::function;
 
 extern ComponentManager manager;
 extern vector<int> i_var;
-extern std::unordered_map<Point, std::size_t> pointToIndex;
+extern std::unordered_map<Point, unsigned long long int> pointToIndex;
 extern double bsf;
 
 ILOSTLBEGIN
@@ -67,7 +67,7 @@ double Exato_h(vector<Point> &points) {
 
     int indice_var = 0;
     for (const auto& pair : manager.components) {
-        i_var[indice_var] = pair.first;
+       
         const Component& component = pair.second;
 
         obj += x[indice_var];
@@ -102,9 +102,13 @@ double Exato_h(vector<Point> &points) {
     IloNumArray sol(env, n_tuplas);
     cplex.getValues(sol, x);
 
-    for (int i = 0; i < n_tuplas; i++) {
-        Component *c = manager.getComponent(i_var[i]);
-        c->idade = (sol[i] > 0.5) ? 0 : c->idade + 1;
+    indice_var = 0;
+    for (auto& pair : manager.components) {
+        
+        Component& component = pair.second;
+        component.idade = (sol[indice_var] > 0.5) ? 0 : component.idade + 1;
+
+        indice_var++;
     }
 
     env.end();

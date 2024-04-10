@@ -24,7 +24,6 @@ typedef CGAL::Search_traits_2<K> TreeTraits;
 typedef CGAL::Kd_tree<TreeTraits> Tree;
 
 Tree tree;
-
 using std::size_t;
 using std::vector;
 
@@ -32,7 +31,7 @@ int loops_with_no_improval = 0; // controle de loops sem melhora para fugir de o
 double max_x = std::numeric_limits<double>::lowest(), max_y = std::numeric_limits<double>::lowest();
 double min_x = std::numeric_limits<double>::max(), min_y = std::numeric_limits<double>::max();
 double bsf = std::numeric_limits<double>::max();
-std::unordered_map<Point, std::size_t> pointToIndex;
+std::unordered_map<Point, unsigned long long int> pointToIndex;
 
 
 int loops = 0;
@@ -108,8 +107,7 @@ void CMSA(float time_limit, int max_age, int max_loops) {
         construct_total += std::chrono::duration_cast<std::chrono::milliseconds>(construct_end - construct_start).count();
         //std::cout << "quantidade: " << manager.getComponentCount() << std::endl;
         
-        i_var.clear();
-        i_var.resize(manager.getComponentCount());
+
 
         //SOLVE
         auto solve_start = std::chrono::high_resolution_clock::now();

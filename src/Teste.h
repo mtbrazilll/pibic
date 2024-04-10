@@ -16,7 +16,7 @@
 
 typedef K::FT FT;
 
-extern std::unordered_map<Point, std::size_t> pointToIndex;
+extern std::unordered_map<Point, unsigned long long int> pointToIndex;
 
 class Teste {
    const double EPSILON = 1.0 + 1e-14;

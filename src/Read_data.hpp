@@ -17,7 +17,7 @@ typedef K::Point_2 Point;
 typedef CGAL::Search_traits_2<K> TreeTraits;
 typedef CGAL::Kd_tree<TreeTraits> Tree;
 
-extern std::unordered_map<Point, std::size_t> pointToIndex;
+extern std::unordered_map<Point, unsigned long long int> pointToIndex;
 extern CGAL::Kd_tree<TreeTraits> tree;
 
 void read_points(const std::string& filepath, std::vector<Point> &points, K::FT &max_x, K::FT &max_y, K::FT &min_x, K::FT &min_y);
