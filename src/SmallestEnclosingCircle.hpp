@@ -34,7 +34,7 @@ struct Ponto {
           indice(indice) {}
 
 
-              operator CGAL::Simple_cartesian<long double>::Point_2() const {
+    operator CGAL::Simple_cartesian<long double>::Point_2() const {
         return point;
     }
 

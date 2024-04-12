@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Lista de instâncias a serem testadas
-instancias = ["../instancias/i4_pon.txt", "../instancias/i2_pon.txt", "../instancias/i3_pon.txt"]
+instancias = ["../instancias/i4_pon.txt", "../instancias/i2_pon.txt", "../instancias/i3_pon.txt", "../instancias/hail2015.udc",
+              "../instancias/mona-lisa100k.udc", "../instancias/nyctaxi.udc", "../instancias/uber.udc", "../instancias/usa115475.udc",
+              "../instancias/world.txt"]
 
 # Dicionário para coletar todos os tempos e opts
 dados_tempos = {instancia: [] for instancia in instancias}
@@ -14,7 +16,7 @@ dados_opts = {instancia: [] for instancia in instancias}
 # Executar o comando para cada instância 10 vezes
 for instancia in instancias:
     for _ in range(100):
-        comando = f"./pcdp.run -l 10 -f {instancia}"
+        comando = f"./pcdp.run -l 5 -f {instancia}"
         resultado = subprocess.run(comando, shell=True, capture_output=True, text=True)
         saida = resultado.stdout
 
