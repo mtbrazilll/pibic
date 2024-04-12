@@ -17,7 +17,7 @@ using namespace std;
 static const double EPSILON = 1+1e-12;
 
 
-typedef CGAL::Simple_cartesian<double> K;
+typedef CGAL::Simple_cartesian<long double> K;
 typedef K::Point_2 Point;
 typedef CGAL::Search_traits_2<K> TreeTraits;
 typedef CGAL::Kd_tree<TreeTraits> Tree;
@@ -25,11 +25,12 @@ typedef CGAL::Kd_tree<TreeTraits> Tree;
 
 extern Tree tree;
 
-extern vector<Point> points;
+
 extern int loops;
 extern int id_aux_d;
 extern ComponentManager manager;
 extern unsigned seed;
 
-int mateus(vector<Point> &points, double x_max, double y_max, double x_min, double y_min);
+
+int mateus(vector<Ponto>const &points, double x_max, double y_max, double x_min, double y_min);
 

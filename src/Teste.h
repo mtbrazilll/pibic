@@ -16,17 +16,16 @@
 
 typedef K::FT FT;
 
-extern std::unordered_map<Point, unsigned long long int> pointToIndex;
 
 class Teste {
    const double EPSILON = 1.0 + 1e-14;
-   std::vector<Point> P;
+   std::vector<Ponto> P;
   
    std::vector<Component> sol;
 
 public:
     
-    Teste(std::vector<Point> &P, std::vector<Component> &sol) : P(P), sol(sol) { }
+    Teste(std::vector<Ponto> &P, std::vector<Component> &sol) : P(P), sol(sol) { }
 
     bool execute() {
 
@@ -38,7 +37,7 @@ public:
 
             for (const auto& ponto: component.points)
             {
-                FT distSquared = CGAL::squared_distance(ponto, component.pos);
+                FT distSquared = CGAL::squared_distance(ponto.point, component.pos);
                 FT raioSquared = component.raio * component.raio;
 
                 if (CGAL::abs(distSquared - raioSquared) >= EPSILON) {
@@ -46,12 +45,12 @@ public:
                 }
                
               
-                auto it = pointToIndex.find(ponto);
-                if (it == pointToIndex.end()) std::cout << "erro" << std::endl;
+                
+               
 
-                int id = it->second;
-                if (!visitados[id]){
-                    visitados[id] = 1;
+                
+                if (!visitados[ponto.indice]){
+                    visitados[ponto.indice] = 1;
                     count_pontos--;
                 }
             }
@@ -71,15 +70,14 @@ public:
 
         
         for (const auto& component : sol) {
-            for (const auto& point : component.points) {
+            for (const auto& Ponto : component.points) {
                 
                // pointsFile << point.x << " " << point.y << " " << point.id << "\n";
                     
                 
             }
 
-            discsFile << component.pos.x() << " " << component.pos.y() << " "
-                      << component.raio << "\n";
+ 
         }
 
         //pointsFile.close();

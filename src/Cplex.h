@@ -21,8 +21,6 @@ using std::unordered_set;
 using std::function;
 
 extern ComponentManager manager;
-extern vector<int> i_var;
-extern std::unordered_map<Point, unsigned long long int> pointToIndex;
 extern double bsf;
 
 ILOSTLBEGIN
@@ -49,7 +47,7 @@ ILOMIPINFOCALLBACK3(timeLimitCallback,
 
 
 
-double Exato_h(vector<Point> &points) {
+double Exato_h(vector<Ponto> const &points) {
     double valor_otimo = std::numeric_limits<double>::max();
     
 
@@ -73,12 +71,11 @@ double Exato_h(vector<Point> &points) {
         obj += x[indice_var];
 
         for (const auto& po : component.points) {
-            auto it = pointToIndex.find(po);
-            int i_p = it->second;
-            if (componente_point[i_p].getImpl() == 0) {
-                componente_point[i_p] = IloExpr(env);
+
+            if (componente_point[po.indice].getImpl() == 0) {
+                componente_point[po.indice] = IloExpr(env);
             }
-            componente_point[i_p] += x[indice_var];
+            componente_point[po.indice] += x[indice_var];
         }
 
         indice_var++;

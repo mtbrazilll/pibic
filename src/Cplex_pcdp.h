@@ -3,6 +3,7 @@
 #define Cplex_pcdp_H
 
 #include <ilcplex/ilocplex.h>
+#include "SmallestEnclosingCircle.hpp"
 
 #include <fstream>
 #include <vector>
@@ -13,8 +14,9 @@ typedef IloArray<IloNumVarArray> NumVar2D;
 
 
 
-extern std::vector<Point> points;
-extern double max_x;
+extern std::vector<Ponto> pontos;
+
+extern long double max_x;
 
 
 double solve(int n_point) 
@@ -58,7 +60,7 @@ double solve(int n_point)
     for(int i = 0; i < n_point; ++i) {
         for(int j = 0; j < n_point; ++j) {
             IloExpr distancia(env);
-            distancia = (IloPower(points[j].x() - X[i], 2) + IloPower(points[j].y()  - Y[i], 2));
+            distancia = (IloPower(pontos[j].point.x() - X[i], 2) + IloPower(pontos[j].point.y()  - Y[i], 2));
 
             Model.add(distancia <= p[j][i] + max_x*max_x*(1-p[j][i]));
             distancia.end();

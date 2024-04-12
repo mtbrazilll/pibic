@@ -11,13 +11,14 @@ extern std::unordered_map<Point, std::vector<int>> cellToDisks;
 
 class Element {
 public:
-    std::vector<Point> points;
+
+	std::vector<Ponto> points;
     double x_max;
     double y_max;
     double x_min;
     double y_min;
 
-    Element(const std::vector<Point>& points, double x_max, double y_max, double x_min, double y_min)
+    Element(const std::vector<Ponto>& points, double x_max, double y_max, double x_min, double y_min)
         : points(points), x_max(x_max), y_max(y_max), x_min(x_min), y_min(y_min) {}
 };
 
@@ -26,7 +27,7 @@ double getRandomValue(double minVal, double maxVal) {
     return minVal + randomValue * (maxVal - minVal); // Mapeia para o intervalo [minVal, maxVal]
 }
  
-int mateus(vector<Point> &points, double x_max, double y_max, double x_min, double y_min) {
+int mateus(vector<Ponto> const &points, double x_max, double y_max, double x_min, double y_min) {
 	
 	double raio = 1.0;
 	queue<Element> fila;
@@ -47,8 +48,8 @@ int mateus(vector<Point> &points, double x_max, double y_max, double x_min, doub
 
 			if(pai.points.size()==1){
 				
-				std::vector<Point> pontos = pai.points;
-				Component aux(id_aux_d,0,1.0,pontos,pai.points[0]);
+				std::vector<Ponto> pontos = pai.points;
+				Component aux(id_aux_d,0,1.0,pontos,pai.points[0].point);
 
 				manager.addComponent(aux);
 				id_aux_d++;
@@ -63,7 +64,7 @@ int mateus(vector<Point> &points, double x_max, double y_max, double x_min, doub
 					
 				if (1.0 >= smallest.r * (EPSILON)) { 
 					
-					std::vector<Point> pontos = pai.points;
+					std::vector<Ponto> pontos = pai.points;
 					Component aux(id_aux_d,0,1.0,pontos,smallest.pos);
 
 					manager.addComponent(aux);
@@ -84,26 +85,26 @@ int mateus(vector<Point> &points, double x_max, double y_max, double x_min, doub
 			double XminQ3 = pai.x_min, YminQ3 = pai.y_min, XmaxQ3 = rand1,     YmaxQ3 = rand2;
 			double XminQ4 = rand1, 	   YminQ4 = pai.y_min, XmaxQ4 = pai.x_max, YmaxQ4 = rand2;
 				
-			vector<Point> quad1, quad2, quad3, quad4;
+			vector<Ponto> quad1, quad2, quad3, quad4;
 
 			for (int i = 0; i < pai.points.size(); i++) {
 
-				if ((pai.points[i].x() >= XminQ1 && pai.points[i].x() <= XmaxQ1) && (pai.points[i].y() >= YminQ1 && pai.points[i].y() <= YmaxQ1)) {
+				if ((pai.points[i].point.x() >= XminQ1 && pai.points[i].point.x() <= XmaxQ1) && (pai.points[i].point.y() >= YminQ1 && pai.points[i].point.y() <= YmaxQ1)) {
 
 					quad1.push_back(pai.points[i]);
 
 				}
-				else if ((pai.points[i].x() >= XminQ2 && pai.points[i].x() <= XmaxQ2) && (pai.points[i].y() >= YminQ2 && pai.points[i].y() <= YmaxQ2)) {
+				else if ((pai.points[i].point.x() >= XminQ2 && pai.points[i].point.x() <= XmaxQ2) && (pai.points[i].point.y() >= YminQ2 && pai.points[i].point.y() <= YmaxQ2)) {
 
 					quad2.push_back(pai.points[i]);
 
 				}
-				else if ((pai.points[i].x() >= XminQ3 && pai.points[i].x() <= XmaxQ3) && (pai.points[i].y() >= YminQ3 && pai.points[i].y() <= YmaxQ3)) {
+				else if ((pai.points[i].point.x() >= XminQ3 && pai.points[i].point.x() <= XmaxQ3) && (pai.points[i].point.y() >= YminQ3 && pai.points[i].point.y() <= YmaxQ3)) {
 
 					quad3.push_back(pai.points[i]);
 
 				}
-				else if ((pai.points[i].x() >= XminQ4 && pai.points[i].x() <= XmaxQ4) && (pai.points[i].y() >= YminQ4 && pai.points[i].y() <= YmaxQ4)) {
+				else if ((pai.points[i].point.x() >= XminQ4 && pai.points[i].point.x() <= XmaxQ4) && (pai.points[i].point.y() >= YminQ4 && pai.points[i].point.y() <= YmaxQ4)) {
 
 					quad4.push_back(pai.points[i]);
 

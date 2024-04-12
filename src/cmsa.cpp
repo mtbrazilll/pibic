@@ -18,31 +18,32 @@
 #include <CGAL/Kd_tree.h>
 #include <CGAL/Search_traits_2.h>
 
-typedef CGAL::Simple_cartesian<double> K;
+typedef CGAL::Simple_cartesian<long double> K;
 typedef K::Point_2 Point;
 typedef CGAL::Search_traits_2<K> TreeTraits;
 typedef CGAL::Kd_tree<TreeTraits> Tree;
 
-Tree tree;
+
 using std::size_t;
 using std::vector;
 
 int loops_with_no_improval = 0; // controle de loops sem melhora para fugir de otimos locais
-double max_x = std::numeric_limits<double>::lowest(), max_y = std::numeric_limits<double>::lowest();
-double min_x = std::numeric_limits<double>::max(), min_y = std::numeric_limits<double>::max();
+long double max_x = std::numeric_limits<long double>::lowest(), max_y = std::numeric_limits<long double>::lowest();
+long double min_x = std::numeric_limits<long double>::max(), min_y = std::numeric_limits<long double>::max();
 double bsf = std::numeric_limits<double>::max();
-std::unordered_map<Point, unsigned long long int> pointToIndex;
+
 
 
 int loops = 0;
-std::unordered_map<Point, std::vector<int>> cellToDisks;
-
-vector<Point> points;
-std::vector<int> idsToRemove;
 int id_aux_d = 0;
-ComponentManager manager;
-vector<int> i_var; 
 unsigned seed = time(0);
+
+
+std::unordered_map<Point, std::vector<int>> cellToDisks;
+Tree tree;
+vector<Ponto> pontos;
+std::vector<int> idsToRemove;
+ComponentManager manager;
 std::vector<Component> sol_reduzida;
 
 void CMSA(float time_limit, int max_age, int max_loops);
@@ -77,7 +78,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    read_points(filePath, points, max_x, max_y, min_x, min_y); 
+    read_points(filePath, pontos, max_x, max_y, min_x, min_y); 
     K::FT max_x, max_y, min_x, min_y;
     
     CMSA(time_limit, max_age, max_loops);
@@ -100,7 +101,7 @@ void CMSA(float time_limit, int max_age, int max_loops) {
         //CONSTRUCT 
         auto construct_start = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < 3; i++) {
-            mateus(points, max_x+1, max_y+1, min_x-1, min_y-1);
+            mateus(pontos, max_x+1, max_y+1, min_x-1, min_y-1);
         }
 
         auto construct_end = std::chrono::high_resolution_clock::now();
@@ -111,7 +112,7 @@ void CMSA(float time_limit, int max_age, int max_loops) {
 
         //SOLVE
         auto solve_start = std::chrono::high_resolution_clock::now();
-        bsf = Exato_h(points);
+        bsf = Exato_h(pontos);
         auto solve_end = std::chrono::high_resolution_clock::now();
         solve_total += std::chrono::duration_cast<std::chrono::milliseconds>(solve_end - solve_start).count();    
 
@@ -163,10 +164,10 @@ void testando(){
 		}
 			
 	}
-    std::cout<<"pontos_hash:" << pointToIndex.size() << std::endl;
-    std::cout<<"pontos_vector:" << points.size() << std::endl;
+
+    std::cout<<"pontos_vector:" << pontos.size() << std::endl;
     
-    Teste teste(points,sol);
+    Teste teste(pontos,sol);
 	if (teste.execute()) std::cout << "success" << endl;
     teste.writeOutput();
 

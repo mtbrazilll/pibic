@@ -2,7 +2,8 @@
 
 #include "SmallestEnclosingCircle.hpp"
 
-Circle makeSmallestEnclosingCircle(const std::vector<Point>& points) {
+Circle makeSmallestEnclosingCircle(const std::vector<Ponto>& points) {
+    
     Min_circle mc(points.begin(), points.end(), true);
     Traits::Circle c = mc.circle();
 
