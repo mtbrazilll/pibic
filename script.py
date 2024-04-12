@@ -5,7 +5,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Lista de instâncias a serem testadas
-instancias = ["../instancias/i4_pon.txt", "../instancias/i2_pon.txt", "../instancias/i3_pon.txt"]
+instancias = ["../instancias/i4_pon.txt", "../instancias/i2_pon.txt", "../instancias/i3_pon.txt", "../instancias/hail2015.udc",
+              "../instancias/mona-lisa100k.udc", "../instancias/nyctaxi.udc", "../instancias/uber.udc", "../instancias/usa115475.udc",
+              "../instancias/world.txt"]
 
 # Dicionário para coletar todos os tempos e opts
 dados_tempos = {instancia: [] for instancia in instancias}
