@@ -51,7 +51,7 @@ void CMSA(float time_limit, int max_age, int max_loops);
 void testando();
 
 int main(int argc, char *argv[]) {
-    int max_age = 2, max_loops = 10;
+    int max_age = 1, max_loops = 10;
     float time_limit = 0;   
 
     //std::cout <<"seed: "<< seed << std::endl;

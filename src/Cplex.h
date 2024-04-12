@@ -37,7 +37,7 @@ ILOMIPINFOCALLBACK3(timeLimitCallback,
         
         //printf("Found solution value: %f\n", cost);
 
-        if ( timeUsed >= 3.0 || cost < bsf ) {
+        if ( timeUsed >= 1.0 || cost < bsf ) {
             //printf("Cost is better than bsf and time limit run out. Quiting after %fs...\n", timeUsed);
             aborted = IloTrue;
             abort();
