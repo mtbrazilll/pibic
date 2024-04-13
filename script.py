@@ -12,6 +12,7 @@ instancias = ["../instancias/i4_pon.txt", "../instancias/i2_pon.txt", "../instan
 # Dicionário para coletar todos os tempos e opts
 dados_tempos = {instancia: [] for instancia in instancias}
 dados_opts = {instancia: [] for instancia in instancias}
+dados_opts_cplex = {instancia: [] for instancia in instancias}
 
 # Executar o comando para cada instância 10 vezes
 for instancia in instancias:
@@ -23,9 +24,21 @@ for instancia in instancias:
         # Extrair tempo e opt da saída
         tempo = int(re.search(r"Total CMSA time: (\d+)ms", saida).group(1))
         opt = int(re.search(r"opt: (\d+)", saida).group(1))
+        cplex = int(re.search(r"cplex_otimo: (\d+)", saida).group(1))
 
         dados_tempos[instancia].append(tempo)
         dados_opts[instancia].append(opt)
+
+# Executar o comando para cada instância 10 vezes
+cplex_opt = []
+for instancia in instancias:
+    comando = f"./pcdp_cplex.run -f {instancia}"
+    resultado = subprocess.run(comando, shell=True, capture_output=True, text=True)
+    saida = resultado.stdout
+
+    cplex = int(re.search(r"cplex_otimo: (\d+)", saida).group(1))
+    cplex_opt.append(cplex)
+
 
 
 
@@ -39,6 +52,7 @@ df = pd.DataFrame({
     "Instancia": [nome[14:] for nome in instancias],
     "Mean_opt": [np.mean(_) for _ in dados_opts.values()],
     "Mean_time": [np.mean(_) for _ in dados_tempos.values()],
+    "cplex_opt": cplex_opt,
 })
 
 # Salvar resultados e estatísticas

@@ -21,4 +21,5 @@ typedef CGAL::Kd_tree<TreeTraits> Tree;
 extern CGAL::Kd_tree<TreeTraits> tree;
 
 
-void read_points(const std::string& filepath, std::vector<Ponto> &pontos, K::FT &max_x, K::FT &max_y, K::FT &min_x, K::FT &min_y);
+void read_points(const std::string& filepath, std::vector<Ponto> &pontos, K::FT &max_x, 
+                K::FT &max_y, K::FT &min_x, K::FT &min_y,  K::FT &maior_em_modulo);

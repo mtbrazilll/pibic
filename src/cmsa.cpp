@@ -30,6 +30,7 @@ using std::vector;
 int loops_with_no_improval = 0; // controle de loops sem melhora para fugir de otimos locais
 long double max_x = std::numeric_limits<long double>::lowest(), max_y = std::numeric_limits<long double>::lowest();
 long double min_x = std::numeric_limits<long double>::max(), min_y = std::numeric_limits<long double>::max();
+long double maior_em_modulo = std::numeric_limits<long double>::lowest();
 double bsf = std::numeric_limits<double>::max();
 
 
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]) {
     float time_limit = 0;   
 
     //std::cout <<"seed: "<< seed << std::endl;
-    std::string filePath = "../instancias/i4_pon.txt";  // Default file path
+    std::string filePath = "../instancias/i1.txt";  // Default file path
     srand(seed);
 
     // lendo argumentos da linha de comando
@@ -78,13 +79,14 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    read_points(filePath, pontos, max_x, max_y, min_x, min_y); 
-    K::FT max_x, max_y, min_x, min_y;
+    read_points(filePath, pontos, max_x, max_y, min_x, min_y,maior_em_modulo); 
+    
     
     CMSA(time_limit, max_age, max_loops);
     testando();
-    //solve(points.size());
     
+    //solve(points.size());
+    solve(pontos.size());
     exit(0);
 }
 
