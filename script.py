@@ -5,9 +5,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Lista de instâncias a serem testadas
-instancias = ["../instancias/i4_pon.txt", "../instancias/i2_pon.txt", "../instancias/i3_pon.txt", "../instancias/hail2015.udc",
-              "../instancias/mona-lisa100k.udc", "../instancias/nyctaxi.udc", "../instancias/uber.udc", "../instancias/usa115475.udc",
-              "../instancias/world.txt"]
+instancias = ["../instancias/Real-world/hail2015_10M.udc",
+            "../instancias/Real-world/mona-lisa100k.udc",
+            "../instancias/Real-world/nyctaxi_2.9M.udc",
+            "../instancias/Real-world/uber_4.5M.udc",
+            "../instancias/Real-world/usa_115K.udc",
+            "../instancias/Real-world/wildfires_1.8M.udc",
+            "../instancias/Real-world/world_1.9M.udc",
+            "../instancias/i1_pon.txt",
+            "../instancias/i2_pon.txt",
+            "../instancias/i4_pon.txt"]
 
 # Dicionário para coletar todos os tempos e opts
 dados_tempos = {instancia: [] for instancia in instancias}
@@ -28,21 +35,7 @@ for instancia in instancias:
 
         dados_tempos[instancia].append(tempo)
         dados_opts[instancia].append(opt)
-
-# Executar o comando para cada instância 10 vezes
-cplex_opt = []
-for instancia in instancias:
-    comando = f"./pcdp_cplex.run -f {instancia}"
-    resultado = subprocess.run(comando, shell=True, capture_output=True, text=True)
-    saida = resultado.stdout
-
-    cplex = int(re.search(r"cplex_otimo: (\d+)", saida).group(1))
-    cplex_opt.append(cplex)
-
-
-
-
-        
+  
 
 # Criar DataFrames
 df_tempos = pd.DataFrame(dados_tempos)
@@ -52,7 +45,6 @@ df = pd.DataFrame({
     "Instancia": [nome[14:] for nome in instancias],
     "Mean_opt": [np.mean(_) for _ in dados_opts.values()],
     "Mean_time": [np.mean(_) for _ in dados_tempos.values()],
-    "cplex_opt": cplex_opt,
 })
 
 # Salvar resultados e estatísticas
