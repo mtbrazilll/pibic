@@ -27,7 +27,7 @@ void read_points(const std::string& filepath, std::vector<Ponto>  &pontos, K::FT
 
         Ponto aux_pont(x,y,id);
         pontos.push_back(aux_pont);
-        tree.insert(aux_pont.point);
+        tree.insert(aux_pont);
  
         max_x = std::max(max_x, aux_pont.point.x());
         max_y = std::max(max_y, aux_pont.point.y());

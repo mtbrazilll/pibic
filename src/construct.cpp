@@ -43,13 +43,13 @@ int mateus(vector<Ponto> const &points, double x_max, double y_max, double x_min
 
 		if (pai.x_min >= pai.x_max || pai.y_max <= pai.y_min) continue;
 		
-		if (fabs(pai.x_max - pai.x_min) > 1.0 && fabs(pai.y_max - pai.y_min) > 1.0) {
+		if (fabs(pai.x_max - pai.x_min) > 0 && fabs(pai.y_max - pai.y_min) > 0) {
 
 
 			if(pai.points.size()==1){
 				
 				std::vector<Ponto> pontos = pai.points;
-				Component aux(id_aux_d,0,1.0,pontos,pai.points[0].point);
+				Component aux(id_aux_d,0,0,1.0,pontos,pai.points[0].point);
 
 				manager.addComponent(aux);
 				id_aux_d++;
@@ -65,7 +65,7 @@ int mateus(vector<Ponto> const &points, double x_max, double y_max, double x_min
 				if (1.0 >= smallest.r * (EPSILON)) { 
 					
 					std::vector<Ponto> pontos = pai.points;
-					Component aux(id_aux_d,0,1.0,pontos,smallest.pos);
+					Component aux(id_aux_d,0,0,1.0,pontos,smallest.pos);
 
 					manager.addComponent(aux);
 					id_aux_d++;

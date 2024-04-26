@@ -17,6 +17,9 @@
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/Kd_tree.h>
 #include <CGAL/Search_traits_2.h>
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Random.h>
+#include <CGAL/random_convex_set_2.h>
 
 typedef CGAL::Simple_cartesian<long double> K;
 typedef K::Point_2 Point;
@@ -84,10 +87,12 @@ int main(int argc, char *argv[]) {
     
     CMSA(time_limit, max_age, max_loops);
     testando();
+    //manager.displayComponents();
     
-    //solve(points.size());
-    solve(pontos.size());
+   
+    //solve(pontos.size());
     exit(0);
+    
 }
 
 void CMSA(float time_limit, int max_age, int max_loops) {

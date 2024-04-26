@@ -14,15 +14,16 @@ class Component {
 public:
     int id;
     int idade;
+    int idade_rastreio;
     double raio;
     std::vector<Ponto> points;
     std::vector<int> points_id;
     Point pos;
 
     Component() 
-        : id(0), idade(0), raio(0.0) {} 
+        : id(0), idade(0), raio(0.0), idade_rastreio(0) {} 
 
-    Component(int id, int idade, double raio, const std::vector<Ponto>& points, const Point& pos);
+    Component(int id, int idade, int idade_rastreio, double raio, const std::vector<Ponto>& points, const Point& pos);
 };
 
 class ComponentManager {
@@ -39,6 +40,7 @@ public:
 
             std::cout << "Component ID: " << component.id << std::endl;
             std::cout << "Idade: " << component.idade << std::endl;
+            std::cout << "Idade: " << component.idade_rastreio << std::endl;
             std::cout << "Pos: (" << component.pos.x() << ", " << component.pos.y() << ")" << std::endl;
             std::cout << "Points:" << std::endl;
             for (const auto& point : component.points) {

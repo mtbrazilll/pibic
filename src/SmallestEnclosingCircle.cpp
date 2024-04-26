@@ -5,7 +5,7 @@
 Circle makeSmallestEnclosingCircle(const std::vector<Ponto>& points) {
     
     Min_circle mc(points.begin(), points.end(), true);
-    Traits::Circle c = mc.circle();
+    Traits_circle::Circle c = mc.circle();
 
     Circle result;
     

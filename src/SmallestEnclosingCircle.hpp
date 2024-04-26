@@ -10,8 +10,8 @@
 
 typedef CGAL::Simple_cartesian<long double> K;
 typedef K::Point_2 Point;
-typedef CGAL::Min_circle_2_traits_2<K> Traits;
-typedef CGAL::Min_circle_2<Traits> Min_circle;
+typedef CGAL::Min_circle_2_traits_2<K> Traits_circle;
+typedef CGAL::Min_circle_2<Traits_circle> Min_circle;
 
 struct Circle {
     Point c;   // Centro

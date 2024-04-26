@@ -89,10 +89,10 @@ double Exato_h(vector<Ponto> const &points) {
 
     antena.add(IloMinimize(env, obj));
 
-    //cplex.setParam(IloCplex::Param::TimeLimit, 0.01); // limite de tempo pra resolver
+    cplex.setParam(IloCplex::Param::TimeLimit, 1.0); // limite de tempo pra resolver
 
     cplex.setOut(env.getNullStream());
-    cplex.use(timeLimitCallback(env, cplex, IloFalse, cplex.getCplexTime()));
+    //cplex.use(timeLimitCallback(env, cplex, IloFalse, cplex.getCplexTime()));
 
     cplex.solve(); 
     valor_otimo = cplex.getObjValue();
@@ -104,6 +104,7 @@ double Exato_h(vector<Ponto> const &points) {
         
         Component& component = pair.second;
         component.idade = (sol[indice_var] > 0.5) ? 0 : component.idade + 1;
+        component.idade_rastreio++;
 
         indice_var++;
     }

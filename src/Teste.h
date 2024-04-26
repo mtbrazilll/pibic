@@ -76,6 +76,8 @@ public:
                     
                 
             }
+        discsFile << component.pos.x() << " " << component.pos.y() << " "
+        << component.raio << "\n";
 
  
         }
