@@ -20,6 +20,7 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Random.h>
 #include <CGAL/random_convex_set_2.h>
+#include "FASTCOVER.h"
 
 typedef CGAL::Simple_cartesian<long double> K;
 typedef K::Point_2 Point;
@@ -103,12 +104,16 @@ void CMSA(float time_limit, int max_age, int max_loops) {
     double solve_total = 0;
     double adapt_total = 0;
 
+    std::list<Ponto> C; // a list to hold the disk centers
+    
+    FASTCOVER ob(pontos,C);
+    
     //================= CMSA Loop ==========================
     while (loops < max_loops) {              
         //CONSTRUCT 
         auto construct_start = std::chrono::high_resolution_clock::now();
-        for (int i = 0; i < 3; i++) {
-            mateus(pontos, max_x+1, max_y+1, min_x-1, min_y-1);
+        for (int i = 0; i < 1; i++) {
+            ob.execute();
         }
 
         auto construct_end = std::chrono::high_resolution_clock::now();
@@ -137,7 +142,7 @@ void CMSA(float time_limit, int max_age, int max_loops) {
         idsToRemove.clear();
         auto adapt_end = std::chrono::high_resolution_clock::now();
         adapt_total += std::chrono::duration_cast<std::chrono::milliseconds>(adapt_end - adapt_start).count();
-
+        testando();
         loops++;
     }
 
