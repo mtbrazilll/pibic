@@ -37,11 +37,15 @@ long double min_x = std::numeric_limits<long double>::max(), min_y = std::numeri
 long double maior_em_modulo = std::numeric_limits<long double>::lowest();
 double bsf = std::numeric_limits<double>::max();
 
+//gerador de numeros aleatorios
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_int_distribution<> distr(1, 100);
 
 
 int loops = 0;
 int id_aux_d = 0;
-unsigned seed = time(0);
+unsigned seed = 1;
 
 
 std::unordered_map<Point, std::vector<int>> cellToDisks;
@@ -61,7 +65,7 @@ int main(int argc, char *argv[]) {
 
     //std::cout <<"seed: "<< seed << std::endl;
     std::string filePath = "../instancias/i1.txt";  // Default file path
-    srand(seed);
+ 
 
     // lendo argumentos da linha de comando
     for (int i = 0; i < argc; i++) {
@@ -82,6 +86,8 @@ int main(int argc, char *argv[]) {
             i++;
         }
     }
+
+    gen.seed(seed);
 
     read_points(filePath, pontos, max_x, max_y, min_x, min_y,maior_em_modulo); 
     
@@ -111,8 +117,10 @@ void CMSA(float time_limit, int max_age, int max_loops) {
     //================= CMSA Loop ==========================
     while (loops < max_loops) {              
         //CONSTRUCT 
+       // std::cout << "-----------------------------------\n";
+        std::cout << "---------iniciando-loop--------\n";
         auto construct_start = std::chrono::high_resolution_clock::now();
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 3; i++) {
             ob.execute();
         }
 
@@ -142,23 +150,28 @@ void CMSA(float time_limit, int max_age, int max_loops) {
         idsToRemove.clear();
         auto adapt_end = std::chrono::high_resolution_clock::now();
         adapt_total += std::chrono::duration_cast<std::chrono::milliseconds>(adapt_end - adapt_start).count();
-        testando();
+        //testando();
         loops++;
+        std::cout<<"otimo atual: " << bsf <<"\n";
+        std::cout << "---------Finalizando-loop--------\n";
+
     }
 
     auto total_end = std::chrono::high_resolution_clock::now();
     auto total_duration = std::chrono::duration_cast<std::chrono::milliseconds>(total_end - total_start);
 
     if (true) {
+        std::cout << "-----------------------------------\n";
         std::cout << "CONSTRUCT total time: " << construct_total << "ms\n";
         std::cout << "SOLVE total time: " << solve_total << "ms\n";
         std::cout << "ADAPT total time: " << adapt_total << "ms\n";
-        std::cout << "-----------------------------------\n";
+        
         //std::cout << "Total CMSA time: " << total_duration.count() << "ms\n";
     }
 
     std::cout << "Total CMSA time: " << total_duration.count() << "ms\n";
     std::cout << "opt: " << bsf << std::endl;
+    std::cout << "-----------------------------------\n";
 }
 
 

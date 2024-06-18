@@ -38,7 +38,7 @@ ILOMIPINFOCALLBACK3(timeLimitCallback,
         //printf("Found solution value: %f\n", cost);
 
         if ( timeUsed >= 1.0 || cost < bsf ) {
-            //printf("Cost is better than bsf and time limit run out. Quiting after %fs...\n", timeUsed);
+            printf("Cost is better than bsf and time limit run out. Quiting after %fs...\n", timeUsed);
             aborted = IloTrue;
             abort();
         }
@@ -92,7 +92,7 @@ double Exato_h(vector<Ponto> const &points) {
     cplex.setParam(IloCplex::Param::TimeLimit, 1.0); // limite de tempo pra resolver
 
     cplex.setOut(env.getNullStream());
-    //cplex.use(timeLimitCallback(env, cplex, IloFalse, cplex.getCplexTime()));
+    cplex.use(timeLimitCallback(env, cplex, IloFalse, cplex.getCplexTime()));
 
     cplex.solve(); 
     valor_otimo = cplex.getObjValue();
