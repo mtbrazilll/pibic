@@ -40,8 +40,7 @@ double bsf = std::numeric_limits<double>::max();
 //gerador de numeros aleatorios
 std::random_device rd;
 std::mt19937 gen(rd());
-std::uniform_int_distribution<> distr(1, 100);
-
+std::uniform_real_distribution<>distr(-1, 1);
 
 int loops = 0;
 int id_aux_d = 0;
@@ -113,14 +112,14 @@ void CMSA(float time_limit, int max_age, int max_loops) {
     std::list<Ponto> C; // a list to hold the disk centers
     
     FASTCOVER ob(pontos,C);
-    
+    //ob.execute();
     //================= CMSA Loop ==========================
     while (loops < max_loops) {              
         //CONSTRUCT 
        // std::cout << "-----------------------------------\n";
         std::cout << "---------iniciando-loop--------\n";
         auto construct_start = std::chrono::high_resolution_clock::now();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 1; i++) {
             ob.execute();
         }
 
