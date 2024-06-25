@@ -20,6 +20,7 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Random.h>
 #include <CGAL/random_convex_set_2.h>
+#include "FASTCOVER.h"
 
 typedef CGAL::Simple_cartesian<long double> K;
 typedef K::Point_2 Point;
@@ -36,11 +37,14 @@ long double min_x = std::numeric_limits<long double>::max(), min_y = std::numeri
 long double maior_em_modulo = std::numeric_limits<long double>::lowest();
 double bsf = std::numeric_limits<double>::max();
 
-
+//gerador de numeros aleatorios
+std::random_device rd;
+std::mt19937 gen(rd());
+std::uniform_real_distribution<>distr(-1, 1);
 
 int loops = 0;
 int id_aux_d = 0;
-unsigned seed = time(0);
+unsigned seed = 1;
 
 
 std::unordered_map<Point, std::vector<int>> cellToDisks;
@@ -60,7 +64,7 @@ int main(int argc, char *argv[]) {
 
     //std::cout <<"seed: "<< seed << std::endl;
     std::string filePath = "../instancias/i1.txt";  // Default file path
-    srand(seed);
+ 
 
     // lendo argumentos da linha de comando
     for (int i = 0; i < argc; i++) {
@@ -81,6 +85,8 @@ int main(int argc, char *argv[]) {
             i++;
         }
     }
+
+    gen.seed(seed);
 
     read_points(filePath, pontos, max_x, max_y, min_x, min_y,maior_em_modulo); 
     
@@ -103,12 +109,18 @@ void CMSA(float time_limit, int max_age, int max_loops) {
     double solve_total = 0;
     double adapt_total = 0;
 
+    std::list<Ponto> C; // a list to hold the disk centers
+    
+    FASTCOVER ob(pontos,C);
+    //ob.execute();
     //================= CMSA Loop ==========================
     while (loops < max_loops) {              
         //CONSTRUCT 
+       // std::cout << "-----------------------------------\n";
+        std::cout << "---------iniciando-loop--------\n";
         auto construct_start = std::chrono::high_resolution_clock::now();
-        for (int i = 0; i < 3; i++) {
-            mateus(pontos, max_x+1, max_y+1, min_x-1, min_y-1);
+        for (int i = 0; i < 1; i++) {
+            ob.execute();
         }
 
         auto construct_end = std::chrono::high_resolution_clock::now();
@@ -137,23 +149,28 @@ void CMSA(float time_limit, int max_age, int max_loops) {
         idsToRemove.clear();
         auto adapt_end = std::chrono::high_resolution_clock::now();
         adapt_total += std::chrono::duration_cast<std::chrono::milliseconds>(adapt_end - adapt_start).count();
-
+        //testando();
         loops++;
+        std::cout<<"otimo atual: " << bsf <<"\n";
+        std::cout << "---------Finalizando-loop--------\n";
+
     }
 
     auto total_end = std::chrono::high_resolution_clock::now();
     auto total_duration = std::chrono::duration_cast<std::chrono::milliseconds>(total_end - total_start);
 
     if (true) {
+        std::cout << "-----------------------------------\n";
         std::cout << "CONSTRUCT total time: " << construct_total << "ms\n";
         std::cout << "SOLVE total time: " << solve_total << "ms\n";
         std::cout << "ADAPT total time: " << adapt_total << "ms\n";
-        std::cout << "-----------------------------------\n";
+        
         //std::cout << "Total CMSA time: " << total_duration.count() << "ms\n";
     }
 
     std::cout << "Total CMSA time: " << total_duration.count() << "ms\n";
     std::cout << "opt: " << bsf << std::endl;
+    std::cout << "-----------------------------------\n";
 }
 
 
