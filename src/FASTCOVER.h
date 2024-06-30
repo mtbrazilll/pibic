@@ -45,7 +45,7 @@ class FASTCOVER {
         double num1 = distr(gen);
         double num2 = distr(gen);
 
-        std::cout<< num1 << " " << num2<< endl;
+        //std::cout<< num1 << " " << num2<< endl;
         std::unordered_map<intPair, VectorType, boost::hash<intPair>> cellToVectorMap;
 
         for(const Ponto &p : P)
@@ -62,6 +62,7 @@ class FASTCOVER {
             manager.addComponent(aux);
             
         } 
+        std::cout<<manager.components.size()<<std::endl;
         return;        
     }
 };

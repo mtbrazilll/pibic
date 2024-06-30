@@ -31,6 +31,10 @@ extern int id_aux_d;
 extern ComponentManager manager;
 extern unsigned seed;
 
+extern std::random_device rd;
+extern std::mt19937 gen;
+extern std::uniform_real_distribution<>distr2;
+
 
 int mateus(vector<Ponto>const &points, double x_max, double y_max, double x_min, double y_min);
 

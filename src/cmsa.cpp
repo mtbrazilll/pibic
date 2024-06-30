@@ -40,7 +40,9 @@ double bsf = std::numeric_limits<double>::max();
 //gerador de numeros aleatorios
 std::random_device rd;
 std::mt19937 gen(rd());
-std::uniform_real_distribution<>distr(-1, 1);
+std::uniform_real_distribution<>distr(-std::sqrt(2), std::sqrt(2));
+std::uniform_real_distribution<> distr2(0, 1);
+
 
 int loops = 0;
 int id_aux_d = 0;
@@ -113,14 +115,16 @@ void CMSA(float time_limit, int max_age, int max_loops) {
     
     FASTCOVER ob(pontos,C);
     //ob.execute();
+    //testando();
     //================= CMSA Loop ==========================
     while (loops < max_loops) {              
         //CONSTRUCT 
        // std::cout << "-----------------------------------\n";
-        std::cout << "---------iniciando-loop--------\n";
+       // std::cout << "---------iniciando-loop--------\n";
         auto construct_start = std::chrono::high_resolution_clock::now();
-        for (int i = 0; i < 1; i++) {
-            ob.execute();
+        for (int i = 0; i < 3; i++) {
+            mateus(pontos,max_x+1,max_y+1,min_x-1,min_y-1);
+            //ob.execute();
         }
 
         auto construct_end = std::chrono::high_resolution_clock::now();
@@ -151,8 +155,8 @@ void CMSA(float time_limit, int max_age, int max_loops) {
         adapt_total += std::chrono::duration_cast<std::chrono::milliseconds>(adapt_end - adapt_start).count();
         //testando();
         loops++;
-        std::cout<<"otimo atual: " << bsf <<"\n";
-        std::cout << "---------Finalizando-loop--------\n";
+        //std::cout<<"otimo atual: " << bsf <<"\n";
+        //std::cout << "---------Finalizando-loop--------\n";
 
     }
 
@@ -189,7 +193,7 @@ void testando(){
 			
 	}
 
-    std::cout<<"pontos_vector:" << pontos.size() << std::endl;
+    //std::cout<<"pontos_vector:" << pontos.size() << std::endl;
     
     Teste teste(pontos,sol);
 	if (teste.execute()) std::cout << "success" << endl;

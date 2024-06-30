@@ -57,7 +57,7 @@ public:
             
         }
         if (count_pontos != 0){
-            std::cout << "ERRO " << count_pontos << std::endl;
+            std::cout << "ERRO 2 " << count_pontos << std::endl;
             return false;
         }
         return true;     

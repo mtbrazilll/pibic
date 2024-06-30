@@ -23,7 +23,8 @@ public:
 };
 
 double getRandomValue(double minVal, double maxVal) {
-    double randomValue = static_cast<double>(rand()) / RAND_MAX; // Número entre 0 e 1
+	
+    double randomValue = distr2(gen); // Número entre 0 e 1
     return minVal + randomValue * (maxVal - minVal); // Mapeia para o intervalo [minVal, maxVal]
 }
  
@@ -77,7 +78,7 @@ int mateus(vector<Ponto> const &points, double x_max, double y_max, double x_min
 
 			double rand1 = getRandomValue(pai.x_min, pai.x_max);
 			double rand2 = getRandomValue(pai.y_min, pai.y_max);
-				
+			//std::cout<<rand1<<" "<<rand2<<std::endl;	
 			
 			
 			double XminQ1 = rand1, 	   YminQ1 = rand2,     XmaxQ1 = pai.x_max, YmaxQ1 = pai.y_max;
