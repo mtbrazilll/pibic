@@ -13,7 +13,7 @@
 #include <CGAL/Search_traits_2.h>
 #include "SmallestEnclosingCircle.hpp"
 
-typedef CGAL::Simple_cartesian<long double> K;
+typedef CGAL::Simple_cartesian<double> K;
 typedef K::Point_2 Point;
 typedef CGAL::Search_traits_2<K> TreeTraits;
 typedef CGAL::Kd_tree<TreeTraits> Tree;

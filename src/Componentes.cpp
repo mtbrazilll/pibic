@@ -1,7 +1,5 @@
 #include "Componentes.hpp"
 
-Component::Component(int id, int idade, int idade_rastreio, double raio, const std::vector<Ponto>& points, const Point& pos)
-    : id(id), idade(idade), idade_rastreio(idade_rastreio), raio(raio), points(points), pos(pos) {}
 
 void ComponentManager::addComponent(const Component& component) {
     components[component.id] = component;

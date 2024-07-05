@@ -11,13 +11,14 @@
 #include <limits> // Para obter os valores de limite de double
 #include <CGAL/Kd_tree.h>
 #include <CGAL/Search_traits_2.h>
+#include "FASTCOVER.h"
 
 using namespace std;
 
 static const double EPSILON = 1+1e-12;
 
 
-typedef CGAL::Simple_cartesian<long double> K;
+typedef CGAL::Simple_cartesian<double> K;
 typedef K::Point_2 Point;
 typedef CGAL::Search_traits_2<K> TreeTraits;
 typedef CGAL::Kd_tree<TreeTraits> Tree;
@@ -30,7 +31,6 @@ extern int loops;
 extern int id_aux_d;
 extern ComponentManager manager;
 extern unsigned seed;
-
 extern std::random_device rd;
 extern std::mt19937 gen;
 extern std::uniform_real_distribution<>distr2;

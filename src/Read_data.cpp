@@ -13,7 +13,7 @@ void read_points(const std::string& filepath, std::vector<Ponto>  &pontos, K::FT
     }
 
     std::string line;
-    long double x, y;
+    double x, y;
     max_x = std::numeric_limits<K::FT>::lowest();
     max_y = std::numeric_limits<K::FT>::lowest();
     min_x = std::numeric_limits<K::FT>::max();

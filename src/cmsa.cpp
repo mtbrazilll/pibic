@@ -22,7 +22,7 @@
 #include <CGAL/random_convex_set_2.h>
 #include "FASTCOVER.h"
 
-typedef CGAL::Simple_cartesian<long double> K;
+typedef CGAL::Simple_cartesian<double> K;
 typedef K::Point_2 Point;
 typedef CGAL::Search_traits_2<K> TreeTraits;
 typedef CGAL::Kd_tree<TreeTraits> Tree;
@@ -32,9 +32,9 @@ using std::size_t;
 using std::vector;
 
 int loops_with_no_improval = 0; // controle de loops sem melhora para fugir de otimos locais
-long double max_x = std::numeric_limits<long double>::lowest(), max_y = std::numeric_limits<long double>::lowest();
-long double min_x = std::numeric_limits<long double>::max(), min_y = std::numeric_limits<long double>::max();
-long double maior_em_modulo = std::numeric_limits<long double>::lowest();
+ double max_x = std::numeric_limits< double>::lowest(), max_y = std::numeric_limits<double>::lowest();
+ double min_x = std::numeric_limits< double>::max(), min_y = std::numeric_limits<double>::max();
+ double maior_em_modulo = std::numeric_limits< double>::lowest();
 double bsf = std::numeric_limits<double>::max();
 
 //gerador de numeros aleatorios
@@ -47,6 +47,7 @@ std::uniform_real_distribution<> distr2(0, 1);
 int loops = 0;
 int id_aux_d = 0;
 unsigned seed = 1;
+int n_pon = 0;
 
 
 std::unordered_map<Point, std::vector<int>> cellToDisks;
@@ -91,7 +92,7 @@ int main(int argc, char *argv[]) {
     gen.seed(seed);
 
     read_points(filePath, pontos, max_x, max_y, min_x, min_y,maior_em_modulo); 
-    
+    n_pon = pontos.size();
     
     CMSA(time_limit, max_age, max_loops);
     testando();
@@ -110,14 +111,36 @@ void CMSA(float time_limit, int max_age, int max_loops) {
     double construct_total = 0;
     double solve_total = 0;
     double adapt_total = 0;
+    double total_duration = 0;
 
-    std::list<Ponto> C; // a list to hold the disk centers
-    
-    FASTCOVER ob(pontos,C);
-    //ob.execute();
+
+
+
+     //================= CMSA inicializa ==========================
+
+    FASTCOVER ob(pontos);
+    ob.execute();
+    bsf = Exato_h();
+        for (const auto& pair : manager.components) {
+        const Component& component = pair.second;	 
+        if (component.idade >= max_age) {
+            idsToRemove.push_back(component.id);
+        }  
+    }
+    for (int id : idsToRemove) {
+        manager.removeComponent(id);
+    }
+    idsToRemove.clear();
+
+
     //testando();
+
+   
+
+
     //================= CMSA Loop ==========================
-    while (loops < max_loops) {              
+    //while (loops < max_loops) {
+     while (total_duration < max_loops) {              
         //CONSTRUCT 
        // std::cout << "-----------------------------------\n";
        // std::cout << "---------iniciando-loop--------\n";
@@ -135,7 +158,7 @@ void CMSA(float time_limit, int max_age, int max_loops) {
 
         //SOLVE
         auto solve_start = std::chrono::high_resolution_clock::now();
-        bsf = Exato_h(pontos);
+        bsf = Exato_start();
         auto solve_end = std::chrono::high_resolution_clock::now();
         solve_total += std::chrono::duration_cast<std::chrono::milliseconds>(solve_end - solve_start).count();    
 
@@ -157,11 +180,13 @@ void CMSA(float time_limit, int max_age, int max_loops) {
         loops++;
         //std::cout<<"otimo atual: " << bsf <<"\n";
         //std::cout << "---------Finalizando-loop--------\n";
+        auto total_end = std::chrono::high_resolution_clock::now();
+        total_duration = std::chrono::duration_cast<std::chrono::milliseconds>(total_end - total_start).count();
 
     }
 
     auto total_end = std::chrono::high_resolution_clock::now();
-    auto total_duration = std::chrono::duration_cast<std::chrono::milliseconds>(total_end - total_start);
+    total_duration = std::chrono::duration_cast<std::chrono::milliseconds>(total_end - total_start).count();
 
     if (true) {
         std::cout << "-----------------------------------\n";
@@ -172,7 +197,7 @@ void CMSA(float time_limit, int max_age, int max_loops) {
         //std::cout << "Total CMSA time: " << total_duration.count() << "ms\n";
     }
 
-    std::cout << "Total CMSA time: " << total_duration.count() << "ms\n";
+    std::cout << "Total CMSA time: " << total_duration << "ms\n";
     std::cout << "opt: " << bsf << std::endl;
     std::cout << "-----------------------------------\n";
 }

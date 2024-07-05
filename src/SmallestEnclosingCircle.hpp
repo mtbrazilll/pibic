@@ -8,7 +8,7 @@
 #include <CGAL/Min_circle_2_traits_2.h>
 #include <vector>
 
-typedef CGAL::Simple_cartesian<long double> K;
+typedef CGAL::Simple_cartesian<double> K;
 typedef K::Point_2 Point;
 typedef CGAL::Min_circle_2_traits_2<K> Traits_circle;
 typedef CGAL::Min_circle_2<Traits_circle> Min_circle;
@@ -22,19 +22,19 @@ struct Circle {
 
 
 struct Ponto {
-    CGAL::Simple_cartesian<long double>::Point_2 point;
+    CGAL::Simple_cartesian<double>::Point_2 point;
 
 
     
     unsigned long int indice;
 
     // Constructor
-    Ponto(long double x = 0, long double y = 0, unsigned long int indice = 0)
+    Ponto( double x = 0,  double y = 0, unsigned long int indice = 0)
         : point(x, y),
           indice(indice) {}
 
 
-    operator CGAL::Simple_cartesian<long double>::Point_2() const {
+    operator CGAL::Simple_cartesian<double>::Point_2() const {
         return point;
     }
 

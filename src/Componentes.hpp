@@ -15,15 +15,28 @@ public:
     int id;
     int idade;
     int idade_rastreio;
+    int eh_sol;
     double raio;
     std::vector<Ponto> points;
     std::vector<int> points_id;
     Point pos;
 
     Component() 
-        : id(0), idade(0), raio(0.0), idade_rastreio(0) {} 
+        : id(0), idade(0), raio(0.0), idade_rastreio(0), eh_sol(0) {} 
 
-    Component(int id, int idade, int idade_rastreio, double raio, const std::vector<Ponto>& points, const Point& pos);
+    //Component(int id, int idade, int idade_rastreio, double raio, const std::vector<Ponto>& points, const Point& pos);
+
+    Component(int id, double raio, const std::vector<Ponto>& points,const Point& pos)
+    {   
+        this->id = id;
+        this->idade = 0;
+        this->idade_rastreio = 0;
+        this->raio = raio;
+        this->points = points;
+        this->pos = pos;
+        this->eh_sol = 0;
+    }
+
 };
 
 class ComponentManager {

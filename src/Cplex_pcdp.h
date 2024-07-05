@@ -11,8 +11,8 @@
 typedef IloArray<IloNumVarArray> NumVar2D; 
 extern std::vector<Ponto> pontos;
 const double eps = 1e-14;
-extern long double max_x;
-extern long double maior_em_modulo;
+extern  double max_x;
+extern  double maior_em_modulo;
 
 
 double solve(int n_point) 

@@ -23,7 +23,7 @@ extern std::uniform_real_distribution<>distr;
 
 class FASTCOVER {
     std::vector<Ponto> &P;
-    std::list<Ponto> &diskCenters;
+   
 
     typedef std::pair<int,int> intPair;
     typedef std::unordered_set<intPair,boost::hash<intPair>> SetOfCells;
@@ -35,7 +35,7 @@ class FASTCOVER {
     
 
     public:
-    FASTCOVER(std::vector<Ponto> &P, std::list<Ponto> &diskCenters) : P(P), diskCenters(diskCenters) { }
+    FASTCOVER(std::vector<Ponto> &P) : P(P) { }
 
     void execute() {
         assert(!P.empty());
@@ -56,13 +56,13 @@ class FASTCOVER {
         for(auto& pair : cellToVectorMap){
 
             intPair cell = pair.first;
-            vector<Ponto>& vector = pair.second;
-            Component aux(id_aux_d,0,0,1.0,vector,Ponto((pair.first.first*sqrt2+additiveFactor)-num1,(pair.first.second*sqrt2+additiveFactor)-num2));
+            std::vector<Ponto>& abcd = pair.second;
+            Component aux(id_aux_d,1.0,abcd,Ponto((pair.first.first*sqrt2+additiveFactor)-num1,(pair.first.second*sqrt2+additiveFactor)-num2));
             id_aux_d++;
             manager.addComponent(aux);
             
         } 
-        std::cout<<manager.components.size()<<std::endl;
+        //std::cout<<manager.components.size()<<std::endl;
         return;        
     }
 };
