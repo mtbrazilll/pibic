@@ -194,12 +194,14 @@ void CMSA(float time_limit, int max_age, int max_loops) {
         std::cout << "SOLVE total time: " << solve_total << "ms\n";
         std::cout << "ADAPT total time: " << adapt_total << "ms\n";
         
+        
         //std::cout << "Total CMSA time: " << total_duration.count() << "ms\n";
     }
 
     std::cout << "Total CMSA time: " << total_duration << "ms\n";
     std::cout << "opt: " << bsf << std::endl;
     std::cout << "-----------------------------------\n";
+    std::cout<<  "Loops: " << loops << std::endl;
 }
 
 
