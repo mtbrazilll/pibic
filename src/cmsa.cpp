@@ -121,16 +121,7 @@ void CMSA(float time_limit, int max_age, int max_loops) {
     FASTCOVER ob(pontos);
     ob.execute();
     bsf = Exato_h();
-        for (const auto& pair : manager.components) {
-        const Component& component = pair.second;	 
-        if (component.idade >= max_age) {
-            idsToRemove.push_back(component.id);
-        }  
-    }
-    for (int id : idsToRemove) {
-        manager.removeComponent(id);
-    }
-    idsToRemove.clear();
+
 
 
     //testando();
@@ -146,8 +137,8 @@ void CMSA(float time_limit, int max_age, int max_loops) {
        // std::cout << "---------iniciando-loop--------\n";
         auto construct_start = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < 3; i++) {
-            mateus(pontos,max_x+1,max_y+1,min_x-1,min_y-1);
-            //ob.execute();
+            //mateus(pontos,max_x+1,max_y+1,min_x-1,min_y-1);
+            ob.execute();
         }
 
         auto construct_end = std::chrono::high_resolution_clock::now();
@@ -220,7 +211,7 @@ void testando(){
 			
 	}
 
-    //std::cout<<"pontos_vector:" << pontos.size() << std::endl;
+    std::cout<<"pontos_vector:" << pontos.size() << std::endl;
     
     Teste teste(pontos,sol);
 	if (teste.execute()) std::cout << "success" << endl;

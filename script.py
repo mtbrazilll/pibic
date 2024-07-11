@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-nome = "welz_initFastcover"
+nome = "Fastcover"
 
 # Cria a pasta se ela não existir
 if not os.path.exists(nome):
@@ -81,7 +81,7 @@ for i, instancia in enumerate(instancias):
     df1 = pd.DataFrame(dados[instancia])
     df1.to_csv(f'{nome}/resultado_{instancia.split("/")[-1]}_{nome}.csv', index=False)
 
-    dados_csv.append(df1)
+    dados_csv.append((f"{instancia}",df1))
 
     df = pd.DataFrame({
         "Instancia": [nome[14:] for nome in instancias[:i+1]],
@@ -110,8 +110,10 @@ df = pd.DataFrame({
     "Melhor_tempo": [np.min(dados_tempos[inst]) for inst in instancias[:i+1]],
     "Pior_tempo": [np.max(dados_tempos[inst]) for inst in instancias[:i+1]],
 })
-dados_csv.append(df)
+dados_csv.append((f"{nome}",df))
 
-with pd.ExcelWriter(f'{nome}/{nome}.xlsx') as writer:
-    for instancia in dados_csv:
-        instancia.to_excel(writer, index=False)
+# Crie um objeto ExcelWriter
+with pd.ExcelWriter("output.xlsx", engine='openpyxl') as writer:
+    for nome_arquivo, df in dados_csv:
+        nome_sheet = nome_arquivo.split("/")[-1].replace(".csv", "")
+        df.to_excel(writer, sheet_name=nome_sheet, index=False)

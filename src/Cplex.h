@@ -242,13 +242,13 @@ double Exato_start() {
         Component& component = pair.second;
         if(sol[indice_var] > 0.5){
             component.idade = 0;
-            component.eh_sol = true;
+            component.eh_sol = 1;
 
         }
         else{
 
             component.idade = component.idade + 1;
-            component.eh_sol = true;
+            component.eh_sol = 0;
 
         }
         component.idade_rastreio++;

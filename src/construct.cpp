@@ -2,7 +2,6 @@
 #include "construct.hpp"
 
 
-using namespace std;
 
 
 
@@ -38,101 +37,86 @@ int mateus(vector<Ponto> const &points, double x_max, double y_max, double x_min
 	while (!fila.empty()){
 
 		
-		auto pai = fila.front();
+		auto* pai = &fila.front();
         fila.pop();
 		 
 
 		
 		
-		if (pai.x_min < pai.x_max && pai.y_max > pai.y_min) {
+		if (pai->x_min < pai->x_max && pai->y_max > pai->y_min) {
 
 
-			if(pai.points.size()==1){
+			if(pai->points.size()==1){
 				
-				//FASTCOVER ob(pai.points);
-				//ob.execute();
+				FASTCOVER ob(pai->points);
+				ob.execute();
 			
-				//continue;
-				Component aux(id_aux_d,1.0,pai.points,pai.points[0].point);
 
-				manager.addComponent(aux);
-				id_aux_d++;
 				
-				continue;
 
 			}
 			
-			if(fabs(pai.x_max - pai.x_min) <= 5.0 && fabs(pai.y_max - pai.y_min) <= 5.0){
+			else if(fabs(pai->x_max - pai->x_min) <= 5.0 && fabs(pai->y_max - pai->y_min) <= 5.0){
 
-					//FASTCOVER ob(pai.points);
-					//ob.execute();
+					FASTCOVER ob(pai->points);
+					ob.execute();
 				
-					//continue;
-
-				Circle smallest = makeSmallestEnclosingCircle(pai.points);
 					
-				if (1.0 >= smallest.r * (EPSILON)) { 
-					
-
-					Component aux(id_aux_d,1.0,pai.points,smallest.pos);
-
-					manager.addComponent(aux);
-					id_aux_d++;
-					continue;
-				}
 					
 				
 			}
 
-			double rand1 = getRandomValue(pai.x_min-1, pai.x_max+1);
-			double rand2 = getRandomValue(pai.y_min-1, pai.y_max+1);
-				
+			else {
 
-			double XminQ1 = rand1, 	   YminQ1 = rand2,     XmaxQ1 = pai.x_max, YmaxQ1 = pai.y_max;
-			double XminQ2 = pai.x_min, YminQ2 = rand2,     XmaxQ2 = rand1,     YmaxQ2 = pai.y_max;
-			double XminQ3 = pai.x_min, YminQ3 = pai.y_min, XmaxQ3 = rand1,     YmaxQ3 = rand2;
-			double XminQ4 = rand1, 	   YminQ4 = pai.y_min, XmaxQ4 = pai.x_max, YmaxQ4 = rand2;
-				
-			vector<Ponto> quad1, quad2, quad3, quad4;
+				double rand1 = getRandomValue(pai->x_min-1, pai->x_max+1);
+				double rand2 = getRandomValue(pai->y_min-1, pai->y_max+1);
+					
 
-			double Xminq1 = std::numeric_limits<K::FT>::max(), 	   Yminq1 = std::numeric_limits<K::FT>::max(),     Xmaxq1 = std::numeric_limits<K::FT>::lowest(), 	   Ymaxq1 = std::numeric_limits<K::FT>::lowest();
-			double Xminq2 = std::numeric_limits<K::FT>::max(), 	   Yminq2 = std::numeric_limits<K::FT>::max(),     Xmaxq2 = std::numeric_limits<K::FT>::lowest(),     Ymaxq2 = std::numeric_limits<K::FT>::lowest();
-			double Xminq3 = std::numeric_limits<K::FT>::max(),     Yminq3 = std::numeric_limits<K::FT>::max(), 	   Xmaxq3 = std::numeric_limits<K::FT>::lowest(),     Ymaxq3 = std::numeric_limits<K::FT>::lowest();
-			double Xminq4 = std::numeric_limits<K::FT>::max(), 	   Yminq4 = std::numeric_limits<K::FT>::max(),     Xmaxq4 = std::numeric_limits<K::FT>::lowest(), 	   Ymaxq4 = std::numeric_limits<K::FT>::lowest();
+				double XminQ1 = rand1, 	   YminQ1 = rand2,     XmaxQ1 = pai->x_max, YmaxQ1 = pai->y_max;
+				double XminQ2 = pai->x_min, YminQ2 = rand2,     XmaxQ2 = rand1,     YmaxQ2 = pai->y_max;
+				double XminQ3 = pai->x_min, YminQ3 = pai->y_min, XmaxQ3 = rand1,     YmaxQ3 = rand2;
+				double XminQ4 = rand1, 	   YminQ4 = pai->y_min, XmaxQ4 = pai->x_max, YmaxQ4 = rand2;
+					
+				vector<Ponto> quad1, quad2, quad3, quad4;
 
-			for (int i = 0; i < pai.points.size(); i++) {
+				double Xminq1 = std::numeric_limits<K::FT>::max(), 	   Yminq1 = std::numeric_limits<K::FT>::max(),     Xmaxq1 = std::numeric_limits<K::FT>::lowest(), 	   Ymaxq1 = std::numeric_limits<K::FT>::lowest();
+				double Xminq2 = std::numeric_limits<K::FT>::max(), 	   Yminq2 = std::numeric_limits<K::FT>::max(),     Xmaxq2 = std::numeric_limits<K::FT>::lowest(),     Ymaxq2 = std::numeric_limits<K::FT>::lowest();
+				double Xminq3 = std::numeric_limits<K::FT>::max(),     Yminq3 = std::numeric_limits<K::FT>::max(), 	   Xmaxq3 = std::numeric_limits<K::FT>::lowest(),     Ymaxq3 = std::numeric_limits<K::FT>::lowest();
+				double Xminq4 = std::numeric_limits<K::FT>::max(), 	   Yminq4 = std::numeric_limits<K::FT>::max(),     Xmaxq4 = std::numeric_limits<K::FT>::lowest(), 	   Ymaxq4 = std::numeric_limits<K::FT>::lowest();
 
-				if ((pai.points[i].point.x() >= XminQ1 && pai.points[i].point.x() <= XmaxQ1) && (pai.points[i].point.y() >= YminQ1 && pai.points[i].point.y() <= YmaxQ1)) {
+				for (int i = 0; i < pai->points.size(); i++) {
 
-					quad1.push_back(pai.points[i]);
+					if ((pai->points[i].point.x() >= XminQ1 && pai->points[i].point.x() <= XmaxQ1) && (pai->points[i].point.y() >= YminQ1 && pai->points[i].point.y() <= YmaxQ1)) {
+
+						quad1.push_back(pai->points[i]);
 
 
+
+					}
+					else if ((pai->points[i].point.x() >= XminQ2 && pai->points[i].point.x() <= XmaxQ2) && (pai->points[i].point.y() >= YminQ2 && pai->points[i].point.y() <= YmaxQ2)) {
+
+						quad2.push_back(pai->points[i]);
+
+					}
+					else if ((pai->points[i].point.x() >= XminQ3 && pai->points[i].point.x() <= XmaxQ3) && (pai->points[i].point.y() >= YminQ3 && pai->points[i].point.y() <= YmaxQ3)) {
+
+						quad3.push_back(pai->points[i]);
+
+					}
+					else if ((pai->points[i].point.x() >= XminQ4 && pai->points[i].point.x() <= XmaxQ4) && (pai->points[i].point.y() >= YminQ4 && pai->points[i].point.y() <= YmaxQ4)) {
+
+						quad4.push_back(pai->points[i]);
+
+					}
 
 				}
-				else if ((pai.points[i].point.x() >= XminQ2 && pai.points[i].point.x() <= XmaxQ2) && (pai.points[i].point.y() >= YminQ2 && pai.points[i].point.y() <= YmaxQ2)) {
 
-					quad2.push_back(pai.points[i]);
-
-				}
-				else if ((pai.points[i].point.x() >= XminQ3 && pai.points[i].point.x() <= XmaxQ3) && (pai.points[i].point.y() >= YminQ3 && pai.points[i].point.y() <= YmaxQ3)) {
-
-					quad3.push_back(pai.points[i]);
-
-				}
-				else if ((pai.points[i].point.x() >= XminQ4 && pai.points[i].point.x() <= XmaxQ4) && (pai.points[i].point.y() >= YminQ4 && pai.points[i].point.y() <= YmaxQ4)) {
-
-					quad4.push_back(pai.points[i]);
-
-				}
-
-			}
-
-			if (!quad1.empty()) fila.push(Element(quad1, XmaxQ1, YmaxQ1, XminQ1, YminQ1));
-			if (!quad2.empty()) fila.push(Element(quad2, XmaxQ2, YmaxQ2, XminQ2, YminQ2));
-			if (!quad3.empty()) fila.push(Element(quad3, XmaxQ3, YmaxQ3, XminQ3, YminQ3));
-			if (!quad4.empty()) fila.push(Element(quad4, XmaxQ4, YmaxQ4, XminQ4, YminQ4));
+				if (!quad1.empty()) fila.push(Element(quad1, XmaxQ1, YmaxQ1, XminQ1, YminQ1));
+				if (!quad2.empty()) fila.push(Element(quad2, XmaxQ2, YmaxQ2, XminQ2, YminQ2));
+				if (!quad3.empty()) fila.push(Element(quad3, XmaxQ3, YmaxQ3, XminQ3, YminQ3));
+				if (!quad4.empty()) fila.push(Element(quad4, XmaxQ4, YmaxQ4, XminQ4, YminQ4));
 	
-
+			}
 		}		
 		
 
