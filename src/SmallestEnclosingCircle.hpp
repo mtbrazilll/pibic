@@ -30,8 +30,7 @@ struct Ponto {
 
     // Constructor
     Ponto( double x = 0,  double y = 0, unsigned long int indice = 0)
-        : point(x, y),
-          indice(indice) {}
+        : point(x, y), indice(indice) {}
 
 
     operator CGAL::Simple_cartesian<double>::Point_2() const {

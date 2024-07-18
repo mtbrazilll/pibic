@@ -20,15 +20,10 @@ static const double EPSILON = 1+1e-12;
 
 typedef CGAL::Simple_cartesian<double> K;
 typedef K::Point_2 Point;
-typedef CGAL::Search_traits_2<K> TreeTraits;
-typedef CGAL::Kd_tree<TreeTraits> Tree;
 
 
-extern Tree tree;
 
 
-extern int loops;
-extern int id_aux_d;
 extern ComponentManager manager;
 extern unsigned seed;
 extern std::random_device rd;

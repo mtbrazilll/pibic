@@ -22,7 +22,7 @@ extern std::mt19937 gen;
 extern std::uniform_real_distribution<>distr;
 
 class FASTCOVER {
-    std::vector<Ponto> &P;
+    const std::vector<Ponto> &P;
    
 
     typedef std::pair<int,int> intPair;
@@ -35,7 +35,7 @@ class FASTCOVER {
     
 
     public:
-    FASTCOVER(std::vector<Ponto> &P) : P(P) { }
+    FASTCOVER(const std::vector<Ponto>& P) : P(P) { }
 
     void execute() {
         assert(!P.empty());
@@ -48,17 +48,24 @@ class FASTCOVER {
         //std::cout<< num1 << " " << num2<< endl;
         std::unordered_map<intPair, VectorType, boost::hash<intPair>> cellToVectorMap;
 
-        for(const Ponto &p : P)
+        for(const Ponto &p : P){
             //S.insert(std::make_pair(floor(p.point.x()/sqrt2),floor(p.point.y()/sqrt2)));
-            cellToVectorMap[std::make_pair(floor((p.point.x()+num1)/sqrt2),floor((p.point.y()+num2)/sqrt2))].push_back(p);
-            
+            int x = floor((p.point.x()+num1)/sqrt2);
+            int y = floor((p.point.y()+num2)/sqrt2);
 
+            cellToVectorMap[std::make_pair(x,y)].push_back(p);
+            
+        
+        }
         for(auto& pair : cellToVectorMap){
 
             intPair cell = pair.first;
-            std::vector<Ponto>& abcd = pair.second;
-            Component aux(id_aux_d,1.0,abcd,Ponto((pair.first.first*sqrt2+additiveFactor)-num1,(pair.first.second*sqrt2+additiveFactor)-num2));
-            id_aux_d++;
+            std::vector<Ponto>& pontos_cobertos = pair.second;
+            
+            Ponto centro((pair.first.first*sqrt2+additiveFactor)-num1,(pair.first.second*sqrt2+additiveFactor)-num2);
+            double raio = 1.0;
+
+            Component aux(raio,pontos_cobertos,centro);
             manager.addComponent(aux);
             
         } 

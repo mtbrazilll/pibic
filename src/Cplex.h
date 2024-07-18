@@ -22,7 +22,7 @@ using std::function;
 
 extern ComponentManager manager;
 extern double bsf;
-extern int n_pon;
+extern unsigned long int n_pon;
 
 ILOSTLBEGIN
 
@@ -56,10 +56,52 @@ ILOSIMPLEXCALLBACK0(MyCallback) {
 }
 
 
+struct ComponentComparator {
+    bool operator()(const Component& lhs, const Component& rhs) const {
+        return lhs.points.size() > rhs.points.size(); // Ordena pelo número de pontos cobertos em ordem decrescente
+    }
+};
 
+std::vector<bool> visitado;
 
+double guloso() {
+    // Ordena os componentes pelo número de pontos que cobrem em ordem decrescente
+    std::sort(manager.components.begin(), manager.components.end(), ComponentComparator());
 
+     
 
+    // Inicializa o vetor visitado
+    visitado.assign(n_pon, false);
+    double sol = 0.0;
+    // Percorre os componentes ordenados
+    for (auto& component : manager.components) {
+        bool fazParteSolucao = false;
+
+        // Verifica se o componente cobre pontos não visitados
+        for (const auto& ponto : component.points) {
+            //std::cout << ponto.indice << "cima \n";
+            if (!visitado[ponto.indice]) {
+                fazParteSolucao = true;
+                break;
+            }
+        }
+
+        if (fazParteSolucao) {
+            // Se o componente faz parte da solução, define sua idade como zero e marca os pontos como visitados
+            ++sol;
+            component.idade = 0;
+            for (const auto& ponto : component.points) {
+                //std::cout << ponto.indice << "baixo\n";
+                visitado[ponto.indice] = true;
+            }
+        } else {
+            // Se o componente não faz parte da solução, incrementa sua idade
+            component.idade++;
+        }
+    }
+    //std::cout<<sol<<std::endl;
+    return sol;
+}
 
 double Exato_h() {
     double valor_otimo = std::numeric_limits<double>::max();
@@ -78,9 +120,9 @@ double Exato_h() {
     IloExprArray componente_point(env, n_pon);
 
     int indice_var = 0;
-    for (const auto& pair : manager.components) {
+    for (const auto& component : manager.components) {
        
-        const Component& component = pair.second;
+        
 
         obj += x[indice_var];
 
@@ -105,30 +147,11 @@ double Exato_h() {
 
 
 
-// Crie uma solução viável inicial
-    IloNumVarArray startVar(env);
-    IloNumArray startVal(env);
-    indice_var = 0;
-    for (auto& pair : manager.components) {
-        
-        Component& component = pair.second;
-    // Adicione cada variável à lista de variáveis de início
-        startVar.add(x[indice_var]);
-        // Adicione o valor inicial correspondente à lista de valores de início
-        startVal.add(component.eh_sol);  // seus valores iniciais são 0 ou        
-        indice_var++;
-    }
-
-    
 
 
     //cplex.setParam(IloCplex::Param::TimeLimit, 1.0); // limite de tempo pra resolver
 
     cplex.setOut(env.getNullStream());
-    cplex.use(Callback(env, IloFalse, bsf));
-    //cplex.use(MyCallback(env));
-    //cplex.setParam(IloCplex::Param::RootAlgorithm, IloCplex::Primal);
-    cplex.addMIPStart(startVar, startVal);
 
     cplex.solve();
     
@@ -138,9 +161,9 @@ double Exato_h() {
     
 
     indice_var = 0;
-    for (auto& pair : manager.components) {
+    for (auto& component : manager.components) {
         
-        Component& component = pair.second;
+      
         if(sol[indice_var] > 0.5){
             component.idade = 0;
             component.eh_sol = true;
@@ -177,9 +200,9 @@ double Exato_start() {
     IloExprArray componente_point(env, n_pon);
 
     int indice_var = 0;
-    for (const auto& pair : manager.components) {
+    for (const auto& component : manager.components) {
        
-        const Component& component = pair.second;
+        
 
         obj += x[indice_var];
 
@@ -208,9 +231,10 @@ double Exato_start() {
     IloNumVarArray startVar(env);
     IloNumArray startVal(env);
     indice_var = 0;
-    for (auto& pair : manager.components) {
+    for (auto& component : manager.components) {
+
+      
         
-        Component& component = pair.second;
     // Adicione cada variável à lista de variáveis de início
         startVar.add(x[indice_var]);
         // Adicione o valor inicial correspondente à lista de valores de início
@@ -237,9 +261,9 @@ double Exato_start() {
     
 
     indice_var = 0;
-    for (auto& pair : manager.components) {
+    for (Component& component : manager.components) {
         
-        Component& component = pair.second;
+       
         if(sol[indice_var] > 0.5){
             component.idade = 0;
             component.eh_sol = 1;

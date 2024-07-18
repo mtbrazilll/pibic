@@ -32,9 +32,9 @@ using std::size_t;
 using std::vector;
 
 int loops_with_no_improval = 0; // controle de loops sem melhora para fugir de otimos locais
- double max_x = std::numeric_limits< double>::lowest(), max_y = std::numeric_limits<double>::lowest();
- double min_x = std::numeric_limits< double>::max(), min_y = std::numeric_limits<double>::max();
- double maior_em_modulo = std::numeric_limits< double>::lowest();
+double max_x = std::numeric_limits< double>::lowest(), max_y = std::numeric_limits<double>::lowest();
+double min_x = std::numeric_limits< double>::max(), min_y = std::numeric_limits<double>::max();
+double maior_em_modulo = std::numeric_limits< double>::lowest();
 double bsf = std::numeric_limits<double>::max();
 
 //gerador de numeros aleatorios
@@ -47,12 +47,12 @@ std::uniform_real_distribution<> distr2(0, 1);
 int loops = 0;
 int id_aux_d = 0;
 unsigned seed = 1;
-int n_pon = 0;
+unsigned long int n_pon = 0;
 
 
 std::unordered_map<Point, std::vector<int>> cellToDisks;
 Tree tree;
-vector<Ponto> pontos;
+std::vector<Ponto> pontos;
 std::vector<int> idsToRemove;
 ComponentManager manager;
 std::vector<Component> sol_reduzida;
@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
     float time_limit = 0;   
 
     //std::cout <<"seed: "<< seed << std::endl;
-    std::string filePath = "../instancias/i1.txt";  // Default file path
+    std::string filePath = "../instancias/i4_pon.txt";  // Default file path
  
 
     // lendo argumentos da linha de comando
@@ -118,9 +118,9 @@ void CMSA(float time_limit, int max_age, int max_loops) {
 
      //================= CMSA inicializa ==========================
 
-    FASTCOVER ob(pontos);
-    ob.execute();
-    bsf = Exato_h();
+    //FASTCOVER ob(pontos);
+    
+
 
 
 
@@ -128,7 +128,7 @@ void CMSA(float time_limit, int max_age, int max_loops) {
 
    
 
-
+    
     //================= CMSA Loop ==========================
     //while (loops < max_loops) {
      while (total_duration < max_loops) {              
@@ -136,9 +136,9 @@ void CMSA(float time_limit, int max_age, int max_loops) {
        // std::cout << "-----------------------------------\n";
        // std::cout << "---------iniciando-loop--------\n";
         auto construct_start = std::chrono::high_resolution_clock::now();
-        for (int i = 0; i < 3; i++) {
-            //mateus(pontos,max_x+1,max_y+1,min_x-1,min_y-1);
-            ob.execute();
+        for (int i = 0; i < 6; i++) {
+            mateus(pontos,max_x+1,max_y+1,min_x-1,min_y-1);
+            //ob.execute();
         }
 
         auto construct_end = std::chrono::high_resolution_clock::now();
@@ -149,22 +149,13 @@ void CMSA(float time_limit, int max_age, int max_loops) {
 
         //SOLVE
         auto solve_start = std::chrono::high_resolution_clock::now();
-        bsf = Exato_start();
+        bsf = guloso();
         auto solve_end = std::chrono::high_resolution_clock::now();
         solve_total += std::chrono::duration_cast<std::chrono::milliseconds>(solve_end - solve_start).count();    
-
+        //std::cout << "SOLVE total time: " << solve_total << "ms\n";
         // ADAPT
         auto adapt_start = std::chrono::high_resolution_clock::now();
-        for (const auto& pair : manager.components) {
-            const Component& component = pair.second;	 
-            if (component.idade >= max_age) {
-                idsToRemove.push_back(component.id);
-            }  
-        }
-        for (int id : idsToRemove) {
-            manager.removeComponent(id);
-        }
-        idsToRemove.clear();
+        manager.removeOldComponents(max_age);
         auto adapt_end = std::chrono::high_resolution_clock::now();
         adapt_total += std::chrono::duration_cast<std::chrono::milliseconds>(adapt_end - adapt_start).count();
         //testando();
@@ -173,6 +164,7 @@ void CMSA(float time_limit, int max_age, int max_loops) {
         //std::cout << "---------Finalizando-loop--------\n";
         auto total_end = std::chrono::high_resolution_clock::now();
         total_duration = std::chrono::duration_cast<std::chrono::milliseconds>(total_end - total_start).count();
+
 
     }
 
@@ -200,9 +192,8 @@ void testando(){
 
     std::vector<Component> sol;
 
-    for (const auto& pair : manager.components) {
+    for (const auto& c : manager.components) {
 
-        const Component& c = pair.second;
 
         if (c.idade == 0) {
 				 

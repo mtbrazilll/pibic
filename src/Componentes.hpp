@@ -1,18 +1,15 @@
 #pragma once
 #include <vector>
 #include <iostream>
-#include <unordered_map>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <boost/multiprecision/gmp.hpp>
-
-
-
+#include <set>
 
 #include "SmallestEnclosingCircle.hpp"
 
 class Component {
 public:
-    int id;
+    std::string id;
     int idade;
     int idade_rastreio;
     int eh_sol;
@@ -22,44 +19,53 @@ public:
     Point pos;
 
     Component() 
-        : id(0), idade(0), raio(0.0), idade_rastreio(0), eh_sol(0) {} 
+        :idade(0), raio(0.0), idade_rastreio(0), eh_sol(0) {}
 
-    //Component(int id, int idade, int idade_rastreio, double raio, const std::vector<Ponto>& points, const Point& pos);
-
-    Component(int id, double raio, const std::vector<Ponto>& points,const Point& pos)
-    {   
-        this->id = id;
-        this->idade = 0;
-        this->idade_rastreio = 0;
-        this->raio = raio;
-        this->points = points;
-        this->pos = pos;
-        this->eh_sol = 0;
-    }
-
+    Component( double raio, std::vector<Ponto>& points, const Point& pos)
+        :  idade(0), idade_rastreio(0), raio(raio), points(points), pos(pos), eh_sol(0) {}
 };
 
 class ComponentManager {
 public:
-    std::map<int, Component> components;
-    void addComponent(const Component& component);
-    bool removeComponent(int id);
-    Component* getComponent(int id);
-    size_t getComponentCount() const;
+    std::vector<Component> components;
 
-    void displayComponents() const {
-        for (const auto& pair : components) {
-            const Component& component = pair.second;
+    void addComponent(const Component& component) {
+      
+        components.push_back(component);
+    }
 
-            std::cout << "Component ID: " << component.id << std::endl;
-            std::cout << "Idade: " << component.idade << std::endl;
-            std::cout << "Idade: " << component.idade_rastreio << std::endl;
-            std::cout << "Pos: (" << component.pos.x() << ", " << component.pos.y() << ")" << std::endl;
-            std::cout << "Points:" << std::endl;
-            for (const auto& point : component.points) {
-                std::cout << "    (" << point.point.x() << ", " << point.point.y() << ")" << std::endl;
-            }
-            std::cout << "--------------------------------" << std::endl;
+
+    bool removeComponent(int position) {
+        if (position >= 0 && position < components.size()) {
+            components.erase(components.begin() + position);
+            return true;
         }
+        return false;
+    }
+
+    Component* getComponent(const std::string& id) {
+        for (auto& comp : components) {
+            if (comp.id == id) {
+                return &comp;
+            }
+        }
+        return nullptr;
+    }
+
+    size_t getComponentCount() const {
+        return components.size();
+    }
+
+    void removeOldComponents(int max_age) {
+        auto it = components.begin();
+        std::vector<Component> aux;
+        for (auto &temp: components) {
+            if (temp.idade <= max_age) {
+                aux.push_back(temp);
+                
+            }
+        }
+        components.clear();
+        components = aux;
     }
 };

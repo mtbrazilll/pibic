@@ -8,8 +8,12 @@ void read_points(const std::string& filepath, std::vector<Ponto>  &pontos, K::FT
     std::ifstream filePontos(filepath);
 
     if (!filePontos.is_open()) {
-        
-        return;
+        std::cout << "Erro ao abrir o arquivo" << std::endl;
+        exit(1);
+    }
+    if(filePontos.fail()){
+        std::cout << "Arquivo nao existe" << std::endl;
+        exit(1);
     }
 
     std::string line;
@@ -18,16 +22,21 @@ void read_points(const std::string& filepath, std::vector<Ponto>  &pontos, K::FT
     max_y = std::numeric_limits<K::FT>::lowest();
     min_x = std::numeric_limits<K::FT>::max();
     min_y = std::numeric_limits<K::FT>::max();
-    int id = 0;
+    unsigned long int id = 0;
     while (getline(filePontos, line)) {
         std::istringstream iss(line);
+
+
         if (!(iss >> x >> y)) {
-            continue;
+            std::cout << "formato de dados errado" << std::endl;
+            exit(1);
         }
 
         Ponto aux_pont(x,y,id);
+        id++;
+        
         pontos.push_back(aux_pont);
-        tree.insert(aux_pont);
+        //tree.insert(aux_pont);
  
         max_x = std::max(max_x, aux_pont.point.x());
         max_y = std::max(max_y, aux_pont.point.y());
@@ -36,7 +45,7 @@ void read_points(const std::string& filepath, std::vector<Ponto>  &pontos, K::FT
 
         maior_em_modulo = std::max(maior_em_modulo, fabs(aux_pont.point.x()));
         maior_em_modulo = std::max(maior_em_modulo, fabs(aux_pont.point.y()));
-        id++;
+        
     }
     
 }
