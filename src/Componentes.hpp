@@ -43,15 +43,6 @@ public:
         return false;
     }
 
-    Component* getComponent(const std::string& id) {
-        for (auto& comp : components) {
-            if (comp.id == id) {
-                return &comp;
-            }
-        }
-        return nullptr;
-    }
-
     size_t getComponentCount() const {
         return components.size();
     }

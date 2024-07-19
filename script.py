@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-nome = "Fastcover"
+nome = "Guloso_welz"
 
 # Cria a pasta se ela não existir
 if not os.path.exists(nome):

@@ -14,7 +14,6 @@
 
 #include <CGAL/Cartesian.h>
 extern ComponentManager manager;
-extern int id_aux_d;
 
 
 extern std::random_device rd;

@@ -27,6 +27,8 @@ int mateus(vector<Ponto> const &points, double x_max, double y_max, double x_min
 	Element pai(points, x_max, y_max, x_min, y_min);
 	fila.push(pai);
 
+	//std::cout << "Iniciando processamento com " << points.size() << " pontos." << std::endl;
+
 	while (!fila.empty()){
 
 		
@@ -34,36 +36,54 @@ int mateus(vector<Ponto> const &points, double x_max, double y_max, double x_min
         fila.pop();
 		 
 
+		//std::cout << "Processando elemento com " << pai.points.size() << " pontos." << std::endl;
+		//std::cout << pai.x_min << " " << pai.x_max <<  " " << pai.x_max - pai.x_min <<std::endl;
+		//std::cout << pai.y_min << " " << pai.y_max << " " << pai.y_max - pai.y_min <<std::endl;
+
+
 		
 		
-		if (pai.x_min < pai.x_max && pai.y_max > pai.y_min) {
 
 
 			if(pai.points.size()==1){
 				
-				FASTCOVER ob(pai.points);
-				ob.execute();
+				//	std::cout << "Adicionando componente com um único ponto: " << pai.points[0].point << std::endl;
+
+					Component aux(1.0,pai.points,pai.points[0].point);
+					manager.addComponent(aux);	
+					continue;		
 
 			}
 			
-			else if(fabs(pai.x_max - pai.x_min) <= 5.0 && fabs(pai.y_max - pai.y_min) <= 5.0){
+			if(fabs(pai.x_max - pai.x_min) <= 5.0 && fabs(pai.y_max - pai.y_min) <= 5.0){
 
-					FASTCOVER ob(pai.points);
-					ob.execute();
+				Circle smallest = makeSmallestEnclosingCircle(pai.points);
+			//	std::cout << "pos: " << smallest.pos << std::endl;
+			//	std::cout << "raio: " << smallest.r << std::endl;
+				//if (smallest.r >= 1) std::cout<<"miss"<<std::endl;
+				if (1.0 >= smallest.r * (EPSILON)) { 
+					//std::cout << "oi /n";
+
+					Component aux(1.0,pai.points,smallest.pos);
+					manager.addComponent(aux);
+					//std::cout << "Adicionando componente com círculo menor ou igual ao raio." << std::endl;
+					continue;
+
+				}
 
 				
 			}
 
-			else {
+			 
 
 				double rand1 = getRandomValue(pai.x_min-1, pai.x_max+1);
 				double rand2 = getRandomValue(pai.y_min-1, pai.y_max+1);
 					
 
-				double XminQ1 = rand1, 	   YminQ1 = rand2,     XmaxQ1 = pai.x_max, YmaxQ1 = pai.y_max;
-				double XminQ2 = pai.x_min, YminQ2 = rand2,     XmaxQ2 = rand1,     YmaxQ2 = pai.y_max;
-				double XminQ3 = pai.x_min, YminQ3 = pai.y_min, XmaxQ3 = rand1,     YmaxQ3 = rand2;
-				double XminQ4 = rand1, 	   YminQ4 = pai.y_min, XmaxQ4 = pai.x_max, YmaxQ4 = rand2;
+				double XminQ1 = rand1, 	   YminQ1 = rand2,     XmaxQ1 = pai.x_max+1, YmaxQ1 = pai.y_max+1;
+				double XminQ2 = pai.x_min-1, YminQ2 = rand2,     XmaxQ2 = rand1,     YmaxQ2 = pai.y_max+1;
+				double XminQ3 = pai.x_min-1, YminQ3 = pai.y_min-1, XmaxQ3 = rand1,     YmaxQ3 = rand2;
+				double XminQ4 = rand1, 	   YminQ4 = pai.y_min-1, XmaxQ4 = pai.x_max+1, YmaxQ4 = rand2;
 					
 				std::vector<Ponto> quad1, quad2, quad3, quad4;
 
@@ -105,8 +125,24 @@ int mateus(vector<Ponto> const &points, double x_max, double y_max, double x_min
 				if (!quad3.empty()) fila.push(Element(quad3, XmaxQ3, YmaxQ3, XminQ3, YminQ3));
 				if (!quad4.empty()) fila.push(Element(quad4, XmaxQ4, YmaxQ4, XminQ4, YminQ4));
 	
-			}
-		}		
+			//	std::cout << "Quadrantes:" << std::endl;
+             //   std::cout << "Quad1: " << quad1.size() << " pontos ";
+			//	std::cout << "x: "<< XminQ1 << " " << XmaxQ1 <<  " " << XmaxQ1 - XminQ1 << " y: ";
+			//	std::cout << YmaxQ1 << " " << YminQ1 << " " << YmaxQ1 - YminQ1 <<std::endl;
+				
+             //   std::cout << "Quad2: " << quad2.size() << " pontos ";
+			//	std::cout << "x: "<< XminQ2 << " " << XmaxQ2 <<  " " << XmaxQ2 - XminQ2 << " y: ";
+		//		std::cout << YmaxQ2 << " " << YminQ2 << " " << YmaxQ2 - YminQ2 <<std::endl;
+
+          //      std::cout << "Quad3: " << quad3.size() << " pontos ";
+			//	std::cout << "x: "<< XminQ3 << " " << XmaxQ3 <<  " " << XmaxQ3 - XminQ3 << " y: ";
+		//		std::cout << YmaxQ3 << " " << YminQ3 << " " << YmaxQ3 - YminQ3 <<std::endl;
+
+          //      std::cout << "Quad4: " << quad4.size() << " pontos ";
+		//		std::cout << "x: "<< XminQ4 << " " << XmaxQ4 <<  " " << XmaxQ4 - XminQ4 << " y: ";
+	//			std::cout << YmaxQ4 << " " << YminQ4 << " " << YmaxQ4 - YminQ4 <<std::endl;
+			
+				
 		
 
 	}

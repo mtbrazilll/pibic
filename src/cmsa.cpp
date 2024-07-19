@@ -46,7 +46,7 @@ std::uniform_real_distribution<> distr2(0, 1);
 
 int loops = 0;
 int id_aux_d = 0;
-unsigned seed = 1;
+int seed = 1;
 unsigned long int n_pon = 0;
 
 
@@ -119,10 +119,6 @@ void CMSA(float time_limit, int max_age, int max_loops) {
      //================= CMSA inicializa ==========================
 
     //FASTCOVER ob(pontos);
-    
-
-
-
 
     //testando();
 
@@ -136,7 +132,7 @@ void CMSA(float time_limit, int max_age, int max_loops) {
        // std::cout << "-----------------------------------\n";
        // std::cout << "---------iniciando-loop--------\n";
         auto construct_start = std::chrono::high_resolution_clock::now();
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 3; i++) {
             mateus(pontos,max_x+1,max_y+1,min_x-1,min_y-1);
             //ob.execute();
         }
@@ -173,9 +169,9 @@ void CMSA(float time_limit, int max_age, int max_loops) {
 
     if (true) {
         std::cout << "-----------------------------------\n";
-        std::cout << "CONSTRUCT total time: " << construct_total << "ms\n";
-        std::cout << "SOLVE total time: " << solve_total << "ms\n";
-        std::cout << "ADAPT total time: " << adapt_total << "ms\n";
+        std::cout << "CONSTRUCT time: " << construct_total << "ms\n";
+        std::cout << "SOLVE time: " << solve_total << "ms\n";
+        std::cout << "ADAPT time: " << adapt_total << "ms\n";
         
         
         //std::cout << "Total CMSA time: " << total_duration.count() << "ms\n";
