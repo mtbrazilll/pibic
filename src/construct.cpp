@@ -55,7 +55,7 @@ int mateus(vector<Ponto> const &points, double x_max, double y_max, double x_min
 
 			}
 			
-			if(fabs(pai.x_max - pai.x_min) <= 5.0 && fabs(pai.y_max - pai.y_min) <= 5.0){
+			if(fabs(pai.x_max - pai.x_min) <= 10.0 && fabs(pai.y_max - pai.y_min) <= 10.0){
 
 				Circle smallest = makeSmallestEnclosingCircle(pai.points);
 			//	std::cout << "pos: " << smallest.pos << std::endl;

@@ -96,11 +96,26 @@ double guloso() {
             }
         } else {
             // Se o componente não faz parte da solução, incrementa sua idade
-            component.idade++;
+            ++component.idade;
         }
     }
+    if (bsf < sol){ // nunca acontece na primeira iteracao 
+        for (auto& component : manager.components){
+            if(component.eh_sol) component.idade = 0;
+            else ++component.idade;
+        }
+        return bsf;
+
+    }
+    else{
+        for (auto& component : manager.components){
+            if(component.idade == 0) component.eh_sol = true;
+            else component.eh_sol = false;
+        }
+        return sol;
+    }
     //std::cout<<sol<<std::endl;
-    return sol;
+    
 }
 
 double Exato_h() {

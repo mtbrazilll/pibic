@@ -118,7 +118,7 @@ void CMSA(float time_limit, int max_age, int max_loops) {
 
      //================= CMSA inicializa ==========================
 
-    //FASTCOVER ob(pontos);
+    FASTCOVER ob(pontos);
 
     //testando();
 
@@ -132,9 +132,9 @@ void CMSA(float time_limit, int max_age, int max_loops) {
        // std::cout << "-----------------------------------\n";
        // std::cout << "---------iniciando-loop--------\n";
         auto construct_start = std::chrono::high_resolution_clock::now();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             mateus(pontos,max_x+1,max_y+1,min_x-1,min_y-1);
-            //ob.execute();
+            ob.execute();
         }
 
         auto construct_end = std::chrono::high_resolution_clock::now();
