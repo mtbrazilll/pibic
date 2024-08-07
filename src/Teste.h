@@ -15,7 +15,7 @@
 
 
 typedef K::FT FT;
-
+extern double raio;
 
 class Teste {
    const double EPSILON = 1.0 + 1e-14;

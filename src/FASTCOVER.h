@@ -11,7 +11,7 @@
 #include <unordered_set>
 #include "SmallestEnclosingCircle.hpp"
 #include <random>
-
+#include "Componentes.hpp"
 #include <CGAL/Cartesian.h>
 extern ComponentManager manager;
 
@@ -61,7 +61,7 @@ class FASTCOVER {
             intPair cell = pair.first;
             std::vector<Ponto>& pontos_cobertos = pair.second;
             
-            Ponto centro((pair.first.first*sqrt2+additiveFactor)-num1,(pair.first.second*sqrt2+additiveFactor)-num2);
+            Point centro((pair.first.first*sqrt2+additiveFactor)-num1,(pair.first.second*sqrt2+additiveFactor)-num2);
             double raio = 1.0;
 
             Component aux(raio,pontos_cobertos,centro);
@@ -69,7 +69,7 @@ class FASTCOVER {
             
         } 
         //std::cout<<manager.components.size()<<std::endl;
-        return;        
+                
     }
 };
 

@@ -29,7 +29,8 @@ extern int seed;
 extern std::random_device rd;
 extern std::mt19937 gen;
 extern std::uniform_real_distribution<>distr2;
+extern double raio;
 
 
-int mateus(vector<Ponto>const &points, double x_max, double y_max, double x_min, double y_min);
+void mateus(vector<Ponto>const &points, double x_max, double y_max, double x_min, double y_min);
 

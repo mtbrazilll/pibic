@@ -47,6 +47,7 @@ std::uniform_real_distribution<> distr2(0, 1);
 int loops = 0;
 int id_aux_d = 0;
 int seed = 1;
+double raio =   1.0;
 unsigned long int n_pon = 0;
 
 
@@ -66,7 +67,7 @@ int main(int argc, char *argv[]) {
     float time_limit = 0;   
 
     //std::cout <<"seed: "<< seed << std::endl;
-    std::string filePath = "../instancias/i4_pon.txt";  // Default file path
+    std::string filePath = "../instancias/i1.txt";  // Default file path
  
 
     // lendo argumentos da linha de comando
@@ -95,7 +96,7 @@ int main(int argc, char *argv[]) {
     n_pon = pontos.size();
     
     CMSA(time_limit, max_age, max_loops);
-    testando();
+    //testando();
     //manager.displayComponents();
     
    
@@ -118,7 +119,6 @@ void CMSA(float time_limit, int max_age, int max_loops) {
 
      //================= CMSA inicializa ==========================
 
-    FASTCOVER ob(pontos);
 
     //testando();
 
@@ -132,9 +132,8 @@ void CMSA(float time_limit, int max_age, int max_loops) {
        // std::cout << "-----------------------------------\n";
        // std::cout << "---------iniciando-loop--------\n";
         auto construct_start = std::chrono::high_resolution_clock::now();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 3; i++) {
             mateus(pontos,max_x+1,max_y+1,min_x-1,min_y-1);
-            ob.execute();
         }
 
         auto construct_end = std::chrono::high_resolution_clock::now();
