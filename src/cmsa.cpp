@@ -47,6 +47,7 @@ std::uniform_real_distribution<> distr2(0, 1);
 int loops = 0;
 int id_aux_d = 0;
 int seed = 1;
+int ita_construtivo = 3;
 double raio =   1.0;
 unsigned long int n_pon = 0;
 
@@ -86,6 +87,14 @@ int main(int argc, char *argv[]) {
         }
         if(!strcmp(argv[i], "-f")) {  // Add a new flag for file path         
             filePath = argv[i+1];
+            i++;
+        }
+        if(!strcmp(argv[i], "-r")) { 
+            sscanf(argv[i+1], "%lf", &raio);       
+            i++;
+        }
+        if(!strcmp(argv[i], "-c")) { 
+            sscanf(argv[i+1], "%d", &ita_construtivo);       
             i++;
         }
     }
@@ -132,7 +141,7 @@ void CMSA(float time_limit, int max_age, int max_loops) {
        // std::cout << "-----------------------------------\n";
        // std::cout << "---------iniciando-loop--------\n";
         auto construct_start = std::chrono::high_resolution_clock::now();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < ita_construtivo; i++) {
             mateus(pontos,max_x+1,max_y+1,min_x-1,min_y-1);
         }
 
@@ -144,7 +153,7 @@ void CMSA(float time_limit, int max_age, int max_loops) {
 
         //SOLVE
         auto solve_start = std::chrono::high_resolution_clock::now();
-        bsf = guloso();
+        bsf = Exato_h();
         auto solve_end = std::chrono::high_resolution_clock::now();
         solve_total += std::chrono::duration_cast<std::chrono::milliseconds>(solve_end - solve_start).count();    
         //std::cout << "SOLVE total time: " << solve_total << "ms\n";
@@ -180,6 +189,7 @@ void CMSA(float time_limit, int max_age, int max_loops) {
     std::cout << "opt: " << bsf << std::endl;
     std::cout << "-----------------------------------\n";
     std::cout<<  "Loops: " << loops << std::endl;
+    std::cout<<  "Raio: " << raio << std::endl;
 }
 
 

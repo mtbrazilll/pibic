@@ -167,7 +167,7 @@ double Exato_h() {
     //cplex.setParam(IloCplex::Param::TimeLimit, 1.0); // limite de tempo pra resolver
 
     cplex.setOut(env.getNullStream());
-
+    cplex.use(Callback(env, IloFalse, bsf));
     cplex.solve();
     
     valor_otimo = cplex.getObjValue();
