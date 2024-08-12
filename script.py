@@ -49,7 +49,7 @@ dados_csv = []
 for i, instancia in enumerate(instancias):
     print(f"Iniciando a instancia {instancia}")
     for _ in range(5):
-        comando = f"nice -n -20 ./pcdp.run -l {limites_tempo[instancia]} -f {instancia} -s {_+1}"
+        comando = f"./pcdp.run -l {limites_tempo[instancia]} -f {instancia} -s {_+1} -c 10"
         #print(comando)
         print()
         try:
