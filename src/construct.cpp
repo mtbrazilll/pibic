@@ -34,7 +34,7 @@ void mateus(vector<Ponto> const &points, double x_max, double y_max, double x_mi
 		
 		auto pai = fila.front();
         fila.pop();
-		 
+		
 
 		//std::cout << "Processando Quadranteo com " << pai.points.size() << " pontos." << std::endl;
 		//std::cout << pai.x_min << " " << pai.x_max <<  " " << pai.x_max - pai.x_min <<std::endl;

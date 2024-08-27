@@ -21,6 +21,7 @@
 #include <CGAL/Random.h>
 #include <CGAL/random_convex_set_2.h>
 #include "FASTCOVER.h"
+#include "FASTCOVER-PP.h"
 
 typedef CGAL::Simple_cartesian<double> K;
 typedef K::Point_2 Point;
@@ -40,7 +41,7 @@ double bsf = std::numeric_limits<double>::max();
 //gerador de numeros aleatorios
 std::random_device rd;
 std::mt19937 gen(rd());
-std::uniform_real_distribution<>distr(-std::sqrt(2), std::sqrt(2));
+std::uniform_real_distribution<>distr(-raio*std::sqrt(2), raio*std::sqrt(2));
 std::uniform_real_distribution<> distr2(0, 1);
 
 
@@ -105,7 +106,7 @@ int main(int argc, char *argv[]) {
     n_pon = pontos.size();
     
     CMSA(time_limit, max_age, max_loops);
-    //testando();
+    testando();
     //manager.displayComponents();
     
    
@@ -130,8 +131,9 @@ void CMSA(float time_limit, int max_age, int max_loops) {
 
 
     //testando();
+    std::list<Point> C2;
 
-   
+    
 
     
     //================= CMSA Loop ==========================
@@ -142,8 +144,11 @@ void CMSA(float time_limit, int max_age, int max_loops) {
        // std::cout << "---------iniciando-loop--------\n";
         auto construct_start = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < ita_construtivo; i++) {
-            mateus(pontos,max_x+1,max_y+1,min_x-1,min_y-1);
-        }
+            //mateus(pontos,max_x+1,max_y+1,min_x-1,min_y-1);
+            FASTCOVER_PP ob1(pontos,C2);
+    
+            ob1.execute();
+         }
 
         auto construct_end = std::chrono::high_resolution_clock::now();
         construct_total += std::chrono::duration_cast<std::chrono::milliseconds>(construct_end - construct_start).count();
@@ -210,6 +215,7 @@ void testando(){
     std::cout<<"pontos_vector:" << pontos.size() << std::endl;
     
     Teste teste(pontos,sol);
+    
 	if (teste.execute()) std::cout << "success" << endl;
     teste.writeOutput();
 

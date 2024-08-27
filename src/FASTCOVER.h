@@ -2,8 +2,8 @@
 // Created by Ghosh, Anirban on 11/11/21.
 //
 
-#ifndef UDC_FASTCOVER_H
-#define UDC_FASTCOVER_H
+#ifndef  FASTCOVER_H
+#define  FASTCOVER_H
 
 #include <chrono>
 #include <list>
@@ -19,6 +19,7 @@ extern ComponentManager manager;
 extern std::random_device rd;
 extern std::mt19937 gen;
 extern std::uniform_real_distribution<>distr;
+extern double raio;
 
 class FASTCOVER {
     const std::vector<Ponto> &P;
@@ -30,7 +31,8 @@ class FASTCOVER {
 
     // Crie um mapa onde a chave é um intPair e o valor é um vetor.
     const double sqrt2 = std::sqrt(2);
-    const double additiveFactor = sqrt2/2;
+    const double lado = raio*sqrt2;
+    const double additiveFactor = lado/2;
     
 
     public:
@@ -49,8 +51,8 @@ class FASTCOVER {
 
         for(const Ponto &p : P){
             //S.insert(std::make_pair(floor(p.point.x()/sqrt2),floor(p.point.y()/sqrt2)));
-            int x = floor((p.point.x()+num1)/sqrt2);
-            int y = floor((p.point.y()+num2)/sqrt2);
+            int x = floor((p.point.x()+num1)/lado);
+            int y = floor((p.point.y()+num2)/lado);
 
             cellToVectorMap[std::make_pair(x,y)].push_back(p);
             
@@ -62,7 +64,7 @@ class FASTCOVER {
             std::vector<Ponto>& pontos_cobertos = pair.second;
             
             Point centro((pair.first.first*sqrt2+additiveFactor)-num1,(pair.first.second*sqrt2+additiveFactor)-num2);
-            double raio = 1.0;
+        
 
             Component aux(raio,pontos_cobertos,centro);
             manager.addComponent(aux);
@@ -73,4 +75,4 @@ class FASTCOVER {
     }
 };
 
-#endif //UDC_FASTCOVER_H
+#endif //FASTCOVER_H
