@@ -160,7 +160,7 @@ double Exato_h() {
 
     antena.add(IloMinimize(env, obj));
 
-
+    antena.add(obj<=bsf);
 
 
 
