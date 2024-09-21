@@ -144,10 +144,10 @@ void CMSA(float time_limit, int max_age, int max_loops) {
        // std::cout << "---------iniciando-loop--------\n";
         auto construct_start = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < ita_construtivo; i++) {
-            //mateus(pontos,max_x+1,max_y+1,min_x-1,min_y-1);
-            FASTCOVER_PP ob1(pontos,C2);
+            mateus(pontos,max_x+1,max_y+1,min_x-1,min_y-1);
+            //FASTCOVER_PP ob1(pontos,C2);
     
-            ob1.execute();
+            //ob1.execute();
          }
 
         auto construct_end = std::chrono::high_resolution_clock::now();

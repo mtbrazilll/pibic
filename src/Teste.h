@@ -18,7 +18,7 @@ typedef K::FT FT;
 extern double raio;
 
 class Teste {
-   const double EPSILON = 1.0 + 1e-14;
+   const double EPSILON = raio*raio*(1+1e-14);
    std::vector<Ponto> P;
   
    std::vector<Component> sol;
@@ -40,7 +40,8 @@ public:
                 FT distSquared = CGAL::squared_distance(ponto.point, component.pos);
                 FT raioSquared = component.raio * component.raio;
 
-                if (CGAL::abs(distSquared - raioSquared) >= EPSILON) {
+                if (std::abs(distSquared) > EPSILON) {
+                    //std::cout << std::abs(distSquared - raioSquared) << std::endl;
                     std::cout << "ERRO 1" << std::endl;
                 }
                
