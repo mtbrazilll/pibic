@@ -1,0 +1,210 @@
+//
+// Created by Ghosh, Anirban on 11/11/21.
+//
+
+#ifndef FASTCOVERPP_H
+#define FASTCOVERPP_H
+
+#include <chrono>
+#include <list>
+#include <vector>
+#include <unordered_set>
+#include "SmallestEnclosingCircle.hpp"
+#include <random>
+#include "Componentes.hpp"
+#include <CGAL/Cartesian.h>
+extern ComponentManager manager;
+
+
+extern std::random_device rd;
+extern std::mt19937 gen;
+extern std::uniform_real_distribution<> distr;
+extern double raio;
+
+
+class FASTCOVER_PP {
+
+
+    std::vector<Ponto> &P;
+    std::list<Point> &diskCenters;
+
+
+    double num1;
+    double num2;
+
+    const double sqrt2 = std::sqrt(2);
+    double cellSize = sqrt2 * raio;
+    double additiveFactor = cellSize / 2;
+    double sqrt2TimesOnePointFiveMinusOne; // Será inicializado no construtor
+    double sqrt2TimesZeroPointFivePlusOne; // Será inicializado no construtor
+
+    struct BoundingBox {
+        double minX, maxX, minY, maxY;
+        std::vector<Ponto> pontos;
+        BoundingBox() {
+            minX = minY = DBL_MAX;
+            maxX = maxY = DBL_MIN;
+        }
+        explicit BoundingBox(const Point &p, const Ponto &p1) : minX(p.x()), maxX(p.x()), minY(p.y()), maxY(p.y()) {
+            pontos.push_back(p1);
+        }
+        void update(const Point &p, const Ponto &p1) {
+            pontos.push_back(p1);
+            minX = std::min(minX, p.x());
+            minY = std::min(minY, p.y());
+            maxX = std::max(maxX, p.x());
+            maxY = std::max(maxY, p.y());
+        }
+    };
+
+    typedef std::pair<int, int> intPair;
+    typedef std::pair<BoundingBox, bool> diskInfo;
+    typedef std::unordered_map<intPair, diskInfo, boost::hash<intPair>> HashMap;
+
+    inline bool trytoMergeDisk(HashMap &H, HashMap::iterator &iterToSourceDisk, int vPrime, int hPrime, std::list<Point> &diskCenters) {
+        auto iterToTargetDisk = H.find(std::make_pair(vPrime, hPrime));
+
+        if (iterToTargetDisk == H.end())
+            return false;
+
+        if (iterToTargetDisk->second.second) {
+
+            double minX = std::min((*iterToSourceDisk).second.first.minX, iterToTargetDisk->second.first.minX);
+            double minY = std::min((*iterToSourceDisk).second.first.minY, iterToTargetDisk->second.first.minY);
+            double maxX = std::max((*iterToSourceDisk).second.first.maxX, iterToTargetDisk->second.first.maxX);
+            double maxY = std::max((*iterToSourceDisk).second.first.maxY, iterToTargetDisk->second.first.maxY);
+
+            Point lowerLeft(minX, minY), upperRight(maxX, maxY);
+
+            double maxDistanceSquared = (2 * raio) * (2 * raio);
+            if (CGAL::squared_distance(lowerLeft, upperRight) <= maxDistanceSquared) {
+                (*iterToSourceDisk).second.second = false;
+                iterToTargetDisk->second.second = false;
+
+                iterToTargetDisk->second.first.pontos.insert(iterToTargetDisk->second.first.pontos.end(), iterToSourceDisk->second.first.pontos.begin(), iterToSourceDisk->second.first.pontos.end());
+                Point centro = CGAL::midpoint(lowerLeft, upperRight);
+                Component aux(raio, iterToTargetDisk->second.first.pontos, Point(centro.x() - num1, centro.y() - num2));
+                manager.addComponent(aux);
+
+                return true;
+            }
+        }
+        return false;
+    }
+
+public:
+    FASTCOVER_PP(std::vector<Ponto> &P, std::list<Point> &diskCenters) : P(P), diskCenters(diskCenters) {
+        // Atualiza as constantes baseadas no raio
+        sqrt2TimesOnePointFiveMinusOne = (sqrt2 * 1.5 * raio) - raio;
+        sqrt2TimesZeroPointFivePlusOne = (sqrt2 * 0.5 * raio) + raio;
+    }
+
+    double execute() {
+
+        num1 = distr(gen);
+        num2 = distr(gen);
+        HashMap H;
+
+        for (const Ponto &p : P) {
+
+            Point trans(p.point.x() + num1, p.point.y() + num2);
+
+            int v = floor(trans.x() / cellSize), h = floor(trans.y() / cellSize);
+
+            double verticalTimesCellSize = v * cellSize, horizontalTimesCellSize = h * cellSize;
+
+            auto it = H.find(std::make_pair(v, h));
+            if (it != H.end()) {
+                it->second.first.update(trans, p);
+                continue;
+            }
+
+            if ((trans.x() >= verticalTimesCellSize + sqrt2TimesOnePointFiveMinusOne)) {
+                it = H.find(std::make_pair(v + 1, h));
+                if (it != H.end() && (CGAL::squared_distance(trans, Point(cellSize * (v + 1) + additiveFactor, horizontalTimesCellSize + additiveFactor)) <= raio * raio)) {
+                    it->second.first.update(trans, p);
+                    continue;
+                }
+            }
+
+            if ((trans.x() <= verticalTimesCellSize - sqrt2TimesZeroPointFivePlusOne)) {
+                it = H.find(std::make_pair(v - 1, h));
+                if (it != H.end() && (CGAL::squared_distance(trans, Point(cellSize * (v - 1) + additiveFactor, horizontalTimesCellSize + additiveFactor)) <= raio * raio)) {
+                    it->second.first.update(trans, p);
+                    continue;
+                }
+            }
+
+            if ((trans.y() <= horizontalTimesCellSize + sqrt2TimesOnePointFiveMinusOne)) {
+                it = H.find(std::make_pair(v, h - 1));
+                if (it != H.end() && (CGAL::squared_distance(trans, Point(verticalTimesCellSize + additiveFactor, cellSize * (h - 1) + additiveFactor)) <= raio * raio)) {
+                    it->second.first.update(trans, p);
+                    continue;
+                }
+            }
+
+            if ((trans.y() >= horizontalTimesCellSize - sqrt2TimesZeroPointFivePlusOne)) {
+                it = H.find(std::make_pair(v, h + 1));
+                if (it != H.end() && (CGAL::squared_distance(trans, Point(verticalTimesCellSize + additiveFactor, cellSize * (h + 1) + additiveFactor)) <= raio * raio)) {
+                    it->second.first.update(trans, p);
+                    continue;
+                }
+            }
+            H[std::make_pair(v, h)] = std::make_pair(BoundingBox(trans, p), true);
+        }
+
+        for (auto iter = H.begin(); iter != H.end(); ++iter) {
+            int v = (*iter).first.first, h = (*iter).first.second;
+            if (!(*iter).second.second) {
+                continue;
+            }
+
+            // Tenta mesclar com o disco S
+            if (trytoMergeDisk(H, iter, v, h - 1, diskCenters))
+                continue;
+
+            // Tenta mesclar com o disco N
+            if (trytoMergeDisk(H, iter, v, h + 1, diskCenters))
+                continue;
+
+            // Tenta mesclar com o disco E
+            if (trytoMergeDisk(H, iter, v + 1, h, diskCenters))
+                continue;
+
+            // Tenta mesclar com o disco W
+            if (trytoMergeDisk(H, iter, v - 1, h, diskCenters))
+                continue;
+
+            // Tenta mesclar com o disco SW
+            if (trytoMergeDisk(H, iter, v - 1, h - 1, diskCenters))
+                continue;
+
+            // Tenta mesclar com o disco SE
+            if (trytoMergeDisk(H, iter, v + 1, h - 1, diskCenters))
+                continue;
+
+            // Tenta mesclar com o disco NE
+            if (trytoMergeDisk(H, iter, v + 1, h + 1, diskCenters))
+                continue;
+
+            // Tenta mesclar com o disco NW
+            if (trytoMergeDisk(H, iter, v - 1, h + 1, diskCenters))
+                continue;
+        }
+
+        for (auto aPair : H) {
+            if (aPair.second.second) {
+                Point centro(aPair.first.first * cellSize + additiveFactor, aPair.first.second * cellSize + additiveFactor);
+
+                Component aux(raio, aPair.second.first.pontos, Point(centro.x() - num1, centro.y() - num2));
+                manager.addComponent(aux);
+            }
+        }
+
+        return 0;
+    }
+
+
+};
+
+#endif // FASTCOVERPP_H

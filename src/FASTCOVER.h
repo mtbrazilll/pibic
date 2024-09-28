@@ -63,7 +63,7 @@ class FASTCOVER {
             intPair cell = pair.first;
             std::vector<Ponto>& pontos_cobertos = pair.second;
             
-            Point centro((pair.first.first*sqrt2+additiveFactor)-num1,(pair.first.second*sqrt2+additiveFactor)-num2);
+            Point centro((pair.first.first*lado+additiveFactor)-num1,(pair.first.second*lado+additiveFactor)-num2);
         
 
             Component aux(raio,pontos_cobertos,centro);
