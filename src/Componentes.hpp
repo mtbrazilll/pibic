@@ -9,13 +9,12 @@
 
 class Component {
 public:
-    std::string id;
+   
     int idade;
     int idade_rastreio;
     bool eh_sol;
     double raio;
     std::vector<Ponto> points;
-    std::vector<int> points_id;
     Point pos;
 
     Component() 

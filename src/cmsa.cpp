@@ -29,7 +29,6 @@ typedef CGAL::Search_traits_2<K> TreeTraits;
 typedef CGAL::Kd_tree<TreeTraits> Tree;
 
 
-using std::size_t;
 using std::vector;
 
 int loops_with_no_improval = 0; // controle de loops sem melhora para fugir de otimos locais
@@ -46,19 +45,15 @@ std::uniform_real_distribution<> distr2(0, 1);
 
 
 int loops = 0;
-int id_aux_d = 0;
 int seed = 1;
 int ita_construtivo = 3;
 double raio =   1.0;
 unsigned long int n_pon = 0;
 
 
-std::unordered_map<Point, std::vector<int>> cellToDisks;
-Tree tree;
+
 std::vector<Ponto> pontos;
-std::vector<int> idsToRemove;
 ComponentManager manager;
-std::vector<Component> sol_reduzida;
 
 void CMSA(float time_limit, int max_age, int max_loops);
 
@@ -106,7 +101,7 @@ int main(int argc, char *argv[]) {
     n_pon = pontos.size();
     
     CMSA(time_limit, max_age, max_loops);
-    testando();
+    //testando();
     //manager.displayComponents();
     
    
@@ -145,9 +140,10 @@ void CMSA(float time_limit, int max_age, int max_loops) {
         auto construct_start = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < ita_construtivo; i++) {
             mateus(pontos,max_x+1,max_y+1,min_x-1,min_y-1);
-            FASTCOVER ob1(pontos);
+            //FASTCOVER ob1(pontos);
+            //FASTCOVER ob1(pontos);
     
-            ob1.execute();
+            //ob1.execute();
          }
 
         auto construct_end = std::chrono::high_resolution_clock::now();

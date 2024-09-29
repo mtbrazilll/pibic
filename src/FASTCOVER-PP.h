@@ -26,7 +26,7 @@ class FASTCOVER_PP {
 
 
     std::vector<Ponto> &P;
-    std::list<Point> &diskCenters;
+
 
 
     double num1;
@@ -61,7 +61,7 @@ class FASTCOVER_PP {
     typedef std::pair<BoundingBox, bool> diskInfo;
     typedef std::unordered_map<intPair, diskInfo, boost::hash<intPair>> HashMap;
 
-    inline bool trytoMergeDisk(HashMap &H, HashMap::iterator &iterToSourceDisk, int vPrime, int hPrime, std::list<Point> &diskCenters) {
+    inline bool trytoMergeDisk(HashMap &H, HashMap::iterator &iterToSourceDisk, int vPrime, int hPrime) {
         auto iterToTargetDisk = H.find(std::make_pair(vPrime, hPrime));
 
         if (iterToTargetDisk == H.end())
@@ -93,7 +93,7 @@ class FASTCOVER_PP {
     }
 
 public:
-    FASTCOVER_PP(std::vector<Ponto> &P, std::list<Point> &diskCenters) : P(P), diskCenters(diskCenters) {
+    FASTCOVER_PP(std::vector<Ponto> &P) : P(P) {
         // Atualiza as constantes baseadas no raio
         sqrt2TimesOnePointFiveMinusOne = (sqrt2 * 1.5 * raio) - raio;
         sqrt2TimesZeroPointFivePlusOne = (sqrt2 * 0.5 * raio) + raio;
@@ -160,35 +160,35 @@ public:
             }
 
             // Tenta mesclar com o disco S
-            if (trytoMergeDisk(H, iter, v, h - 1, diskCenters))
+            if (trytoMergeDisk(H, iter, v, h - 1))
                 continue;
 
             // Tenta mesclar com o disco N
-            if (trytoMergeDisk(H, iter, v, h + 1, diskCenters))
+            if (trytoMergeDisk(H, iter, v, h + 1))
                 continue;
 
             // Tenta mesclar com o disco E
-            if (trytoMergeDisk(H, iter, v + 1, h, diskCenters))
+            if (trytoMergeDisk(H, iter, v + 1, h))
                 continue;
 
             // Tenta mesclar com o disco W
-            if (trytoMergeDisk(H, iter, v - 1, h, diskCenters))
+            if (trytoMergeDisk(H, iter, v - 1, h))
                 continue;
 
             // Tenta mesclar com o disco SW
-            if (trytoMergeDisk(H, iter, v - 1, h - 1, diskCenters))
+            if (trytoMergeDisk(H, iter, v - 1, h - 1))
                 continue;
 
             // Tenta mesclar com o disco SE
-            if (trytoMergeDisk(H, iter, v + 1, h - 1, diskCenters))
+            if (trytoMergeDisk(H, iter, v + 1, h - 1))
                 continue;
 
             // Tenta mesclar com o disco NE
-            if (trytoMergeDisk(H, iter, v + 1, h + 1, diskCenters))
+            if (trytoMergeDisk(H, iter, v + 1, h + 1))
                 continue;
 
             // Tenta mesclar com o disco NW
-            if (trytoMergeDisk(H, iter, v - 1, h + 1, diskCenters))
+            if (trytoMergeDisk(H, iter, v - 1, h + 1))
                 continue;
         }
 

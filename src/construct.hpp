@@ -13,6 +13,8 @@
 #include <CGAL/Search_traits_2.h>
 #include "FASTCOVER.h"
 
+#include <algorithm> // For std::nth_element
+
 using namespace std;
 
 static const double EPSILON = 1+1e-12;
