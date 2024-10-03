@@ -12,7 +12,7 @@
 #include <CGAL/Kd_tree.h>
 #include <CGAL/Search_traits_2.h>
 #include "FASTCOVER.h"
-
+#include "FASTCOVER-PP.h"
 #include <algorithm> // For std::nth_element
 
 using namespace std;
@@ -38,4 +38,6 @@ void mateus(vector<Ponto>const &points, double x_max, double y_max, double x_min
 
 
 void mateus2(vector<Ponto>const &points, double x_max, double y_max, double x_min, double y_min);
+
+void mateus3(vector<Ponto>const &points, double x_max, double y_max, double x_min, double y_min);
 
