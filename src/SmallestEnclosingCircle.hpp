@@ -25,7 +25,8 @@ struct Ponto {
     CGAL::Simple_cartesian<double>::Point_2 point;
 
 
-    
+    std::vector<unsigned long int> neighbors; // To store indices of neighbors
+
     unsigned long int indice;
 
     // Constructor

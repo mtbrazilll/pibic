@@ -39,5 +39,4 @@ void mateus(vector<Ponto>const &points, double x_max, double y_max, double x_min
 
 void mateus2(vector<Ponto>const &points, double x_max, double y_max, double x_min, double y_min);
 
-void mateus3(vector<Ponto>const &points, double x_max, double y_max, double x_min, double y_min);
 

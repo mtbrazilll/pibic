@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-nome = "Wellz_5"
-time_limite = "o msm do dr"
+nome = "k_center_t500_c100"
+time_limite = "500"
 loops_construtivo = "100"
 
 # Cria a pasta se ela não existir
@@ -14,23 +14,6 @@ if not os.path.exists(f'../resultados/{nome}'):
     os.makedirs(f'../resultados/{nome}')
 
 # Lista de instâncias a serem testadas
-instancias = [
-            "../instancias/discos_variando/d1291.udc -r 1500",
-            "../instancias/discos_variando/d1291.udc -r 1000",
-            "../instancias/discos_variando/d1291.udc -r 750",
-            "../instancias/discos_variando/d1291.udc -r 500",
-            "../instancias/discos_variando/rl1889.udc -r 4000",
-            "../instancias/discos_variando/rl1889.udc -r 3500",
-            "../instancias/discos_variando/rl1889.udc -r 3000",
-            "../instancias/discos_variando/rl1889.udc -r 2500",
-            "../instancias/discos_variando/u2319.udc -r 2000",
-            "../instancias/discos_variando/u2319.udc -r 1700",
-            "../instancias/discos_variando/u2319.udc -r 1400",
-            "../instancias/discos_variando/u2319.udc -r 1000",
-            "../instancias/discos_variando/pcb3038.udc -r 1000",
-            "../instancias/discos_variando/pcb3038.udc -r 700",
-            "../instancias/discos_variando/pcb3038.udc -r 600",
-            "../instancias/discos_variando/pcb3038.udc -r 500"]
 
 instancias = [
             "../instancias/discos_variando/d1291.udc -r 1500 -l 76.1",
@@ -50,6 +33,25 @@ instancias = [
             "../instancias/discos_variando/pcb3038.udc -r 600 -l 247.5",
             "../instancias/discos_variando/pcb3038.udc -r 500 -l 292.8"]
 
+instancias = [
+            "../instancias/discos_variando/d1291.udc -r 1500",
+            "../instancias/discos_variando/d1291.udc -r 1000",
+            "../instancias/discos_variando/d1291.udc -r 750",
+            "../instancias/discos_variando/d1291.udc -r 500",
+            "../instancias/discos_variando/rl1889.udc -r 4000",
+            "../instancias/discos_variando/rl1889.udc -r 3500",
+            "../instancias/discos_variando/rl1889.udc -r 3000",
+            "../instancias/discos_variando/rl1889.udc -r 2500",
+            "../instancias/discos_variando/u2319.udc -r 2000",
+            "../instancias/discos_variando/u2319.udc -r 1700",
+            "../instancias/discos_variando/u2319.udc -r 1400",
+            "../instancias/discos_variando/u2319.udc -r 1000",
+            "../instancias/discos_variando/pcb3038.udc -r 1000",
+            "../instancias/discos_variando/pcb3038.udc -r 700",
+            "../instancias/discos_variando/pcb3038.udc -r 600",
+            "../instancias/discos_variando/pcb3038.udc -r 500"]
+
+
 
 
 # Dicionário para coletar todos os tempos e opts
@@ -65,8 +67,8 @@ dados_csv = []
 # Executar o comando para cada instância 10 vezes
 for i, instancia in enumerate(instancias):
     print(f"Iniciando a instancia {instancia}")
-    for _ in range(100):
-        comando = f"./pcdp.run  -f {instancia} -s {_+1} -c {loops_construtivo}"
+    for _ in range(3):
+        comando = f"./pcdp.run  -f {instancia} -s {_+1} -c {loops_construtivo} -l 500"
         #print(comando)
         print()
         try:
