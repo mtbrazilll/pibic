@@ -15,10 +15,7 @@
 
 typedef CGAL::Simple_cartesian<double> K;
 typedef K::Point_2 Point;
-typedef CGAL::Search_traits_2<K> TreeTraits;
-typedef CGAL::Kd_tree<TreeTraits> Tree;
 
-extern CGAL::Kd_tree<TreeTraits> tree;
 
 
 void read_points(const std::string& filepath, std::vector<Ponto> &pontos, K::FT &max_x, 

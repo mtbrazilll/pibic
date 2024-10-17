@@ -27,6 +27,7 @@
 #include "Cplex_pcdp.h"
 #include "FASTCOVER.h"
 #include "FASTCOVER-PP.h"
+#include "hexa.h"
 
 // Definições de tipos
 typedef CGAL::Simple_cartesian<double> K;
@@ -154,11 +155,13 @@ void CMSA(float time_limit, int max_age, int max_loops) {
         // CONSTRUCT
         auto construct_start = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < ita_construtivo; i++) {
-            //mateus(pontos, max_x + raio, max_y + raio, min_x - raio, min_y - raio);
+            //mateus(pontos, max_x, max_y + raio, min_x, min_y);
             // FASTCOVER ob2(pontos);
             // FASTCOVER_PP ob1(pontos);
             // ob2.execute();
             // ob1.execute();
+            //hexa ob3(pontos);
+            //ob3.execute();
             k_center(pontos, manager, raio);
         }
         auto construct_end = std::chrono::high_resolution_clock::now();
@@ -167,6 +170,7 @@ void CMSA(float time_limit, int max_age, int max_loops) {
         // SOLVE
         auto solve_start = std::chrono::high_resolution_clock::now();
         bsf = Exato_h();
+        //bsf = guloso();
         auto solve_end = std::chrono::high_resolution_clock::now();
         solve_total += std::chrono::duration_cast<std::chrono::milliseconds>(solve_end - solve_start).count();
 
@@ -248,64 +252,125 @@ void build_struct() {
     
 }
 
-
 void k_center(std::vector<Ponto> &pontos, ComponentManager &manager, double raio) {
-    
-    std::vector<bool> visitados(pontos.size(), false);
-    unsigned int qnt_visitados = 0;
-    // Enquanto existirem pontos não visitados
-    while (qnt_visitados < pontos.size()) {
-        // Escolhe um ponto aleatório não visitado
-        unsigned long int idx;
-        idx = int(Random(0,pontos.size()-1));
-        
-        while (visitados[idx] == true){
-            ++idx;
-        }
+    unsigned int n_nao_visitados = pontos.size();
+    std::vector<unsigned int> indices_nao_visitados(pontos.size());
+    std::vector<unsigned int> indice_em_nao_visitados(pontos.size());
 
-        Ponto& p = pontos[idx];
+    // Inicializa indices_nao_visitados e indice_em_nao_visitados
+    for (unsigned int i = 0; i < pontos.size(); ++i) {
+        indices_nao_visitados[i] = i;
+        indice_em_nao_visitados[i] = i;
+    }
+
+    // Enquanto houver pontos não visitados
+    while (n_nao_visitados > 0) {
+        // Escolhe um índice aleatório entre 0 e n_nao_visitados - 1
+        unsigned int indice = static_cast<unsigned int>(Random(0, n_nao_visitados - 1));
+
+        unsigned int indice_ponto = indices_nao_visitados[indice];
+        Ponto &p = pontos[indice_ponto];
+
+        // Troca o índice selecionado com o último índice não visitado
+        std::swap(indices_nao_visitados[indice], indices_nao_visitados[n_nao_visitados - 1]);
+        // Atualiza o mapeamento
+        indice_em_nao_visitados[indices_nao_visitados[indice]] = indice;
+        indice_em_nao_visitados[indices_nao_visitados[n_nao_visitados - 1]] = n_nao_visitados - 1;
+
+        // Diminui o número de pontos não visitados
+        n_nao_visitados--;
 
         // Gera um deslocamento aleatório dentro do raio
-        double angle = Random(0,2 * M_PI);
-        double distance = Random(0,raio);
+        double angulo = Random(0, 2 * M_PI);
+        double distancia = Random(0, raio);
+        double dx = distancia * cos(angulo);
+        double dy = distancia * sin(angulo);
+
+        // Novo centro deslocado
+        Point novo_centro(p.point.x() + dx, p.point.y() + dy);
+
+        // Encontra vizinhos dentro do raio
+        std::vector<Ponto> cobertos;
+        cobertos.push_back(p);
+
+        for (auto indice_vizinho : p.neighbors) {
+            Ponto &q = pontos[indice_vizinho];
+            double dist = sqrt(CGAL::squared_distance(novo_centro, q.point));
+            if (dist <= raio) {
+                cobertos.push_back(q);
+
+                // Remove o vizinho de indices_nao_visitados se ainda não foi visitado
+                unsigned int indice_para_remover = indice_em_nao_visitados[indice_vizinho];
+                if (indice_para_remover < n_nao_visitados) {
+                    std::swap(indices_nao_visitados[indice_para_remover], indices_nao_visitados[n_nao_visitados - 1]);
+                    // Atualiza o mapeamento
+                    indice_em_nao_visitados[indices_nao_visitados[indice_para_remover]] = indice_para_remover;
+                    indice_em_nao_visitados[indices_nao_visitados[n_nao_visitados - 1]] = n_nao_visitados - 1;
+                    n_nao_visitados--;
+                }
+            }
+        }
+
+        // Cria um novo componente com o centro deslocado e pontos cobertos
+        Component aux(raio, cobertos, novo_centro);
+        manager.addComponent(aux);
+
+        // Todos os pontos cobertos foram marcados como visitados
+    }
+}
+
+
+
+/* void k_center(std::vector<Ponto> &pontos, ComponentManager &manager, double raio) {
+    unsigned int n_unvisited = pontos.size();
+    std::cout<<"oi"<<std::endl;
+    std::vector<unsigned int> unvisited_indices(pontos.size());
+    for (unsigned int i = 0; i < pontos.size(); ++i)
+        unvisited_indices[i] = i;
+
+    // Enquanto existirem pontos não visitados
+    while (n_unvisited > 0) {
+        // Escolhe um índice aleatório entre 0 e n_unvisited - 1
+        unsigned long int idx = int(Random(0, n_unvisited - 1));
+
+        unsigned int point_idx = unvisited_indices[idx];
+        Ponto &p = pontos[point_idx];
+
+        // Swap o índice selecionado com o último índice não visitado
+        std::swap(unvisited_indices[idx], unvisited_indices[n_unvisited - 1]);
+
+        // Decrease the number of unvisited points
+        n_unvisited--;
+
+        // Gera um deslocamento aleatório dentro do raio
+        double angle = Random(0, 2 * M_PI);
+        double distance = Random(0, raio);
         double dx = distance * cos(angle);
         double dy = distance * sin(angle);
 
         // Novo centro deslocado
         Point novo_centro(p.point.x() + dx, p.point.y() + dy);
 
-
-
         // Encontrar vizinhos dentro da distância raio
         std::vector<Ponto> cobertos;
-
         cobertos.push_back(p);
 
         for (auto neighbor_idx : p.neighbors) {
-            Ponto& q = pontos[neighbor_idx];
-            if (visitados[q.indice] == false) {
-                double dist = sqrt(CGAL::squared_distance(novo_centro, q.point));
-                if (dist <= raio) {
-                    cobertos.push_back(q);
-                }
+            Ponto &q = pontos[neighbor_idx];
+            double dist = sqrt(CGAL::squared_distance(novo_centro, q.point));
+            if (dist <= raio) {
+                cobertos.push_back(q);
             }
         }
 
         // Cria um novo componente com o centro deslocado e pontos cobertos
-        Component aux(raio,cobertos,novo_centro);
-		manager.addComponent(aux);
+        Component aux(raio, cobertos, novo_centro);
+        manager.addComponent(aux);
 
-
-        // Marca os pontos cobertos como visitados
-        for (const auto& cp : cobertos) {
-            if (!visitados[cp.indice]) {
-                visitados[cp.indice] = true;
-                qnt_visitados++;
-            }
-        }
+        // marque os pontos cobertos como visitados
     }
-}
-
+} */
+/*
 void k_center_cgal(std::vector<Ponto> &pontos, ComponentManager &manager, double raio) {
     
     std::vector<bool> visitados(pontos.size(), false);
@@ -334,4 +399,4 @@ void k_center_cgal(std::vector<Ponto> &pontos, ComponentManager &manager, double
             }
         }
     }
-}
+}*/

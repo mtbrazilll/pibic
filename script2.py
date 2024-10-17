@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-nome = "Wellz_5"
+nome = "Center_vs_dr"
 time_limite = "o msm do dr"
-loops_construtivo = "100"
+loops_construtivo = "3"
 
 # Cria a pasta se ela não existir
 if not os.path.exists(f'../resultados/{nome}'):
