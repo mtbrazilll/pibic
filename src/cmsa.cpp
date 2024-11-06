@@ -248,7 +248,6 @@ void CMSA(float time_limit, int max_age) {
     if (init){
         FASTCOVER_PP ob1(pontos);
         bsf = ob1.execute();
-
         for (auto& component : manager.components){
             component.eh_sol = 1;
             component.idade = 0;
@@ -265,7 +264,7 @@ void CMSA(float time_limit, int max_age) {
         for (int na = 0; na < n_of_sols; na++) {
            int aux_solution = generate_solution_cgal(pontos, max_x , max_y , min_x , min_y );
         //std::cout << "solucao construtivo "<<aux_solution << std::endl;
-           if (bsf > aux_solution) bsf = aux_solution;
+           //if (bsf > aux_solution) bsf = aux_solution;
           // mateus_recursive(pontos, max_x + raio, max_y + raio, min_x - raio, min_y -raio);
            // FASTCOVER ob2(pontos);
 
@@ -335,7 +334,7 @@ void testando() {
     }
 
     std::cout << "pontos_vector: " << pontos.size() << std::endl;
-
+     std::cout << "sol size: " << sol.size() << std::endl;
     Teste teste(pontos, sol);
 
     if (teste.execute())

@@ -85,7 +85,7 @@ class FASTCOVER_PP {
                 Point centro = CGAL::midpoint(lowerLeft, upperRight);
                 Component aux(raio, iterToTargetDisk->second.first.pontos, Point(centro.x() - num1, centro.y() - num2));
                 manager.addComponent(aux);
-
+                ++solution;
                 return true;
             }
         }

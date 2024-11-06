@@ -506,6 +506,7 @@ int generate_solution_cgal(const std::vector<Ponto>& points, double x_max, doubl
             if (quad.points.size() == 1) {
 /*                 Component aux(raio, quad.points, quad.points[0].point);
                 manager.addComponent(aux); */
+
                 Point centro = quad.getCenter();
                 Fuzzy_sphere sphere(centro, raio);
 
@@ -526,6 +527,7 @@ int generate_solution_cgal(const std::vector<Ponto>& points, double x_max, doubl
                 double max_diameter = std::max({ d1, d2, d3, d4 });
 
                 if (max_diameter <= 2.0 * raio) {
+
                     Point centro = quad.getCenter();
                     Fuzzy_sphere sphere(centro, raio);
 
