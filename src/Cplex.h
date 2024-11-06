@@ -23,6 +23,13 @@ using std::function;
 extern ComponentManager manager;
 extern double bsf;
 extern unsigned long int n_pon;
+extern ComponentManager bestSolution;
+
+extern bool warm_start;
+extern int heuristic_emphasis;
+extern bool cplex_abort;
+extern double cplex_time_limit;
+extern double r_limit;
 
 ILOSTLBEGIN
 
@@ -45,6 +52,12 @@ ILOMIPINFOCALLBACK2(Callback,
     }
 }
 
+ILOSOLVECALLBACK2(abortCallback, IloCplex::Aborter&, abo, int&, curbest) {
+    if (hasIncumbent()) {
+        IloNum nv = getIncumbentObjValue();
+        if (curbest > int(nv)) abo.abort();
+    }
+}
 
 ILOSIMPLEXCALLBACK0(MyCallback) {
   std::cout << "Iteration " << getNiterations() << ": ";
@@ -55,6 +68,137 @@ ILOSIMPLEXCALLBACK0(MyCallback) {
   }
 }
 
+
+
+
+double cplex_run() {
+    double solution_cplex = std::numeric_limits<double>::max();
+    
+
+    IloEnv env;
+    env.setOut(env.getNullStream());
+    env.setWarning(env.getNullStream());
+
+    try 
+    {
+        IloModel model(env);
+        IloIntVarArray x(env, manager.getComponentCount(), 0, 1);
+
+        // preparing warm-start
+        IloNumVarArray mipVar(env);
+        IloNumArray mipVal(env);
+        if (warm_start) 
+            {
+            int indice_var = 0;
+            for (auto& component : manager.components) 
+                {
+    
+                // Adicione cada variável à lista de variáveis de início
+                    mipVar.add(x[indice_var]);
+
+                // Adicione o valor inicial correspondente à lista de valores de início
+                    mipVal.add(component.eh_sol);   
+                    indice_var++;
+                }
+            
+            }
+             // end preparing warm-start
+
+        IloExpr obj(env);
+        IloExprArray componente_point(env, n_pon);
+
+        int indice_var = 0;
+        for (const auto& component : manager.components) 
+        {
+            obj += x[indice_var];
+
+            for (const auto& ponto : component.points) {
+
+                if (componente_point[ponto.indice].getImpl() == 0) {
+                    componente_point[ponto.indice] = IloExpr(env);
+                }
+                componente_point[ponto.indice] += x[indice_var];
+            }
+
+            indice_var++;
+        }
+        for (int i = 0; i < n_pon; ++i) {
+            if (!componente_point[i].getImpl() == 0) {
+                model.add(componente_point[i] >= 1);
+                componente_point[i].end();
+            }
+        }
+
+        model.add(IloMinimize(env, obj));
+        obj.end();
+
+        IloCplex cpl(model);
+        /* the aborter stops CPLEX once a better solution than
+        "best_sol" is found */
+
+        int aux_bsf = bsf;
+        if (cplex_abort) {
+            IloCplex::Aborter abo(env);
+            cpl.use(abo);
+            cpl.use(abortCallback(env, abo, aux_bsf));
+        }
+        if (warm_start) cpl.addMIPStart(mipVar, mipVal);
+
+        cpl.setParam(IloCplex::TiLim, r_limit);
+        cpl.setParam(IloCplex::EpGap, 0.0);
+        cpl.setParam(IloCplex::EpAGap, 0.0);
+        cpl.setParam(IloCplex::Threads, 1);
+        //if (heuristic_emphasis) 
+        cpl.setParam(IloCplex::Param::Emphasis::MIP, heuristic_emphasis);
+        cpl.setWarning(env.getNullStream());
+
+        // calling CPLEX to solve the model
+        cpl.solve();
+        
+        if (cpl.getStatus() == IloAlgorithm::Optimal or cpl.getStatus() == IloAlgorithm::Feasible)
+        {
+            IloNumArray sol(env, manager.getComponentCount());
+            solution_cplex = cpl.getObjValue();
+            //std::cout << solution_cplex << std::endl;
+            if (solution_cplex > bsf){
+                 
+                 for (auto& component : manager.components){
+                    component.idade = component.idade * 2;
+                 }
+
+            }
+            else {
+                cpl.getValues(sol, x);
+                indice_var = 0;
+                for (auto& component : manager.components) {
+        
+                    if(sol[indice_var] > 0.8){
+                        component.idade = 0;
+                        component.eh_sol = true;
+
+                    }
+                    else{
+
+                        component.idade = component.idade + 1;
+                        component.eh_sol = false;
+
+                    }
+                    indice_var++;
+                }
+
+            }
+            
+           
+
+        }   
+    }
+       
+    catch (IloException& e) {
+        cerr << "Concert exception caught: " << e << endl;
+    }
+    env.end();
+    return solution_cplex;
+}
 
 struct ComponentComparator {
     bool operator()(const Component& lhs, const Component& rhs) const {
@@ -118,183 +262,4 @@ double guloso() {
     
 }
 
-double Exato_h() {
-    double valor_otimo = std::numeric_limits<double>::max();
-    
-
-    IloEnv env;
-
- 
-    int n_tuplas = manager.getComponentCount();
-
-    IloModel antena(env);
-    IloCplex cplex(antena);
-
-    IloIntVarArray x(env, n_tuplas, 0, 1);
-    IloExpr obj(env);
-    IloExprArray componente_point(env, n_pon);
-
-    int indice_var = 0;
-    for (const auto& component : manager.components) {
-       
-        
-
-        obj += x[indice_var];
-
-        for (const auto& po : component.points) {
-
-            if (componente_point[po.indice].getImpl() == 0) {
-                componente_point[po.indice] = IloExpr(env);
-            }
-            componente_point[po.indice] += x[indice_var];
-        }
-
-        indice_var++;
-    }
-
-    for (int i = 0; i < n_pon; ++i) {
-        if (!componente_point[i].getImpl() == 0) {
-            antena.add(componente_point[i] >= 1);
-        }
-    }
-
-    antena.add(IloMinimize(env, obj));
-
-    antena.add(obj<=bsf);
-
-
-
-    //cplex.setParam(IloCplex::Param::TimeLimit, 1.0); // limite de tempo pra resolver
-
-    cplex.setOut(env.getNullStream());
-    cplex.use(Callback(env, IloFalse, bsf));
-    cplex.solve();
-    
-    valor_otimo = cplex.getObjValue();
-    IloNumArray sol(env, n_tuplas);
-    cplex.getValues(sol, x);
-    
-
-    indice_var = 0;
-    for (auto& component : manager.components) {
-        
-      
-        if(sol[indice_var] > 0.5){
-            component.idade = 0;
-            component.eh_sol = true;
-
-        }
-        else{
-
-            component.idade = component.idade + 1;
-            component.eh_sol = true;
-
-        }
-        component.idade_rastreio++;
-        indice_var++;
-    }
-
-    env.end();
-    return valor_otimo;
-}
-
-double Exato_start() {
-    double valor_otimo = std::numeric_limits<double>::max();
-    
-
-    IloEnv env;
-
-    
-    int n_tuplas = manager.getComponentCount();
-
-    IloModel antena(env);
-    IloCplex cplex(antena);
-
-    IloIntVarArray x(env, n_tuplas, 0, 1);
-    IloExpr obj(env);
-    IloExprArray componente_point(env, n_pon);
-
-    int indice_var = 0;
-    for (const auto& component : manager.components) {
-       
-        
-
-        obj += x[indice_var];
-
-        for (const auto& po : component.points) {
-
-            if (componente_point[po.indice].getImpl() == 0) {
-                componente_point[po.indice] = IloExpr(env);
-            }
-            componente_point[po.indice] += x[indice_var];
-        }
-
-        indice_var++;
-    }
-
-    for (int i = 0; i < n_pon; ++i) {
-        if (!componente_point[i].getImpl() == 0) {
-            antena.add(componente_point[i] >= 1);
-        }
-    }
-
-    antena.add(IloMinimize(env, obj));
-    antena.add(obj<=bsf);
-
-
-// Crie uma solução viável inicial
-    IloNumVarArray startVar(env);
-    IloNumArray startVal(env);
-    indice_var = 0;
-    for (auto& component : manager.components) {
-
-      
-        
-    // Adicione cada variável à lista de variáveis de início
-        startVar.add(x[indice_var]);
-        // Adicione o valor inicial correspondente à lista de valores de início
-        startVal.add(component.eh_sol);  // seus valores iniciais são 0 ou        
-        indice_var++;
-    }
-
-    
-
-
-    //cplex.setParam(IloCplex::Param::TimeLimit, 1.0); // limite de tempo pra resolver
-
-    cplex.setOut(env.getNullStream());
-    cplex.use(Callback(env, IloFalse, bsf));
-    //cplex.use(MyCallback(env));
-    //cplex.setParam(IloCplex::Param::RootAlgorithm, IloCplex::Primal);
-    cplex.addMIPStart(startVar, startVal);
-
-    cplex.solve();
-    
-    valor_otimo = cplex.getObjValue();
-    IloNumArray sol(env, n_tuplas);
-    cplex.getValues(sol, x);
-    
-
-    indice_var = 0;
-    for (Component& component : manager.components) {
-        
-       
-        if(sol[indice_var] > 0.5){
-            component.idade = 0;
-            component.eh_sol = 1;
-
-        }
-        else{
-
-            component.idade = component.idade + 1;
-            component.eh_sol = 0;
-
-        }
-        component.idade_rastreio++;
-        indice_var++;
-    }
-
-    env.end();
-    return valor_otimo;
-}
 #endif // Cplex_H

@@ -11,17 +11,16 @@ class Component {
 public:
    
     int idade;
-    int idade_rastreio;
     bool eh_sol;
     double raio;
     std::vector<Ponto> points;
     Point pos;
 
     Component() 
-        :idade(0), raio(0.0), idade_rastreio(0), eh_sol(false) {}
+        :idade(0), raio(0.0), eh_sol(false) {}
 
     Component( double raio, std::vector<Ponto>& points, const Point& pos)
-        :  idade(0), idade_rastreio(0), raio(raio), points(points), pos(pos), eh_sol(false) {}
+        :  idade(1), raio(raio), points(points), pos(pos), eh_sol(false) {}
 };
 
 class ComponentManager {

@@ -61,7 +61,7 @@ class FASTCOVER_PP {
     typedef std::pair<BoundingBox, bool> diskInfo;
     typedef std::unordered_map<intPair, diskInfo, boost::hash<intPair>> HashMap;
 
-    inline bool trytoMergeDisk(HashMap &H, HashMap::iterator &iterToSourceDisk, int vPrime, int hPrime) {
+    inline bool trytoMergeDisk(HashMap &H, HashMap::iterator &iterToSourceDisk, int vPrime, int hPrime, int &solution) {
         auto iterToTargetDisk = H.find(std::make_pair(vPrime, hPrime));
 
         if (iterToTargetDisk == H.end())
@@ -97,14 +97,15 @@ public:
         // Atualiza as constantes baseadas no raio
         sqrt2TimesOnePointFiveMinusOne = (sqrt2 * 1.5 * raio) - raio;
         sqrt2TimesZeroPointFivePlusOne = (sqrt2 * 0.5 * raio) + raio;
+        
     }
 
-    double execute() {
+    int execute() {
 
         num1 = distr(gen);
         num2 = distr(gen);
         HashMap H;
-
+        int solution = 0;
         for (const Ponto &p : P) {
 
             Point trans(p.point.x() + num1, p.point.y() + num2);
@@ -160,35 +161,35 @@ public:
             }
 
             // Tenta mesclar com o disco S
-            if (trytoMergeDisk(H, iter, v, h - 1))
+            if (trytoMergeDisk(H, iter, v, h - 1,solution))
                 continue;
 
             // Tenta mesclar com o disco N
-            if (trytoMergeDisk(H, iter, v, h + 1))
+            if (trytoMergeDisk(H, iter, v, h + 1,solution))
                 continue;
 
             // Tenta mesclar com o disco E
-            if (trytoMergeDisk(H, iter, v + 1, h))
+            if (trytoMergeDisk(H, iter, v + 1, h,solution))
                 continue;
 
             // Tenta mesclar com o disco W
-            if (trytoMergeDisk(H, iter, v - 1, h))
+            if (trytoMergeDisk(H, iter, v - 1, h,solution))
                 continue;
 
             // Tenta mesclar com o disco SW
-            if (trytoMergeDisk(H, iter, v - 1, h - 1))
+            if (trytoMergeDisk(H, iter, v - 1, h - 1,solution))
                 continue;
 
             // Tenta mesclar com o disco SE
-            if (trytoMergeDisk(H, iter, v + 1, h - 1))
+            if (trytoMergeDisk(H, iter, v + 1, h - 1,solution))
                 continue;
 
             // Tenta mesclar com o disco NE
-            if (trytoMergeDisk(H, iter, v + 1, h + 1))
+            if (trytoMergeDisk(H, iter, v + 1, h + 1,solution))
                 continue;
 
             // Tenta mesclar com o disco NW
-            if (trytoMergeDisk(H, iter, v - 1, h + 1))
+            if (trytoMergeDisk(H, iter, v - 1, h + 1,solution))
                 continue;
         }
 
@@ -198,10 +199,12 @@ public:
 
                 Component aux(raio, aPair.second.first.pontos, Point(centro.x() - num1, centro.y() - num2));
                 manager.addComponent(aux);
+                solution++;
+                
             }
         }
 
-        return 0;
+        return solution;
     }
 
 

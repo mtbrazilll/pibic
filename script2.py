@@ -5,16 +5,21 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-nome = "Center_vs_dr"
-time_limite = "o msm do dr"
-loops_construtivo = "3"
+nome = "cmsa-DR"
+time_limite = "300"
+nsols = "8"
+cpl_abort = "0"
+init = "1"
+warm_start = "0"
+h_emph = "3"
+
 
 # Cria a pasta se ela não existir
 if not os.path.exists(f'../resultados/{nome}'):
     os.makedirs(f'../resultados/{nome}')
 
 # Lista de instâncias a serem testadas
-instancias = [
+instancias1 = [
             "../instancias/discos_variando/d1291.udc -r 1500",
             "../instancias/discos_variando/d1291.udc -r 1000",
             "../instancias/discos_variando/d1291.udc -r 750",
@@ -32,25 +37,80 @@ instancias = [
             "../instancias/discos_variando/pcb3038.udc -r 600",
             "../instancias/discos_variando/pcb3038.udc -r 500"]
 
-instancias = [
-            "../instancias/discos_variando/d1291.udc -r 1500 -l 76.1",
-            "../instancias/discos_variando/d1291.udc -r 1000 -l 76.7",
-            "../instancias/discos_variando/d1291.udc -r 750 -l 101.2",
-            "../instancias/discos_variando/d1291.udc -r 500 -l 171.3",
-            "../instancias/discos_variando/rl1889.udc -r 4000 -l 138.3",
-            "../instancias/discos_variando/rl1889.udc -r 3500 -l 109.6",
-            "../instancias/discos_variando/rl1889.udc -r 3000 -l 127.0",
-            "../instancias/discos_variando/rl1889.udc -r 2500 -l 147.4",
-            "../instancias/discos_variando/u2319.udc -r 2000 -l 214.8",
-            "../instancias/discos_variando/u2319.udc -r 1700 -l 152.1",
-            "../instancias/discos_variando/u2319.udc -r 1400 -l 160.1",
-            "../instancias/discos_variando/u2319.udc -r 1000 -l 158.6",
-            "../instancias/discos_variando/pcb3038.udc -r 1000 -l 308.2",
-            "../instancias/discos_variando/pcb3038.udc -r 700 -l 265.8",
-            "../instancias/discos_variando/pcb3038.udc -r 600 -l 247.5",
-            "../instancias/discos_variando/pcb3038.udc -r 500 -l 292.8"]
+instancias2 = [
+            "../instancias/discos_variando/d1291.udc -r 1500 -t 76.1",
+            "../instancias/discos_variando/d1291.udc -r 1000 -t 76.7",
+            "../instancias/discos_variando/d1291.udc -r 750 -t 101.2",
+            "../instancias/discos_variando/d1291.udc -r 500 -t 171.3",
+            "../instancias/discos_variando/rl1889.udc -r 4000 -t 138.3",
+            "../instancias/discos_variando/rl1889.udc -r 3500 -t 109.6",
+            "../instancias/discos_variando/rl1889.udc -r 3000 -t 127.0",
+            "../instancias/discos_variando/rl1889.udc -r 2500 -t 147.4",
+            "../instancias/discos_variando/u2319.udc -r 2000 -t 214.8",
+            "../instancias/discos_variando/u2319.udc -r 1700 -t 152.1",
+            "../instancias/discos_variando/u2319.udc -r 1400 -t 160.1",
+            "../instancias/discos_variando/u2319.udc -r 1000 -t 158.6",
+            "../instancias/discos_variando/pcb3038.udc -r 1000 -t 308.2",
+            "../instancias/discos_variando/pcb3038.udc -r 700 -t 265.8",
+            "../instancias/discos_variando/pcb3038.udc -r 600 -t 247.5",
+            "../instancias/discos_variando/pcb3038.udc -r 500 -t 292.8"]
 
 
+
+
+instancias5 = [
+            "../instancias/discos_variando/d1291.udc",
+            "../instancias/discos_variando/rl1889.udc",
+            "../instancias/discos_variando/u2319.udc",
+            "../instancias/discos_variando/pcb3038.udc",
+            "../instancias/Real-world/mona-lisa100k.udc",
+            "../instancias/Real-world/nyctaxi_2.9M.udc",
+            "../instancias/Real-world/uber_4.5M.udc",
+            "../instancias/Real-world/usa_115K.udc",
+            "../instancias/Real-world/wildfires_1.8M.udc",
+            "../instancias/Real-world/world_1.9M.udc",
+            "../instancias/Real-world/hail2015_10M.udc",
+            "../instancias/mcz.txt"]
+
+
+
+instancias4 = [
+             "../instancias/mcz.txt",
+            "../instancias/discos_variando/d1291.udc",
+            "../instancias/discos_variando/rl1889.udc",
+            "../instancias/discos_variando/u2319.udc",
+            "../instancias/discos_variando/pcb3038.udc",
+            "../instancias/Real-world/mona-lisa100k.udc",
+            "../instancias/Real-world/uber_4.5M.udc",
+            "../instancias/Real-world/usa_115K.udc",
+            "../instancias/Real-world/wildfires_1.8M.udc",
+            "../instancias/Real-world/world_1.9M.udc",
+            "../instancias/Real-world/hail2015_10M.udc"
+            ]
+
+instancias10 = [
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/disco_instancia_1.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/disco_instancia_2.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/disco_instancia_3.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/disco_instancia_4.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/disco_instancia_5.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/convexo_instancia_1.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/convexo_instancia_2.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/convexo_instancia_3.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/convexo_instancia_4.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/convexo_instancia_5.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/anel_instancia_1.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/anel_instancia_2.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/anel_instancia_3.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/anel_instancia_4.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/anel_instancia_5.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/quadrado_instancia_1.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/quadrado_instancia_2.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/quadrado_instancia_3.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/quadrado_instancia_4.txt",
+    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/quadrado_instancia_5.txt",
+]
+instancias = instancias1
 
 # Dicionário para coletar todos os tempos e opts
 dados_tempos = {instancia: [] for instancia in instancias}
@@ -65,8 +125,9 @@ dados_csv = []
 # Executar o comando para cada instância 10 vezes
 for i, instancia in enumerate(instancias):
     print(f"Iniciando a instancia {instancia}")
-    for _ in range(100):
-        comando = f"./pcdp.run  -f {instancia} -s {_+1} -c {loops_construtivo}"
+    for _ in range(5):
+        comando = f"./pcdp.run  -i {instancia} -s {_+1} -nsols {nsols} -init {init} -h_emph {h_emph} -warm_start {warm_start} -cpl_abort {cpl_abort} -t {time_limite}"
+
         #print(comando)
         print()
         try:
@@ -136,4 +197,4 @@ with pd.ExcelWriter(f'../resultados/{nome}/output.xlsx', engine='openpyxl') as w
         df.to_excel(writer, sheet_name=nome_sheet, index=False)
 
 with open(f'../resultados/{nome}/hiperparametros.txt', 'w') as arquivo:
-    arquivo.write(f"limite de tempo: {time_limite} \n loops_construtivo: {loops_construtivo}")
+    arquivo.write(f"limite de tempo: {time_limite} \n loops_construtivo: {nsols}")
