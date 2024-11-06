@@ -223,6 +223,12 @@ struct SubQuadrant {
           x_max(std::numeric_limits<K::FT>::lowest()),
           y_min(std::numeric_limits<K::FT>::max()),
           y_max(std::numeric_limits<K::FT>::lowest()) {}
+
+    CGAL::Point_2<K> getCenter() const {
+        double center_x = (static_cast<double>(x_min) + static_cast<double>(x_max)) / 2.0;
+        double center_y = (static_cast<double>(y_min) + static_cast<double>(y_max)) / 2.0;
+        return CGAL::Point_2<K>(center_x, center_y);
+    }
 };
 
 int generate_solution_2(const std::vector<Ponto>& points, double x_max, double y_max, double x_min, double y_min) {
@@ -366,6 +372,182 @@ int generate_solution_2(const std::vector<Ponto>& points, double x_max, double y
                 else {
                     fila.push(Quadrante(quad.points, Xmax, Ymax, Xmin, Ymin));
                 }
+            }
+        };
+
+        // Processar quadrantes não vazios
+        if (!quad1.points.empty())
+            processSubQuadrant(quad1, XmaxQ1, YmaxQ1, XminQ1, YminQ1);
+        if (!quad2.points.empty())
+            processSubQuadrant(quad2, XmaxQ2, YmaxQ2, XminQ2, YminQ2);
+        if (!quad3.points.empty())
+            processSubQuadrant(quad3, XmaxQ3, YmaxQ3, XminQ3, YminQ3);
+        if (!quad4.points.empty())
+            processSubQuadrant(quad4, XmaxQ4, YmaxQ4, XminQ4, YminQ4);
+    }
+
+    return solution;
+}
+
+int generate_solution_cgal(const std::vector<Ponto>& points, double x_max, double y_max, double x_min, double y_min) {
+    std::queue<Quadrante> fila;
+    Quadrante pai(points, x_max, y_max, x_min, y_min);
+    fila.push(pai);
+
+    int solution = 0;
+
+    while (!fila.empty()) {
+        auto pai = fila.front();
+        fila.pop();
+
+
+
+        double rand1 = getRandomValue(pai.x_min, pai.x_max);
+        double rand2 = getRandomValue(pai.y_min, pai.y_max);
+
+        double XminQ1 = rand1,     YminQ1 = rand2,     XmaxQ1 = pai.x_max, YmaxQ1 = pai.y_max;
+        double XminQ2 = pai.x_min, YminQ2 = rand2,     XmaxQ2 = rand1,     YmaxQ2 = pai.y_max;
+        double XminQ3 = pai.x_min, YminQ3 = pai.y_min, XmaxQ3 = rand1,     YmaxQ3 = rand2;
+        double XminQ4 = rand1,     YminQ4 = pai.y_min, XmaxQ4 = pai.x_max, YmaxQ4 = rand2;
+
+        // Definir os subquadrantes
+        SubQuadrant quad1, quad2, quad3, quad4;
+
+        // Distribuir os pontos e atualizar os extremos
+        for (const Ponto& p : pai.points) {
+            if ((p.point.x() >= XminQ1 && p.point.x() <= XmaxQ1) &&
+                (p.point.y() >= YminQ1 && p.point.y() <= YmaxQ1)) {
+                quad1.points.push_back(p);
+                // Atualizar extremos
+                if (p.point.x() < quad1.x_min) {
+                    quad1.x_min = p.point.x();
+                    quad1.p_min_x = p;
+                }
+                if (p.point.x() > quad1.x_max) {
+                    quad1.x_max = p.point.x();
+                    quad1.p_max_x = p;
+                }
+                if (p.point.y() < quad1.y_min) {
+                    quad1.y_min = p.point.y();
+                    quad1.p_min_y = p;
+                }
+                if (p.point.y() > quad1.y_max) {
+                    quad1.y_max = p.point.y();
+                    quad1.p_max_y = p;
+                }
+            }
+            else if ((p.point.x() >= XminQ2 && p.point.x() <= XmaxQ2) &&
+                     (p.point.y() >= YminQ2 && p.point.y() <= YmaxQ2)) {
+                quad2.points.push_back(p);
+                // Atualizar extremos
+                if (p.point.x() < quad2.x_min) {
+                    quad2.x_min = p.point.x();
+                    quad2.p_min_x = p;
+                }
+                if (p.point.x() > quad2.x_max) {
+                    quad2.x_max = p.point.x();
+                    quad2.p_max_x = p;
+                }
+                if (p.point.y() < quad2.y_min) {
+                    quad2.y_min = p.point.y();
+                    quad2.p_min_y = p;
+                }
+                if (p.point.y() > quad2.y_max) {
+                    quad2.y_max = p.point.y();
+                    quad2.p_max_y = p;
+                }
+            }
+            else if ((p.point.x() >= XminQ3 && p.point.x() <= XmaxQ3) &&
+                     (p.point.y() >= YminQ3 && p.point.y() <= YmaxQ3)) {
+                quad3.points.push_back(p);
+                // Atualizar extremos
+                if (p.point.x() < quad3.x_min) {
+                    quad3.x_min = p.point.x();
+                    quad3.p_min_x = p;
+                }
+                if (p.point.x() > quad3.x_max) {
+                    quad3.x_max = p.point.x();
+                    quad3.p_max_x = p;
+                }
+                if (p.point.y() < quad3.y_min) {
+                    quad3.y_min = p.point.y();
+                    quad3.p_min_y = p;
+                }
+                if (p.point.y() > quad3.y_max) {
+                    quad3.y_max = p.point.y();
+                    quad3.p_max_y = p;
+                }
+            }
+            else if ((p.point.x() >= XminQ4 && p.point.x() <= XmaxQ4) &&
+                     (p.point.y() >= YminQ4 && p.point.y() <= YmaxQ4)) {
+                quad4.points.push_back(p);
+                // Atualizar extremos
+                if (p.point.x() < quad4.x_min) {
+                    quad4.x_min = p.point.x();
+                    quad4.p_min_x = p;
+                }
+                if (p.point.x() > quad4.x_max) {
+                    quad4.x_max = p.point.x();
+                    quad4.p_max_x = p;
+                }
+                if (p.point.y() < quad4.y_min) {
+                    quad4.y_min = p.point.y();
+                    quad4.p_min_y = p;
+                }
+                if (p.point.y() > quad4.y_max) {
+                    quad4.y_max = p.point.y();
+                    quad4.p_max_y = p;
+                }
+            }
+        }
+
+        // Função lambda para processar subquadrantes
+        auto processSubQuadrant = [&](SubQuadrant& quad, double Xmax, double Ymax, double Xmin, double Ymin) {
+            if (quad.points.size() == 1) {
+/*                 Component aux(raio, quad.points, quad.points[0].point);
+                manager.addComponent(aux); */
+                Point centro = quad.getCenter();
+                Fuzzy_sphere sphere(centro, raio);
+
+                std::vector<Ponto> neighbors;
+                tree.search(std::back_inserter(neighbors), sphere);
+                Component aux(raio, neighbors, centro);
+                manager.addComponent(aux);
+                solution++;
+            }
+            else {
+                // Calcular distâncias entre pontos extremos
+                
+                
+                double d1 = distance(quad.p_min_x, quad.p_max_x);
+                double d2 = distance(quad.p_min_y, quad.p_max_y);
+                double d3 = distance(quad.p_min_x, quad.p_max_y);
+                double d4 = distance(quad.p_max_x, quad.p_min_y);
+                double max_diameter = std::max({ d1, d2, d3, d4 });
+
+                if (max_diameter <= 2.0 * raio) {
+                    Point centro = quad.getCenter();
+                    Fuzzy_sphere sphere(centro, raio);
+
+                    std::vector<Ponto> neighbors;
+                    tree.search(std::back_inserter(neighbors), sphere);
+                    Component aux(raio, neighbors, centro);
+                    manager.addComponent(aux);
+                    solution++;
+
+/*                     Circle smallest = makeSmallestEnclosingCircle(quad.points);
+                    if (raio >= smallest.r * (EPSILON)) {
+                        Component aux(raio, quad.points, smallest.pos);
+                        manager.addComponent(aux);
+                        solution++;
+                    }
+                    else {
+                        fila.push(Quadrante(quad.points, Xmax, Ymax, Xmin, Ymin));
+                    } */
+                }
+                else {
+                    fila.push(Quadrante(quad.points, Xmax, Ymax, Xmin, Ymin));
+                } 
             }
         };
 

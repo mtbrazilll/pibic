@@ -29,7 +29,7 @@
 #include "FASTCOVER-PP.h"
 #include "hexa.h"
 
-// Definições de tipos
+/* // Definições de tipos
 typedef CGAL::Simple_cartesian<double> K;
 typedef K::Point_2 Point;
 
@@ -49,7 +49,7 @@ typedef Ponto_to_Point_map Point_map;
 typedef CGAL::Search_traits_2<K> Base_traits;
 typedef CGAL::Search_traits_adapter<Ponto, Point_map, Base_traits> Traits;
 typedef CGAL::Kd_tree<Traits> Kd_tree;
-typedef CGAL::Fuzzy_sphere<Traits> Fuzzy_sphere;
+typedef CGAL::Fuzzy_sphere<Traits> Fuzzy_sphere; */
 
 using std::vector;
 
@@ -226,7 +226,7 @@ int main(int argc, char* argv[]) {
     read_points(filePath, pontos, max_x, max_y, min_x, min_y, maior_em_modulo);
 
     n_pon = pontos.size();
-    //build_struct();
+    build_struct();
     CMSA(cplex_time_limit, age_limit);
     
     testando();
@@ -263,7 +263,7 @@ void CMSA(float time_limit, int max_age) {
         // CONSTRUCT
         auto construct_start = std::chrono::high_resolution_clock::now();
         for (int na = 0; na < n_of_sols; na++) {
-           int aux_solution = generate_solution_2(pontos, max_x , max_y , min_x , min_y );
+           int aux_solution = generate_solution_cgal(pontos, max_x , max_y , min_x , min_y );
         //std::cout << "solucao construtivo "<<aux_solution << std::endl;
            if (bsf > aux_solution) bsf = aux_solution;
           // mateus_recursive(pontos, max_x + raio, max_y + raio, min_x - raio, min_y -raio);
