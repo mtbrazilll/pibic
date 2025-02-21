@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-nome = "cmsa-DR"
-time_limite = "300"
-nsols = "8"
-cpl_abort = "0"
-init = "1"
+nome = "cmsaxfastcover_2025"
+time_limite = "200"
+nsols = "2"
+cpl_abort = "1"
+init = "0"
 warm_start = "0"
 h_emph = "3"
 
@@ -88,29 +88,27 @@ instancias4 = [
             "../instancias/Real-world/hail2015_10M.udc"
             ]
 
-instancias10 = [
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/disco_instancia_1.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/disco_instancia_2.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/disco_instancia_3.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/disco_instancia_4.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/disco_instancia_5.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/convexo_instancia_1.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/convexo_instancia_2.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/convexo_instancia_3.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/convexo_instancia_4.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/convexo_instancia_5.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/anel_instancia_1.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/anel_instancia_2.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/anel_instancia_3.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/anel_instancia_4.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/anel_instancia_5.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/quadrado_instancia_1.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/quadrado_instancia_2.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/quadrado_instancia_3.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/quadrado_instancia_4.txt",
-    "/home/mateus/Documentos/organiza/tcc/instancias/instancias_geradas/instancias_1500/quadrado_instancia_5.txt",
+instancias = [
+    "../instancias/instancias_geradas/instancias_500/disco_instancia_1.txt",
+    "../instancias/instancias_geradas/instancias_500/disco_instancia_2.txt",
+    "../instancias/instancias_geradas/instancias_500/disco_instancia_3.txt",
+    "../instancias/instancias_geradas/instancias_500/disco_instancia_4.txt",
+    "../instancias/instancias_geradas/instancias_500/disco_instancia_5.txt",
+    "../instancias/instancias_geradas/instancias_500/anel_instancia_1.txt",
+    "../instancias/instancias_geradas/instancias_500/anel_instancia_2.txt",
+    "../instancias/instancias_geradas/instancias_500/anel_instancia_3.txt",
+    "../instancias/instancias_geradas/instancias_500/anel_instancia_4.txt",
+    "../instancias/instancias_geradas/instancias_500/anel_instancia_5.txt",
+    "../instancias/instancias_geradas/instancias_500/quadrado_instancia_1.txt",
+    "../instancias/instancias_geradas/instancias_500/quadrado_instancia_2.txt",
+    "../instancias/instancias_geradas/instancias_500/quadrado_instancia_3.txt",
+    "../instancias/instancias_geradas/instancias_500/quadrado_instancia_4.txt",
+    "../instancias/instancias_geradas/instancias_500/quadrado_instancia_5.txt",
 ]
-instancias = instancias1
+
+
+
+#instancias = instancias2
 
 # Dicionário para coletar todos os tempos e opts
 dados_tempos = {instancia: [] for instancia in instancias}
@@ -125,7 +123,7 @@ dados_csv = []
 # Executar o comando para cada instância 10 vezes
 for i, instancia in enumerate(instancias):
     print(f"Iniciando a instancia {instancia}")
-    for _ in range(5):
+    for _ in range(10):
         comando = f"./pcdp.run  -i {instancia} -s {_+1} -nsols {nsols} -init {init} -h_emph {h_emph} -warm_start {warm_start} -cpl_abort {cpl_abort} -t {time_limite}"
 
         #print(comando)
@@ -138,6 +136,8 @@ for i, instancia in enumerate(instancias):
             tempo = int(re.search(r"Total CMSA time: (\d+)ms", saida).group(1))
             opt = int(re.search(r"opt: (\d+)", saida).group(1))
             loops = int(re.search(r"Loops: (\d+)", saida).group(1))
+            #sol size: 21
+            
 
             dados_tempos[instancia].append(tempo)
             dados_opts[instancia].append(opt)
@@ -197,4 +197,9 @@ with pd.ExcelWriter(f'../resultados/{nome}/output.xlsx', engine='openpyxl') as w
         df.to_excel(writer, sheet_name=nome_sheet, index=False)
 
 with open(f'../resultados/{nome}/hiperparametros.txt', 'w') as arquivo:
-    arquivo.write(f"limite de tempo: {time_limite} \n loops_construtivo: {nsols}")
+    arquivo.write(f"time_limite: {time_limite} \n"
+                  f"nsols: {nsols} \n"
+                  f"cpl_abort = {cpl_abort} \n"
+                  f"init = {init} \n"
+                  f"warm_start = {warm_start} \n"
+                  f"h_emph = {h_emph}\n")

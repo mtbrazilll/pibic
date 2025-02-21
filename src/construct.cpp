@@ -391,6 +391,8 @@ int generate_solution_2(const std::vector<Ponto>& points, double x_max, double y
 
 int generate_solution_cgal(const std::vector<Ponto>& points, double x_max, double y_max, double x_min, double y_min) {
     std::queue<Quadrante> fila;
+
+    
     Quadrante pai(points, x_max, y_max, x_min, y_min);
     fila.push(pai);
 
@@ -520,13 +522,14 @@ int generate_solution_cgal(const std::vector<Ponto>& points, double x_max, doubl
                 // Calcular distâncias entre pontos extremos
                 
                 
-                double d1 = distance(quad.p_min_x, quad.p_max_x);
+                double d1 = CGAL::squared_distance(Point(quad.p_max_x.point.x(),quad.p_max_y.point.y()),Point(quad.p_min_x.point.x(),quad.p_min_y.point.y()));
+/*                 double d1 = distance(quad.p_min_x, quad.p_max_x);
                 double d2 = distance(quad.p_min_y, quad.p_max_y);
                 double d3 = distance(quad.p_min_x, quad.p_max_y);
                 double d4 = distance(quad.p_max_x, quad.p_min_y);
-                double max_diameter = std::max({ d1, d2, d3, d4 });
+                double max_diameter = std::max({ d1, d2, d3, d4 }); */
 
-                if (max_diameter <= 2.0 * raio) {
+                if (d1 <= 4.0 * raio*raio) {
 
                     Point centro = quad.getCenter();
                     Fuzzy_sphere sphere(centro, raio);

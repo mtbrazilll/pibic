@@ -1,5 +1,5 @@
 # Flags de compilação
-CFLAGS=-std=c++14 -static-libstdc++ -static-libgcc -Wall -g
+CFLAGS=-std=c++17 -static-libstdc++ -static-libgcc -Wall -g
 
 # Flags de inclusão e outras flags do CPLEX
 CPLEX_INCLUDE_FLAGS=-O3 -m64 -O -fPIC -fexceptions -DNDEBUG -DIL_STD -I/opt/ibm/ILOG/CPLEX_Studio129/cplex/include -I/opt/ibm/ILOG/CPLEX_Studio129/concert/include

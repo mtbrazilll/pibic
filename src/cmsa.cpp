@@ -226,7 +226,8 @@ int main(int argc, char* argv[]) {
     read_points(filePath, pontos, max_x, max_y, min_x, min_y, maior_em_modulo);
 
     n_pon = pontos.size();
-    build_struct();
+    tree.insert(pontos.begin(), pontos.end());
+    //build_struct();
     CMSA(cplex_time_limit, age_limit);
     
     testando();
