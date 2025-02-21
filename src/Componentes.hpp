@@ -1,11 +1,10 @@
 #pragma once
 #include <vector>
 #include <iostream>
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <boost/multiprecision/gmp.hpp>
 #include <set>
 
-#include "SmallestEnclosingCircle.hpp"
+#include "Struct.h"
 
 class Component {
 public:

@@ -10,24 +10,18 @@
 #include <random>
 #include <cmath>
 
-// Bibliotecas do CGAL
-#include <CGAL/Simple_cartesian.h>
-#include <CGAL/Search_traits_adapter.h>
-#include <CGAL/Kd_tree.h>
-#include <CGAL/property_map.h>
-#include <CGAL/Fuzzy_sphere.h>  
+
 
 // Cabeçalhos personalizados
-#include "SmallestEnclosingCircle.hpp"
 #include "Read_data.hpp"
 #include "construct.hpp"
 #include "Componentes.hpp"
 #include "Cplex.h"
 #include "Teste.h"
-#include "Cplex_pcdp.h"
 #include "FASTCOVER.h"
 #include "FASTCOVER-PP.h"
 #include "hexa.h"
+#include "Struct.h"
 
 /* // Definições de tipos
 typedef CGAL::Simple_cartesian<double> K;
@@ -80,7 +74,7 @@ int loops = 0;
 int seed = 1;
 double raio = 1.0; // Declarado antes de ser usado
 unsigned long int n_pon = 0;
-Kd_tree tree;
+PontoTree tree;
 
 std::vector<Ponto> pontos;
 ComponentManager manager;

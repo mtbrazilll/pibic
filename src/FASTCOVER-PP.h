@@ -9,10 +9,9 @@
 #include <list>
 #include <vector>
 #include <unordered_set>
-#include "SmallestEnclosingCircle.hpp"
 #include <random>
 #include "Componentes.hpp"
-#include <CGAL/Cartesian.h>
+#include "Struct.h"
 extern ComponentManager manager;
 
 

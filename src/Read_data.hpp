@@ -1,6 +1,5 @@
 #pragma once
 
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <string>
 #include <fstream>
 #include <iostream>
@@ -9,12 +8,7 @@
 #include <algorithm>
 #include <limits>
 #include <unordered_map>
-#include <CGAL/Kd_tree.h>
-#include <CGAL/Search_traits_2.h>
-#include "SmallestEnclosingCircle.hpp"
-
-typedef CGAL::Simple_cartesian<double> K;
-typedef K::Point_2 Point;
+#include "Struct.h"
 
 
 

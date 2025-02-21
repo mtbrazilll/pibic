@@ -7,12 +7,13 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include "SmallestEnclosingCircle.hpp"
+
 #include "Componentes.hpp"
 #include <stack>
 #include <unordered_set>
 #include <functional>
 #include <unordered_map>
+#include "Struct.h"
 
 using std::vector;
 using std::string;

@@ -3,8 +3,7 @@
 #include <vector>
 #include <random>
 #include "Componentes.hpp"
-#include "SmallestEnclosingCircle.hpp"
-#include <CGAL/Cartesian.h>
+#include "Struct.h"
 
 extern ComponentManager manager;
 extern std::random_device rd;
