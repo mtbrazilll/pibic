@@ -3,13 +3,11 @@
 #ifndef Teste_H
 #define Teste_H
 
-#include "SmallestEnclosingCircle.hpp"
-
+#include "Struct.h"
 #include <vector> 
 #include "Componentes.hpp"
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <CGAL/squared_distance_2.h>
 #include <iostream>
 #include <cmath>
 
