@@ -55,6 +55,7 @@ double min_x = std::numeric_limits<double>::max();
 double min_y = std::numeric_limits<double>::max();
 double maior_em_modulo = std::numeric_limits<double>::lowest();
 double bsf = std::numeric_limits<double>::max();
+double best_solution_time = 0.0; // Tempo em que a melhor solução foi encontrada
 
 // CMSA PARAMETERS
 double computation_time_limit = 100.0;
@@ -73,10 +74,12 @@ bool init = false;
 int loops = 0;
 int seed = 1;
 double raio = 1.0; // Declarado antes de ser usado
+
 unsigned long int n_pon = 0;
 PontoTree tree;
 
 std::vector<Ponto> pontos;
+std::vector<int> indices;
 ComponentManager manager;
 ComponentManager bestSolution;
 
@@ -88,15 +91,29 @@ std::uniform_real_distribution<> distr2(0, 1);
 
 // Declaração de funções
 void CMSA(float time_limit, int max_age);
-void build_struct(); // Corrigido o nome da função
-void k_center(std::vector<Ponto> &pontos, ComponentManager &manager, double raio);
-void k_center_cgal(std::vector<Ponto> &pontos, ComponentManager &manager, double raio);
 void testando();
 
 double Random(double minVal, double maxVal) {
 	
     double randomValue = distr2(gen); // Número entre 0 e 1
     return (minVal + randomValue * (maxVal - minVal)); // Mapeia para o intervalo [minVal, maxVal]
+}
+
+void printHelp() {
+    std::cout << "USO: ./cmsa [OPÇÕES]\n\n";
+    std::cout << "OPÇÕES:\n";
+    std::cout << "  -h, --help            Mostra esta mensagem de ajuda\n";
+    std::cout << "  -s <num>              Define a semente para o gerador de números aleatórios (padrão: 1)\n";
+    std::cout << "  -max_age <num>        Define o limite de idade máxima para componentes (padrão: 1)\n";
+    std::cout << "  -t <num>              Define o limite de tempo de computação em segundos (padrão: 100.0)\n";
+    std::cout << "  -cpl_t <num>          Define o limite de tempo para o CPLEX em segundos (padrão: 10.0)\n";
+    std::cout << "  -i <arquivo>          Define o caminho do arquivo de entrada (padrão: ../instancias/i1.txt)\n";
+    std::cout << "  -r <num>              Define o raio das bolas (padrão: 1.0)\n";
+    std::cout << "  -nsols <num>          Define o número de soluções a serem geradas (padrão: 3)\n";
+    std::cout << "  -h_emph <0|1>         Ativa a ênfase heurística (padrão: 0)\n";
+    std::cout << "  -warm_start <0|1>     Ativa o warm start (padrão: 0)\n";
+    std::cout << "  -init <0|1>           Ativa a inicialização (padrão: 0)\n";
+    std::cout << "  -cpl_abort <0|1>      Ativa o aborto do CPLEX (padrão: 0)\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -107,6 +124,10 @@ int main(int argc, char* argv[]) {
 
     // Lendo argumentos da linha de comando
     for (int i = 1; i < argc; i++) { // Inicia em 1 para pular o nome do programa
+        if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
+            printHelp();
+            return 0;
+        }
         if (strcmp(argv[i], "-s") == 0) {
             if (i + 1 < argc) {
                 seed = std::atoi(argv[++i]);
@@ -218,7 +239,9 @@ int main(int argc, char* argv[]) {
     gen.seed(seed);
 
     read_points(filePath, pontos, max_x, max_y, min_x, min_y, maior_em_modulo);
-
+    indices.resize(pontos.size());
+    std::iota(indices.begin(), indices.end(), 0); 
+    
     n_pon = pontos.size();
     tree.insert(pontos.begin(), pontos.end());
     //build_struct();
@@ -257,7 +280,11 @@ void CMSA(float time_limit, int max_age) {
         // CONSTRUCT
         auto construct_start = std::chrono::high_resolution_clock::now();
         for (int na = 0; na < n_of_sols; na++) {
-           int aux_solution = generate_solution_cgal(pontos, max_x , max_y , min_x , min_y );
+           int aux_solution2 = generate_solution_cgal(pontos, max_x , max_y , min_x , min_y );
+            //int aux_solution1 = generate_solution_dr(pontos, max_x , max_y , min_x , min_y );
+
+           //std::cout << "solucao construtivo "<<aux_solution1 << std::endl;
+           //int aux_solution2 = construtivo_brkg(pontos);
         //std::cout << "solucao construtivo "<<aux_solution << std::endl;
            //if (bsf > aux_solution) bsf = aux_solution;
           // mateus_recursive(pontos, max_x + raio, max_y + raio, min_x - raio, min_y -raio);
@@ -287,8 +314,13 @@ void CMSA(float time_limit, int max_age) {
        
         //        std::cout << "solucao cplex "<<aux_solution_cplex << std::endl;
 
-        if (bsf > aux_solution_cplex) bsf = aux_solution_cplex;
-      //bsf = guloso();
+        // Atualizar melhor solução se encontrada
+        if (bsf > aux_solution_cplex) {
+            bsf = aux_solution_cplex;
+            auto current = std::chrono::high_resolution_clock::now();
+            best_solution_time = std::chrono::duration_cast<std::chrono::milliseconds>(current - total_start).count();
+        }
+        //bsf = guloso();
         auto solve_end = std::chrono::high_resolution_clock::now();
         solve_total += std::chrono::duration_cast<std::chrono::milliseconds>(solve_end - solve_start).count();
 
@@ -317,6 +349,8 @@ void CMSA(float time_limit, int max_age) {
     std::cout << "-----------------------------------\n";
     std::cout << "Loops: " << loops << std::endl;
     std::cout << "Raio: " << raio << std::endl;
+    std::cout << "Best solution found at: " << best_solution_time << " ms" << std::endl;
+
 }
 
 void testando() {
@@ -337,310 +371,5 @@ void testando() {
     teste.writeOutput();
 }
 
-void build_struct() {
-    tree.insert(pontos.begin(), pontos.end());
-    double d = 2 * raio;  // Limite de distância (2*r)
 
-    // Para cada ponto, encontrar seus vizinhos dentro da distância d
-    for (size_t i = 0; i < pontos.size(); ++i) {
-        Ponto& p = pontos[i];
-
-        // Criar uma esfera fuzzy centrada em p com raio d
-        Fuzzy_sphere sphere(p, d);
-
-        // Coletar vizinhos dentro da distância d
-        std::vector<Ponto> neighbors;
-        tree.search(std::back_inserter(neighbors), sphere);
-
-        // Para cada vizinho, armazenar o índice
-        for (const Ponto& neighbor : neighbors) {
-            if (neighbor.indice != p.indice) {
-                p.neighbors.push_back(neighbor.indice);
-            }
-        }
-    }
-
-    // Exemplo: imprimir os vizinhos de cada ponto
-    for (const Ponto& p : pontos) {
-       // std::cout << "Ponto " << p.indice << " tem vizinhos: ";
-        for (unsigned long int neighbor_index : p.neighbors) {
-            //std::cout << neighbor_index << " ";
-        }
-       // std::cout << std::endl;
-    }
-    
-}
-
-/* void k_center(std::vector<Ponto> &pontos, ComponentManager &manager, double raio) {
-    
-    std::vector<bool> visitados(pontos.size(), false);
-    unsigned int qnt_visitados = 0;
-
-    // Enquanto existirem pontos não visitados
-    while (qnt_visitados < pontos.size()) {
-        // Escolhe um ponto aleatório não visitado
-        unsigned long int idx = static_cast<unsigned long int>(Random(0, pontos.size() - 1));
-        
-        // Garantir que idx esteja dentro dos limites
-        while (visitados[idx]) {
-            idx = (idx + 1) % pontos.size();
-        }
-
-        Ponto& p = pontos[idx];
-
-        // Gera um deslocamento aleatório dentro do raio
-        double angle = Random(0, 2 * M_PI);
-        double distance = Random(0, raio); // Distância deve ser positiva
-        double dx = distance * cos(angle);
-        double dy = distance * sin(angle);
-
-        // Novo centro deslocado
-        Point novo_centro(p.point.x() + dx, p.point.y() + dy);
-
-        // Encontrar vizinhos dentro da distância raio
-        std::vector<Ponto> cobertos;
-
-        // Adicionar o próprio ponto se não visitado
-        if (!visitados[p.indice]) {
-            double dist = sqrt(CGAL::squared_distance(novo_centro, p.point));
-            if (dist <= raio) {
-                cobertos.push_back(p);
-            }
-        }
-
-        // Iterar sobre os vizinhos
-        for (unsigned long int neighbor_idx : p.neighbors) {
-            Ponto& q = pontos[neighbor_idx];
-        
-            double dist = sqrt(CGAL::squared_distance(novo_centro, q.point));
-            if (dist <= raio) {
-                cobertos.push_back(q);
-            }
-            
-        }
-
-        // Cria um novo componente com o centro deslocado e pontos cobertos
-        Component aux(raio, cobertos, novo_centro);
-        manager.addComponent(aux);
-
-        // Marca os pontos cobertos como visitados
-        for (const auto& cp : cobertos) {
-            if (!visitados[cp.indice]) {
-                visitados[cp.indice] = true;
-                qnt_visitados++;
-            }
-        }
-    }
-} */
-
- void k_center(std::vector<Ponto> &pontos, ComponentManager &manager, double raio) {
-    unsigned int n_nao_visitados = pontos.size();
-    std::vector<unsigned int> indices_nao_visitados(pontos.size());
-    std::vector<unsigned int> indice_em_nao_visitados(pontos.size());
-
-    // Inicializa indices_nao_visitados e indice_em_nao_visitados
-    for (unsigned int i = 0; i < pontos.size(); ++i) {
-        indices_nao_visitados[i] = i;
-        indice_em_nao_visitados[i] = i;
-    }
-
-    // Enquanto houver pontos não visitados
-    while (n_nao_visitados > 0) {
-        // Escolhe um índice aleatório entre 0 e n_nao_visitados - 1
-        unsigned int indice = static_cast<unsigned int>(Random(0, n_nao_visitados - 1));
-
-        unsigned int indice_ponto = indices_nao_visitados[indice];
-        Ponto &p = pontos[indice_ponto];
-
-        // Troca o índice selecionado com o último índice não visitado
-        std::swap(indices_nao_visitados[indice], indices_nao_visitados[n_nao_visitados - 1]);
-        // Atualiza o mapeamento
-        indice_em_nao_visitados[indices_nao_visitados[indice]] = indice;
-        indice_em_nao_visitados[indices_nao_visitados[n_nao_visitados - 1]] = n_nao_visitados - 1;
-
-        // Diminui o número de pontos não visitados
-        n_nao_visitados--;
-
-        // Gera um deslocamento aleatório dentro do raio
-        double angulo = Random(0, 2 * M_PI);
-        double distancia = Random(0, raio);
-        double dx = distancia * cos(angulo);
-        double dy = distancia * sin(angulo);
-
-        // Novo centro deslocado
-        Point novo_centro(p.point.x() + dx, p.point.y() + dy);
-
-        // Encontra vizinhos dentro do raio
-        std::vector<Ponto> cobertos;
-        cobertos.push_back(p);
-
-        for (auto indice_vizinho : p.neighbors) {
-            Ponto &q = pontos[indice_vizinho];
-            double dist = sqrt(CGAL::squared_distance(novo_centro, q.point));
-            if (dist <= raio) {
-                cobertos.push_back(q);
-
-                // Remove o vizinho de indices_nao_visitados se ainda não foi visitado
-                unsigned int indice_para_remover = indice_em_nao_visitados[indice_vizinho];
-                if (indice_para_remover < n_nao_visitados) {
-                    std::swap(indices_nao_visitados[indice_para_remover], indices_nao_visitados[n_nao_visitados - 1]);
-                    // Atualiza o mapeamento
-                    indice_em_nao_visitados[indices_nao_visitados[indice_para_remover]] = indice_para_remover;
-                    indice_em_nao_visitados[indices_nao_visitados[n_nao_visitados - 1]] = n_nao_visitados - 1;
-                    n_nao_visitados--;
-                }
-            }
-        }
-
-        // Cria um novo componente com o centro deslocado e pontos cobertos
-        Component aux(raio, cobertos, novo_centro);
-        manager.addComponent(aux);
-
-        // Todos os pontos cobertos foram marcados como visitados
-    }
-} 
- 
-
-/* 
- void k_center(std::vector<Ponto> &pontos, ComponentManager &manager, double raio) {
-    unsigned int n_unvisited = pontos.size();
-    
-    std::vector<unsigned int> unvisited_indices(pontos.size());
-    for (unsigned int i = 0; i < pontos.size(); ++i)
-        unvisited_indices[i] = i;
-
-    // Enquanto existirem pontos não visitados
-    while (n_unvisited > 0) {
-        // Escolhe um índice aleatório entre 0 e n_unvisited - 1
-        unsigned long int idx = int(Random(0, n_unvisited - 1));
-
-        unsigned int point_idx = unvisited_indices[idx];
-        Ponto &p = pontos[point_idx];
-
-        // Swap o índice selecionado com o último índice não visitado
-        std::swap(unvisited_indices[idx], unvisited_indices[n_unvisited - 1]);
-
-        // Decrease the number of unvisited points
-        n_unvisited--;
-
-        // Gera um deslocamento aleatório dentro do raio
-        double angle = Random(0, 2 * M_PI);
-        double distance = Random(0, raio);
-        double dx = distance * cos(angle);
-        double dy = distance * sin(angle);
-
-        // Novo centro deslocado
-        Point novo_centro(p.point.x() + dx, p.point.y() + dy);
-
-        // Encontrar vizinhos dentro da distância raio
-        std::vector<Ponto> cobertos;
-        cobertos.push_back(p);
-
-        for (auto neighbor_idx : p.neighbors) {
-            Ponto &q = pontos[neighbor_idx];
-            double dist = sqrt(CGAL::squared_distance(novo_centro, q.point));
-            if (dist <= raio) {
-                cobertos.push_back(q);
-            }
-        }
-
-        // Cria um novo componente com o centro deslocado e pontos cobertos
-        Component aux(raio, cobertos, novo_centro);
-        manager.addComponent(aux);
-
-        // marque os pontos cobertos como visitados
-    }
-}  */
-/*
-void k_center_cgal(std::vector<Ponto> &pontos, ComponentManager &manager, double raio) {
-    
-    std::vector<bool> visitados(pontos.size(), false);
-    unsigned int qnt_visitados = 0;
-    // Enquanto existirem pontos não visitados
-    while (qnt_visitados < pontos.size()) {
-        
-        //gera um ponto aleatorio p
-
-       
-       Fuzzy_sphere sphere(p, raio);
-       // Coletar vizinhos dentro da distância d
-        std::vector<Ponto> cobertos;
-        tree.search(std::back_inserter(cobertos), sphere);
-
-        // Cria um novo componente com o centro deslocado e pontos cobertos
-        Component aux(raio,cobertos,p);
-		manager.addComponent(aux);
-
-
-        // Marca os pontos cobertos como visitados
-        for (const auto& cp : cobertos) {
-            if (!visitados[cp.indice]) {
-                visitados[cp.indice] = true;
-                qnt_visitados++;
-            }
-        }
-    }
-}*/
-
-/* void k_center(std::vector<Ponto> &pontos, ComponentManager &manager, double raio) {
-    
-    std::vector<bool> visitados(pontos.size(), false);
-    unsigned int qnt_visitados = 0;
-
-    // Enquanto existirem pontos não visitados
-    while (qnt_visitados < pontos.size()) {
-        // Escolhe um ponto aleatório não visitado
-        unsigned long int idx = static_cast<unsigned long int>(Random(0, pontos.size() - 1));
-        
-        // Garantir que idx esteja dentro dos limites
-        while (visitados[idx]) {
-            idx = (idx + 1) % pontos.size();
-        }
-
-        Ponto& p = pontos[idx];
-
-        // Gera um deslocamento aleatório dentro do raio
-        double angle = Random(0, 2 * M_PI);
-        double distance = Random(0, raio); // Distância deve ser positiva
-        double dx = distance * cos(angle);
-        double dy = distance * sin(angle);
-
-        // Novo centro deslocado
-        Point novo_centro(p.point.x() + dx, p.point.y() + dy);
-
-        // Encontrar vizinhos dentro da distância raio
-        std::vector<Ponto> cobertos;
-
-        // Adicionar o próprio ponto se não visitado
-        if (!visitados[p.indice]) {
-            double dist = sqrt(CGAL::squared_distance(novo_centro, p.point));
-            if (dist <= raio) {
-                cobertos.push_back(p);
-            }
-        }
-
-        // Iterar sobre os vizinhos
-        for (unsigned long int neighbor_idx : p.neighbors) {
-            Ponto& q = pontos[neighbor_idx];
-            if (!visitados[q.indice]) {
-                double dist = sqrt(CGAL::squared_distance(novo_centro, q.point));
-                if (dist <= raio) {
-                    cobertos.push_back(q);
-                }
-            }
-        }
-
-        // Cria um novo componente com o centro deslocado e pontos cobertos
-        Component aux(raio, cobertos, novo_centro);
-        manager.addComponent(aux);
-
-        // Marca os pontos cobertos como visitados
-        for (const auto& cp : cobertos) {
-            if (!visitados[cp.indice]) {
-                visitados[cp.indice] = true;
-                qnt_visitados++;
-            }
-        }
-    }
-}  */
 

@@ -21,7 +21,7 @@
 
 using namespace std;
 
-static const double EPSILON = 1+1e-12;
+// Definições de tipos
 
 
 
@@ -33,13 +33,14 @@ extern std::random_device rd;
 extern std::mt19937 gen;
 extern std::uniform_real_distribution<>distr2;
 extern double raio;
+extern std::vector<int> indices;
+extern std::vector<Ponto> pontos;
 
-int generate_solution(vector<Ponto>const &points, double x_max, double y_max, double x_min, double y_min);
 
 
 
-int generate_solution_recursive(std::vector<Ponto>& points, double x_max, double y_max, double x_min, double y_min);
-void generate_solution_recursive_real(std::vector<Ponto>& points, double x_max, double y_max, double x_min, double y_min, int & value_solution);
-
-int generate_solution_2(const std::vector<Ponto>& points, double x_max, double y_max, double x_min, double y_min);
 int generate_solution_cgal(const std::vector<Ponto>& points, double x_max, double y_max, double x_min, double y_min);
+int construtivo_brkg(const std::vector<Ponto>& points);
+int generate_solution_dr(const std::vector<Ponto>& points,
+    double x_max, double y_max,
+    double x_min, double y_min);

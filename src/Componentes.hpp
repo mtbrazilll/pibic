@@ -20,6 +20,9 @@ public:
 
     Component( double raio, std::vector<Ponto>& points, const Point& pos)
         :  idade(1), raio(raio), points(points), pos(pos), eh_sol(false) {}
+    
+        Component( double raio, const std::vector<Ponto>& points, const Point& pos)
+        :  idade(1), raio(raio), points(points), pos(pos), eh_sol(false) {}
 };
 
 class ComponentManager {

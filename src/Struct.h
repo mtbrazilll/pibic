@@ -18,7 +18,8 @@ typedef CGAL::Simple_cartesian<double> K;
 typedef K::Point_2 Point;
 
 
-
+typedef CGAL::Min_circle_2_traits_2<K> Traits_circle;
+typedef CGAL::Min_circle_2<Traits_circle> Min_circle;
 
 
 struct Ponto {
@@ -45,12 +46,13 @@ struct Ponto {
 struct Bola {
 
     Point centro;
-
+    
     //Point borda_1;
     //Point borda_2;
     //Point borda_3;
-
-    std::vector<Ponto> pontos_da_bola; // To store indices of neighbors
+    std::vector<Point> bordas;
+    std::vector<Ponto> pontos_da_bola; 
+    Min_circle *mc = nullptr;
     double raio;
    
     // Constructor
@@ -61,6 +63,10 @@ struct Bola {
 
     operator CGAL::Simple_cartesian<double>::Point_2() const {
         return centro;
+    }
+
+    void adicionarPonto(const Ponto& ponto) {
+        pontos_da_bola.push_back(ponto);
     }
 
           
@@ -89,20 +95,19 @@ struct Bola_to_Point_map {
     }
 };
 
-// Traits para Ponto
 typedef CGAL::Search_traits_2<K> Base_traits;
+// Traits para Ponto
+
 typedef CGAL::Search_traits_adapter<Ponto, Ponto_to_Point_map, Base_traits> PontoTraits;
 typedef CGAL::Kd_tree<PontoTraits> PontoTree;
-typedef CGAL::Fuzzy_sphere<PontoTraits> Fuzzy_sphere;
+typedef CGAL::Fuzzy_sphere<PontoTraits> Fuzzy_sphere_Ponto;
 
 // Traits para Bola
 typedef CGAL::Search_traits_adapter<Bola, Bola_to_Point_map, Base_traits> BolaTraits;
 typedef CGAL::Kd_tree<BolaTraits> BolaTree;
-typedef CGAL::Fuzzy_sphere<BolaTraits> Fuzzy_sphere_bola;
+typedef CGAL::Fuzzy_sphere<BolaTraits> Fuzzy_sphere_Bola;
 
 
-typedef CGAL::Min_circle_2_traits_2<K> Traits_circle;
-typedef CGAL::Min_circle_2<Traits_circle> Min_circle;
 
 
 

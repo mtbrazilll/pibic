@@ -64,24 +64,28 @@ public:
 
 
     void writeOutput() {
-        //std::ofstream pointsFile("solution/points_output.txt");
+        std::ofstream pointsFile("solution/points_output.txt");
         std::ofstream discsFile("solution/discs_output.txt");
 
-        
-        for (const auto& component : sol) {
-            for (const auto& Ponto : component.points) {
-                
-               // pointsFile << point.x << " " << point.y << " " << point.id << "\n";
-                    
-                
-            }
-        discsFile << component.pos.x() << " " << component.pos.y() << " "
-        << component.raio << "\n";
-
- 
+        if (!pointsFile.is_open() || !discsFile.is_open()) {
+            std::cerr << "Erro ao abrir os arquivos de saída." << std::endl;
+            return;
         }
 
-        //pointsFile.close();
+        int disc_id = 0; // Identificador para cada disco
+
+        for (const auto& component : sol) {
+            // Escreve informações do disco
+            discsFile << component.pos.x() << " " << component.pos.y() << " " << component.raio << " " << disc_id << "\n";
+
+            // Escreve os pontos cobertos pelo disco, associando-os ao disco
+            for (const auto& ponto : component.points) {
+                pointsFile << ponto.point.x() << " " << ponto.point.y() << " " << ponto.indice << " " << disc_id << "\n";
+            }
+            disc_id++;
+        }
+
+        pointsFile.close();
         discsFile.close();
     }
 };
