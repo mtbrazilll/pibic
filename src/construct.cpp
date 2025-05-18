@@ -71,6 +71,8 @@ class Quadrant {
                                double x_min, double y_min)
     {
         std::queue<Quadrant> fila;
+        
+        int k_random = int_distr(gen);
         fila.push(Quadrant(points, x_max, y_max, x_min, y_min));
     
         int solution = 0;
@@ -119,7 +121,8 @@ class Quadrant {
                         Point(q.x_min, q.y_min)
                     );
                     // Usa d para decidir se gera componente
-                    if (d <= 4.0 * raio * raio) {
+                   
+                    if (d <= int_distr(gen)*raio2x4) {
                         Point centro = q.getCenter();
                         Fuzzy_sphere_Ponto sphere(centro, raio);
                         std::vector<Ponto> neighbors;
@@ -148,6 +151,185 @@ class Quadrant {
     
         return solution;
     }
+
+int generate_solution_cgal_1(const std::vector<Ponto>& points,
+                               double x_max, double y_max,
+                               double x_min, double y_min)
+    {
+        std::queue<Quadrant> fila;
+        
+    
+        fila.push(Quadrant(points, x_max, y_max, x_min, y_min));
+    
+        int solution = 0;
+    
+        while (!fila.empty()) {
+            Quadrant current = fila.front();
+            fila.pop();
+    
+            // Escolhe limites aleatórios para subdividir
+            double rand1 = getRandomValue(current.x_min, current.x_max);
+            double rand2 = getRandomValue(current.y_min, current.y_max);
+    
+            // Definir novos limites de subquadrantes
+            double XminQ1 = rand1,     YminQ1 = rand2,     XmaxQ1 = current.x_max, YmaxQ1 = current.y_max;
+            double XminQ2 = current.x_min, YminQ2 = rand2,     XmaxQ2 = rand1,     YmaxQ2 = current.y_max;
+            double XminQ3 = current.x_min, YminQ3 = current.y_min, XmaxQ3 = rand1,     YmaxQ3 = rand2;
+            double XminQ4 = rand1,     YminQ4 = current.y_min, XmaxQ4 = current.x_max, YmaxQ4 = rand2;
+    
+            // Cria quadrantes vazios
+            Quadrant q1, q2, q3, q4;
+    
+
+            // Distribuir pontos
+            distributePoints(current.points, 
+                             q1, XminQ1, XmaxQ1, YminQ1, YmaxQ1,
+                             q2, XminQ2, XmaxQ2, YminQ2, YmaxQ2,
+                             q3, XminQ3, XmaxQ3, YminQ3, YmaxQ3,
+                             q4, XminQ4, XmaxQ4, YminQ4, YmaxQ4);
+    
+            // Lambda para processar um quadrante e decidir se subdivide ou gera componente
+            auto processQuadrant = [&](Quadrant& q, double mx, double my, double mnx, double mny) {
+                if (q.points.size() == 1) {
+                    // Já temos um ponto único
+                    Point centro = q.getCenter();
+                    Fuzzy_sphere_Ponto sphere(centro, raio);
+                    std::vector<Ponto> neighbors;
+                    tree.search(std::back_inserter(neighbors), sphere);
+    
+                    Component aux(raio, neighbors, centro);
+                    manager.addComponent(aux);
+                    solution++;
+                } else {
+                    // Distância entre cantos opostos
+                    double d = CGAL::squared_distance(
+                        Point(q.x_max, q.y_max),
+                        Point(q.x_min, q.y_min)
+                    );
+                    // Usa d para decidir se gera componente
+                    
+                    if (d <= raio2x4) {
+                        Point centro = q.getCenter();
+                        Fuzzy_sphere_Ponto sphere(centro, raio);
+                        std::vector<Ponto> neighbors;
+                        tree.search(std::back_inserter(neighbors), sphere);
+    
+                        Component aux(raio, neighbors, centro);
+                        manager.addComponent(aux);
+                        solution++;
+                    } else {
+                        // Se não couber, subdivide mais
+                        fila.push(Quadrant(q.points, mx, my, mnx, mny));
+                    }
+                }
+            };
+    
+            // Processa cada subquadrante se não estiver vazio
+            if (!q1.points.empty())
+                processQuadrant(q1, XmaxQ1, YmaxQ1, XminQ1, YminQ1);
+            if (!q2.points.empty())
+                processQuadrant(q2, XmaxQ2, YmaxQ2, XminQ2, YminQ2);
+            if (!q3.points.empty())
+                processQuadrant(q3, XmaxQ3, YmaxQ3, XminQ3, YminQ3);
+            if (!q4.points.empty())
+                processQuadrant(q4, XmaxQ4, YmaxQ4, XminQ4, YminQ4);
+        }
+    
+        return solution;
+    }
+
+
+int generate_solution_cgal_manual(const std::vector<Ponto>& points,
+                               double x_max, double y_max,
+                               double x_min, double y_min)
+{
+    std::queue<Quadrant> fila;
+    fila.push(Quadrant(points, x_max, y_max, x_min, y_min));
+
+    int solution = 0;
+
+    while (!fila.empty()) {
+        Quadrant current = fila.front();
+        fila.pop();
+
+        // Escolhe limites aleatórios para subdividir
+        double rand1 = getRandomValue(current.x_min, current.x_max);
+        double rand2 = getRandomValue(current.y_min, current.y_max);
+
+        // Definir novos limites de subquadrantes
+        double XminQ1 = rand1,     YminQ1 = rand2,     XmaxQ1 = current.x_max, YmaxQ1 = current.y_max;
+        double XminQ2 = current.x_min, YminQ2 = rand2,     XmaxQ2 = rand1,     YmaxQ2 = current.y_max;
+        double XminQ3 = current.x_min, YminQ3 = current.y_min, XmaxQ3 = rand1,     YmaxQ3 = rand2;
+        double XminQ4 = rand1,     YminQ4 = current.y_min, XmaxQ4 = current.x_max, YmaxQ4 = rand2;
+
+        // Cria quadrantes vazios
+        Quadrant q1, q2, q3, q4;
+
+        // Distribuir pontos
+        distributePoints(current.points, 
+                         q1, XminQ1, XmaxQ1, YminQ1, YmaxQ1,
+                         q2, XminQ2, XmaxQ2, YminQ2, YmaxQ2,
+                         q3, XminQ3, XmaxQ3, YminQ3, YmaxQ3,
+                         q4, XminQ4, XmaxQ4, YminQ4, YmaxQ4);
+
+        // Lambda para processar um quadrante e decidir se subdivide ou gera componente
+        auto processQuadrant = [&](Quadrant& q, double mx, double my, double mnx, double mny) {
+            if (q.points.size() == 1) {
+                // Já temos um ponto único
+                Point centro = q.getCenter();
+                
+                // Usando for loop ao invés de Fuzzy_sphere_Ponto
+                std::vector<Ponto> neighbors;
+                for (const auto& p : points) {
+                    if (CGAL::squared_distance(centro, p.point) <= raio * raio) {
+                        neighbors.push_back(p);
+                    }
+                }
+
+                Component aux(raio, neighbors, centro);
+                manager.addComponent(aux);
+                solution++;
+            } else {
+                // Distância entre cantos opostos
+                double d = CGAL::squared_distance(
+                    Point(q.x_max, q.y_max),
+                    Point(q.x_min, q.y_min)
+                );
+                // Usa d para decidir se gera componente
+                if (d <= raio2x4) {
+                    Point centro = q.getCenter();
+                    
+                    // Usando for loop ao invés de Fuzzy_sphere_Ponto
+                    std::vector<Ponto> neighbors;
+                    for (const auto& p : points) {
+                        if (CGAL::squared_distance(centro, p.point) <= raio * raio) {
+                            neighbors.push_back(p);
+                        }
+                    }
+
+                    Component aux(raio, neighbors, centro);
+                    manager.addComponent(aux);
+                    solution++;
+                } else {
+                    // Se não couber, subdivide mais
+                    fila.push(Quadrant(q.points, mx, my, mnx, mny));
+                }
+            }
+        };
+
+        // Processa cada subquadrante se não estiver vazio
+        if (!q1.points.empty())
+            processQuadrant(q1, XmaxQ1, YmaxQ1, XminQ1, YminQ1);
+        if (!q2.points.empty())
+            processQuadrant(q2, XmaxQ2, YmaxQ2, XminQ2, YminQ2);
+        if (!q3.points.empty())
+            processQuadrant(q3, XmaxQ3, YmaxQ3, XminQ3, YminQ3);
+        if (!q4.points.empty())
+            processQuadrant(q4, XmaxQ4, YmaxQ4, XminQ4, YminQ4);
+    }
+
+    return solution;
+}
 
 
 int construtivo_brkg(const std::vector<Ponto>& points){

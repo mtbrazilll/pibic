@@ -164,7 +164,15 @@ double cplex_run() {
             if (solution_cplex > bsf){
                  
                  for (auto& component : manager.components){
-                    component.idade = component.idade * 2;
+                   
+                    if (component.eh_sol) {
+                        component.idade = 0;
+                        component.eh_sol = true;
+                    }
+                    else {
+                        component.idade = component.idade + 1;
+                        component.eh_sol = false;
+                    }
                  }
 
             }
@@ -172,7 +180,7 @@ double cplex_run() {
                 cpl.getValues(sol, x);
                 indice_var = 0;
                 for (auto& component : manager.components) {
-        
+                    
                     if(sol[indice_var] > 0.8){
                         component.idade = 0;
                         component.eh_sol = true;

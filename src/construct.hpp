@@ -32,15 +32,26 @@ extern int seed;
 extern std::random_device rd;
 extern std::mt19937 gen;
 extern std::uniform_real_distribution<>distr2;
+extern std::uniform_int_distribution<int> int_distr;
 extern double raio;
 extern std::vector<int> indices;
 extern std::vector<Ponto> pontos;
+extern double raio2;
+extern double raio2x4;
+extern std::uniform_real_distribution<> distr3;
 
 
+int generate_solution_cgal_manual(const std::vector<Ponto>& points,
+                               double x_max, double y_max,
+                               double x_min, double y_min);
 
-
+                               
 int generate_solution_cgal(const std::vector<Ponto>& points, double x_max, double y_max, double x_min, double y_min);
 int construtivo_brkg(const std::vector<Ponto>& points);
 int generate_solution_dr(const std::vector<Ponto>& points,
     double x_max, double y_max,
     double x_min, double y_min);
+
+int generate_solution_cgal_1(const std::vector<Ponto>& points,
+                               double x_max, double y_max,
+                               double x_min, double y_min);

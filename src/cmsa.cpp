@@ -74,7 +74,8 @@ bool init = false;
 int loops = 0;
 int seed = 1;
 double raio = 1.0; // Declarado antes de ser usado
-
+double raio2;
+double raio2x4;
 unsigned long int n_pon = 0;
 PontoTree tree;
 
@@ -88,6 +89,8 @@ std::random_device rd;
 std::mt19937 gen(rd());
 std::uniform_real_distribution<> distr(-raio, raio);
 std::uniform_real_distribution<> distr2(0, 1);
+std::uniform_real_distribution<> distr3(1, 2);
+std::uniform_int_distribution<int> int_distr(1, 2);
 
 // Declaração de funções
 void CMSA(float time_limit, int max_age);
@@ -186,8 +189,8 @@ int main(int argc, char* argv[]) {
         }
         else if (strcmp(argv[i], "-h_emph") == 0) {
             if (i + 1 < argc) {
-                int val = std::atoi(argv[++i]);
-                heuristic_emphasis = 1;
+               
+                heuristic_emphasis = std::atoi(argv[++i]);
             } else {
                 std::cerr << "Erro: Argumento para -h_emph está faltando.\n";
                 return 1;
@@ -236,6 +239,8 @@ int main(int argc, char* argv[]) {
     std::cout << "Warm start: " << (warm_start ? "Sim" : "Não") << "\n";
     std::cout << "Abortar CPLEX: " << (cplex_abort ? "Sim" : "Não") << "\n";
 
+    raio2 = raio * raio;
+    raio2x4 = raio2 * 4;
     gen.seed(seed);
 
     read_points(filePath, pontos, max_x, max_y, min_x, min_y, maior_em_modulo);
@@ -266,6 +271,9 @@ void CMSA(float time_limit, int max_age) {
     if (init){
         FASTCOVER_PP ob1(pontos);
         bsf = ob1.execute();
+        auto current = std::chrono::high_resolution_clock::now();
+        best_solution_time = std::chrono::duration_cast<std::chrono::milliseconds>(current - total_start).count();
+        //bsf = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y );
         for (auto& component : manager.components){
             component.eh_sol = 1;
             component.idade = 0;
@@ -280,7 +288,19 @@ void CMSA(float time_limit, int max_age) {
         // CONSTRUCT
         auto construct_start = std::chrono::high_resolution_clock::now();
         for (int na = 0; na < n_of_sols; na++) {
-           int aux_solution2 = generate_solution_cgal(pontos, max_x , max_y , min_x , min_y );
+
+
+            if (loops == 0) {
+
+                int aux_solution1 = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y );
+            }
+            else{
+
+                int aux_solution2 = generate_solution_cgal(pontos, max_x , max_y , min_x , min_y );
+
+            }
+          
+           //int aux_solution2 = generate_solution_cgal_manual(pontos, max_x , max_y , min_x , min_y );
             //int aux_solution1 = generate_solution_dr(pontos, max_x , max_y , min_x , min_y );
 
            //std::cout << "solucao construtivo "<<aux_solution1 << std::endl;
@@ -308,10 +328,10 @@ void CMSA(float time_limit, int max_age) {
         auto solve_start = std::chrono::high_resolution_clock::now();
         
         double aux_solution_cplex = std::numeric_limits<double>::max();
-        if(r_limit>=0.001){
-            aux_solution_cplex = cplex_run();
+        if(r_limit < 0.001){
+            break;
         }
-       
+        aux_solution_cplex = cplex_run();
         //        std::cout << "solucao cplex "<<aux_solution_cplex << std::endl;
 
         // Atualizar melhor solução se encontrada
@@ -357,7 +377,7 @@ void testando() {
     std::vector<Component> sol;
 
     for (const auto& c : manager.components) {
-        if (c.idade == 0) {
+        if (c.eh_sol) {
             sol.push_back(c);
         }
     }
