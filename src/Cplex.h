@@ -88,8 +88,7 @@ double cplex_run() {
         // preparing warm-start
         IloNumVarArray mipVar(env);
         IloNumArray mipVal(env);
-        if (warm_start) 
-            {
+        if (warm_start) {
             int indice_var = 0;
             for (auto& component : manager.components) 
                 {
@@ -98,11 +97,12 @@ double cplex_run() {
                     mipVar.add(x[indice_var]);
 
                 // Adicione o valor inicial correspondente à lista de valores de início
-                    mipVal.add(component.eh_sol);   
+                
+                    mipVal.add(component.eh_sol ? 1 : 0);   
                     indice_var++;
                 }
             
-            }
+        }
              // end preparing warm-start
 
         IloExpr obj(env);
@@ -129,7 +129,7 @@ double cplex_run() {
                 componente_point[i].end();
             }
         }
-
+        model.add(obj >= bsf*0.8);
         model.add(IloMinimize(env, obj));
         obj.end();
 

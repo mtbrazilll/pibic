@@ -342,10 +342,15 @@ int construtivo_brkg(const std::vector<Ponto>& points){
         
         bool flag_ponto_achou_bola = false;	
         Ponto ponto_atual = pontos[idx];
-        Fuzzy_sphere_Bola sphere(ponto_atual.point, 2*raio);
+        Fuzzy_sphere_Bola sphere(ponto_atual.point, 2.5*raio);
         std::vector<Bola> neighbors;
         conjunto_bolas->search(std::back_inserter(neighbors), sphere);
 
+        		 // Ordena vizinhos por distância crescente (prioriza bolas mais próximas)
+        std::sort(neighbors.begin(), neighbors.end(), [&ponto_atual](const Bola& b1, const Bola& b2) {
+            return CGAL::squared_distance(ponto_atual.point, b1.centro) < 
+                CGAL::squared_distance(ponto_atual.point, b2.centro);
+        });
         if(neighbors.size() != 0){
             for(auto& bola: neighbors){
                 bola.pontos_da_bola.push_back(pontos[idx]);

@@ -6,11 +6,11 @@
 #include <CGAL/Search_traits_adapter.h>
 #include <CGAL/Kd_tree.h>
 #include <CGAL/property_map.h>
-#include <CGAL/squared_distance_2.h>
 #include <CGAL/Search_traits_2.h>
 #include <CGAL/Fuzzy_sphere.h>  
 #include <CGAL/Min_circle_2.h>
 #include <CGAL/Min_circle_2_traits_2.h>
+#include <CGAL/squared_distance_2.h>
 
 
 // Definições de tipos
@@ -106,6 +106,10 @@ typedef CGAL::Fuzzy_sphere<PontoTraits> Fuzzy_sphere_Ponto;
 typedef CGAL::Search_traits_adapter<Bola, Bola_to_Point_map, Base_traits> BolaTraits;
 typedef CGAL::Kd_tree<BolaTraits> BolaTree;
 typedef CGAL::Fuzzy_sphere<BolaTraits> Fuzzy_sphere_Bola;
+
+
+
+
 
 
 

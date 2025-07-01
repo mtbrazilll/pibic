@@ -1,0 +1,116 @@
+Tempo,Opt,Semente,Log,Loops
+100,1,1,"Caminho do arquivo: ../instancias/i1.txt
+Valor de -s: 1
+Limite de idade: 1
+Limite de tempo do CPLEX: 10
+Raio: 1
+Número de soluções: 3
+Ênfase heurística: 0
+Warm start: Não
+Abortar CPLEX: Não
+-----------------------------------
+CONSTRUCT time: 0ms
+SOLVE time: 24ms
+ADAPT time: 0ms
+Total CMSA time: 100ms
+opt: 1.79769e+308
+-----------------------------------
+Loops: 125
+Raio: 1
+Best solution found at: 0 ms
+pontos_vector: 10
+sol size: 0
+ERRO 2 10
+",125
+100,1,2,"Caminho do arquivo: ../instancias/i1.txt
+Valor de -s: 2
+Limite de idade: 1
+Limite de tempo do CPLEX: 10
+Raio: 1
+Número de soluções: 3
+Ênfase heurística: 0
+Warm start: Não
+Abortar CPLEX: Não
+-----------------------------------
+CONSTRUCT time: 0ms
+SOLVE time: 11ms
+ADAPT time: 0ms
+Total CMSA time: 100ms
+opt: 1.79769e+308
+-----------------------------------
+Loops: 125
+Raio: 1
+Best solution found at: 0 ms
+pontos_vector: 10
+sol size: 0
+ERRO 2 10
+",125
+100,1,3,"Caminho do arquivo: ../instancias/i1.txt
+Valor de -s: 3
+Limite de idade: 1
+Limite de tempo do CPLEX: 10
+Raio: 1
+Número de soluções: 3
+Ênfase heurística: 0
+Warm start: Não
+Abortar CPLEX: Não
+-----------------------------------
+CONSTRUCT time: 0ms
+SOLVE time: 17ms
+ADAPT time: 0ms
+Total CMSA time: 100ms
+opt: 1.79769e+308
+-----------------------------------
+Loops: 126
+Raio: 1
+Best solution found at: 0 ms
+pontos_vector: 10
+sol size: 0
+ERRO 2 10
+",126
+101,1,4,"Caminho do arquivo: ../instancias/i1.txt
+Valor de -s: 4
+Limite de idade: 1
+Limite de tempo do CPLEX: 10
+Raio: 1
+Número de soluções: 3
+Ênfase heurística: 0
+Warm start: Não
+Abortar CPLEX: Não
+-----------------------------------
+CONSTRUCT time: 0ms
+SOLVE time: 16ms
+ADAPT time: 0ms
+Total CMSA time: 101ms
+opt: 1.79769e+308
+-----------------------------------
+Loops: 127
+Raio: 1
+Best solution found at: 0 ms
+pontos_vector: 10
+sol size: 0
+ERRO 2 10
+",127
+101,1,5,"Caminho do arquivo: ../instancias/i1.txt
+Valor de -s: 5
+Limite de idade: 1
+Limite de tempo do CPLEX: 10
+Raio: 1
+Número de soluções: 3
+Ênfase heurística: 0
+Warm start: Não
+Abortar CPLEX: Não
+-----------------------------------
+CONSTRUCT time: 0ms
+SOLVE time: 18ms
+ADAPT time: 0ms
+Total CMSA time: 101ms
+opt: 1.79769e+308
+-----------------------------------
+Loops: 126
+Raio: 1
+Best solution found at: 0 ms
+pontos_vector: 10
+sol size: 0
+ERRO 2 10
+",126

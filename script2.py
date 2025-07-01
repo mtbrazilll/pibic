@@ -5,13 +5,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-nome = "cmsaxfastcover_2025"
-time_limite = "200"
-nsols = "2"
+nome = "cmsa_brkga_2"
+time_limite = "300"
+nsols = "1"
 cpl_abort = "1"
-init = "0"
+init = "1"
 warm_start = "0"
-h_emph = "3"
+h_emph = "2"
+max_age = "0"
 
 
 # Cria a pasta se ela não existir
@@ -106,14 +107,224 @@ instancias = [
     "../instancias/instancias_geradas/instancias_500/quadrado_instancia_5.txt",
 ]
 
+instancias10 = [
+    "../instancias/tsp/d1291.pcd -r 500",
+    "../instancias/tsp/d1655.pcd -r 500",
+    "../instancias/tsp/d2103.pcd -r 500",
+    "../instancias/tsp/dsj1000.pcd -r 500",
+    "../instancias/tsp/fl1400.pcd -r 500",
+    "../instancias/tsp/fl1577.pcd -r 500",
+    "../instancias/tsp/fl3795.pcd -r 500",
+    "../instancias/tsp/nrw1379.pcd -r 500",
+    "../instancias/tsp/pcb1173.pcd -r 500",
+    "../instancias/tsp/pcb3038.pcd -r 500",
+    "../instancias/tsp/pr1002.pcd -r 500",
+    "../instancias/tsp/pr2392.pcd -r 500",
+    "../instancias/tsp/rl1304.pcd -r 500",
+    "../instancias/tsp/rl1323.pcd -r 500",
+    "../instancias/tsp/rl1889.pcd -r 500",
+    "../instancias/tsp/rl5915.pcd -r 500",
+    "../instancias/tsp/u1060.pcd -r 500",
+    "../instancias/tsp/u1432.pcd -r 500",
+    "../instancias/tsp/u1817.pcd -r 500",
+    "../instancias/tsp/u2152.pcd -r 500",
+    "../instancias/tsp/u2319.pcd -r 500",
+    "../instancias/tsp/vm1084.pcd -r 500",
+    "../instancias/tsp/vm1748.pcd -r 500",
+     "../instancias/tsp/d1291.pcd -r 1000",
+    "../instancias/tsp/d1655.pcd -r 1000",
+    "../instancias/tsp/d2103.pcd -r 1000",
+    "../instancias/tsp/dsj1000.pcd -r 1000",
+    "../instancias/tsp/fl1400.pcd -r 1000",
+    "../instancias/tsp/fl1577.pcd -r 1000",
+    "../instancias/tsp/fl3795.pcd -r 1000",
+    "../instancias/tsp/nrw1379.pcd -r 1000",
+    "../instancias/tsp/pcb1173.pcd -r 1000",
+    "../instancias/tsp/pcb3038.pcd -r 1000",
+    "../instancias/tsp/pr1002.pcd -r 1000",
+    "../instancias/tsp/pr2392.pcd -r 1000",
+    "../instancias/tsp/rl1304.pcd -r 1000",
+    "../instancias/tsp/rl1323.pcd -r 1000",
+    "../instancias/tsp/rl1889.pcd -r 1000",
+    "../instancias/tsp/rl5915.pcd -r 1000",
+    "../instancias/tsp/u1060.pcd -r 1000",
+    "../instancias/tsp/u1432.pcd -r 1000",
+    "../instancias/tsp/u1817.pcd -r 1000",
+    "../instancias/tsp/u2152.pcd -r 1000",
+    "../instancias/tsp/u2319.pcd -r 1000",
+    "../instancias/tsp/vm1084.pcd -r 1000",
+    "../instancias/tsp/vm1748.pcd -r 1000",
+    "../instancias/tsp/d1291.pcd -r  750",
+    "../instancias/tsp/d1655.pcd -r  750",
+    "../instancias/tsp/d2103.pcd -r  750",
+    "../instancias/tsp/dsj1000.pcd -r  750",
+    "../instancias/tsp/fl1400.pcd -r  750",
+    "../instancias/tsp/fl1577.pcd -r  750",
+    "../instancias/tsp/fl3795.pcd -r  750",
+    "../instancias/tsp/nrw1379.pcd -r  750",
+    "../instancias/tsp/pcb1173.pcd -r  750",
+    "../instancias/tsp/pcb3038.pcd -r  750",
+    "../instancias/tsp/pr1002.pcd -r  750",
+    "../instancias/tsp/pr2392.pcd -r  750",
+    "../instancias/tsp/rl1304.pcd -r  750",
+    "../instancias/tsp/rl1323.pcd -r  750",
+    "../instancias/tsp/rl1889.pcd -r  750",
+    "../instancias/tsp/rl5915.pcd -r  750",
+    "../instancias/tsp/u1060.pcd -r  750",
+    "../instancias/tsp/u1432.pcd -r  750",
+    "../instancias/tsp/u1817.pcd -r  750",
+    "../instancias/tsp/u2152.pcd -r  750",
+    "../instancias/tsp/u2319.pcd -r  750",
+    "../instancias/tsp/vm1084.pcd -r  750",
+    "../instancias/tsp/vm1748.pcd -r  750",
+    "../instancias/tsp/d1291.pcd -r  1500",
+    "../instancias/tsp/d1655.pcd -r  1500",
+    "../instancias/tsp/d2103.pcd -r  1500",
+    "../instancias/tsp/dsj1000.pcd -r  1500",
+    "../instancias/tsp/fl1400.pcd -r  1500",
+    "../instancias/tsp/fl1577.pcd -r  1500",
+    "../instancias/tsp/fl3795.pcd -r  1500",
+    "../instancias/tsp/nrw1379.pcd -r  1500",
+    "../instancias/tsp/pcb1173.pcd -r  1500",
+    "../instancias/tsp/pcb3038.pcd -r  1500",
+    "../instancias/tsp/pr1002.pcd -r  1500",
+    "../instancias/tsp/pr2392.pcd -r  1500",
+    "../instancias/tsp/rl1304.pcd -r  1500",
+    "../instancias/tsp/rl1323.pcd -r  1500",
+    "../instancias/tsp/rl1889.pcd -r  1500",
+    "../instancias/tsp/rl5915.pcd -r  1500",
+    "../instancias/tsp/u1060.pcd -r  1500",
+    "../instancias/tsp/u1432.pcd -r  1500",
+    "../instancias/tsp/u1817.pcd -r  1500",
+    "../instancias/tsp/u2152.pcd -r  1500",
+    "../instancias/tsp/u2319.pcd -r  1500",
+    "../instancias/tsp/vm1084.pcd -r  1500",
+    "../instancias/tsp/vm1748.pcd -r  1500"
+    "../instancias/tsp/d1291.pcd -r  2000",
+    "../instancias/tsp/d1655.pcd -r  2000",
+    "../instancias/tsp/d2103.pcd -r  2000",
+    "../instancias/tsp/dsj1000.pcd -r  2000",
+    "../instancias/tsp/fl1400.pcd -r  2000",
+    "../instancias/tsp/fl1577.pcd -r  2000",
+    "../instancias/tsp/fl3795.pcd -r  2000",
+    "../instancias/tsp/nrw1379.pcd -r  2000",
+    "../instancias/tsp/pcb1173.pcd -r  2000",
+    "../instancias/tsp/pcb3038.pcd -r  2000",
+    "../instancias/tsp/pr1002.pcd -r  2000",
+    "../instancias/tsp/pr2392.pcd -r  2000",
+    "../instancias/tsp/rl1304.pcd -r  2000",
+    "../instancias/tsp/rl1323.pcd -r  2000",
+    "../instancias/tsp/rl1889.pcd -r  2000",
+    "../instancias/tsp/rl5915.pcd -r  2000",
+    "../instancias/tsp/u1060.pcd -r  2000",
+    "../instancias/tsp/u1432.pcd -r  2000",
+    "../instancias/tsp/u1817.pcd -r  2000",
+    "../instancias/tsp/u2152.pcd -r  2000",
+    "../instancias/tsp/u2319.pcd -r  2000",
+    "../instancias/tsp/vm1084.pcd -r  2000",
+    "../instancias/tsp/vm1748.pcd -r  2000"
+    
+]
+
+instancias10 = [
+    "../instancias/tsp/d1291.pcd -r 500",
+    "../instancias/tsp/d1655.pcd -r 500",
+    "../instancias/tsp/d2103.pcd -r 500",
+    "../instancias/tsp/dsj1000.pcd -r 500",
+    "../instancias/tsp/fl1400.pcd -r 500",
+    "../instancias/tsp/fl1577.pcd -r 500",
+    "../instancias/tsp/fl3795.pcd -r 500",
+    "../instancias/tsp/nrw1379.pcd -r 500",
+    "../instancias/tsp/pcb1173.pcd -r 500",
+    "../instancias/tsp/pcb3038.pcd -r 500",
+    "../instancias/tsp/pr1002.pcd -r 500",
+    "../instancias/tsp/pr2392.pcd -r 500",
+    "../instancias/tsp/rl1304.pcd -r 500",
+    "../instancias/tsp/rl1323.pcd -r 500",
+    "../instancias/tsp/rl1889.pcd -r 500",
+    "../instancias/tsp/rl5915.pcd -r 500",
+    "../instancias/tsp/u1060.pcd -r 500",
+    "../instancias/tsp/u1432.pcd -r 500",
+    "../instancias/tsp/u1817.pcd -r 500",
+    "../instancias/tsp/u2152.pcd -r 500",
+    "../instancias/tsp/u2319.pcd -r 500",
+    "../instancias/tsp/vm1084.pcd -r 500",
+    "../instancias/tsp/vm1748.pcd -r 500",
+     "../instancias/tsp/d1291.pcd -r 1000",
+    "../instancias/tsp/d1655.pcd -r 1000",
+    "../instancias/tsp/d2103.pcd -r 1000",
+    "../instancias/tsp/dsj1000.pcd -r 1000",
+    "../instancias/tsp/fl1400.pcd -r 1000",
+    "../instancias/tsp/fl1577.pcd -r 1000",
+    "../instancias/tsp/fl3795.pcd -r 1000",
+    "../instancias/tsp/nrw1379.pcd -r 1000",
+    "../instancias/tsp/pcb1173.pcd -r 1000",
+    "../instancias/tsp/pcb3038.pcd -r 1000",
+    "../instancias/tsp/pr1002.pcd -r 1000",
+    "../instancias/tsp/pr2392.pcd -r 1000",
+    "../instancias/tsp/rl1304.pcd -r 1000",
+    "../instancias/tsp/rl1323.pcd -r 1000",
+    "../instancias/tsp/rl1889.pcd -r 1000",
+    "../instancias/tsp/rl5915.pcd -r 1000",
+    "../instancias/tsp/u1060.pcd -r 1000",
+    "../instancias/tsp/u1432.pcd -r 1000",
+    "../instancias/tsp/u1817.pcd -r 1000",
+    "../instancias/tsp/u2152.pcd -r 1000",
+    "../instancias/tsp/u2319.pcd -r 1000",
+    "../instancias/tsp/vm1084.pcd -r 1000",
+    "../instancias/tsp/vm1748.pcd -r 1000",
+    "../instancias/tsp/d1291.pcd -r  2000",
+    "../instancias/tsp/d1655.pcd -r  2000",
+    "../instancias/tsp/d2103.pcd -r  2000",
+    "../instancias/tsp/dsj1000.pcd -r  2000",
+    "../instancias/tsp/fl1400.pcd -r  2000",
+    "../instancias/tsp/fl1577.pcd -r  2000",
+    "../instancias/tsp/fl3795.pcd -r  2000",
+    "../instancias/tsp/nrw1379.pcd -r  2000",
+    "../instancias/tsp/pcb1173.pcd -r  2000",
+    "../instancias/tsp/pcb3038.pcd -r  2000",
+    "../instancias/tsp/pr1002.pcd -r  2000",
+    "../instancias/tsp/pr2392.pcd -r  2000",
+    "../instancias/tsp/rl1304.pcd -r  2000",
+    "../instancias/tsp/rl1323.pcd -r  2000",
+    "../instancias/tsp/rl1889.pcd -r  2000",
+    "../instancias/tsp/rl5915.pcd -r  2000",
+    "../instancias/tsp/u1060.pcd -r  2000",
+    "../instancias/tsp/u1432.pcd -r  2000",
+    "../instancias/tsp/u1817.pcd -r  2000",
+    "../instancias/tsp/u2152.pcd -r  2000",
+    "../instancias/tsp/u2319.pcd -r  2000",
+    "../instancias/tsp/vm1084.pcd -r  2000",
+    "../instancias/tsp/vm1748.pcd -r  2000"
+    
+]
 
 
-#instancias = instancias2
+
+instancias = [
+    "../instancias/tsp/d2103.pcd -r 1000",
+    "../instancias/tsp/fl3795.pcd -r 500",
+    "../instancias/tsp/nrw1379.pcd -r 1000",
+    "../instancias/tsp/pcb1173.pcd -r 1000",
+    "../instancias/tsp/pcb3038.pcd -r 500",
+    "../instancias/tsp/pr2392.pcd -r 1000",
+    "../instancias/tsp/pr2392.pcd -r 2000",
+    "../instancias/tsp/rl1889.pcd -r 2000",
+    "../instancias/tsp/rl5915.pcd -r 1000",
+    "../instancias/tsp/rl5915.pcd -r 2000",
+    "../instancias/tsp/rl5915.pcd -r 500",
+    "../instancias/tsp/u1432.pcd -r 1000",
+    "../instancias/tsp/u2319.pcd -r 500"
+]
+
+instancias = instancias10
+
 
 # Dicionário para coletar todos os tempos e opts
 dados_tempos = {instancia: [] for instancia in instancias}
 dados_opts = {instancia: [] for instancia in instancias}
 dados_loops = {instancia: [] for instancia in instancias}
+dados_best_solution_time = {instancia: [] for instancia in instancias}
 dados = {instancia: [] for instancia in instancias}
 
 dados_csv = []
@@ -123,8 +334,8 @@ dados_csv = []
 # Executar o comando para cada instância 10 vezes
 for i, instancia in enumerate(instancias):
     print(f"Iniciando a instancia {instancia}")
-    for _ in range(10):
-        comando = f"./pcdp.run  -i {instancia} -s {_+1} -nsols {nsols} -init {init} -h_emph {h_emph} -warm_start {warm_start} -cpl_abort {cpl_abort} -t {time_limite}"
+    for _ in range(30):
+        comando = f"./pcdp.run  -i {instancia} -s {_} -nsols {nsols} -init {init} -h_emph {h_emph} -warm_start {warm_start} -cpl_abort {cpl_abort} -t {time_limite} -max_age {max_age}"
 
         #print(comando)
         print()
@@ -136,22 +347,42 @@ for i, instancia in enumerate(instancias):
             tempo = int(re.search(r"Total CMSA time: (\d+)ms", saida).group(1))
             opt = int(re.search(r"opt: (\d+)", saida).group(1))
             loops = int(re.search(r"Loops: (\d+)", saida).group(1))
+            best_time = int(re.search(r"Best solution found at: (\d+) ms", saida).group(1))
+
             #sol size: 21
             
 
             dados_tempos[instancia].append(tempo)
             dados_opts[instancia].append(opt)
             dados_loops[instancia].append(loops)
-            dados[instancia].append({"Tempo": tempo, "Opt": opt, "Semente": _+1, "Log": saida, "Loops": loops})
+            dados_best_solution_time[instancia].append(best_time)  # Adicione essa linha
+
+            dados[instancia].append({
+                "Tempo": tempo, 
+                "Opt": opt, 
+                "Semente": _+1, 
+                "Log": saida, 
+                "Loops": loops,
+                "Best_solution_time": best_time  # Adicione essa linha
+            })
         except Exception as e:
             tempo = 0
             opt = 0
             loops = 0
+            best_time = 0
 
             dados_tempos[instancia].append(tempo)
             dados_opts[instancia].append(opt)
             dados_loops[instancia].append(loops)
-            dados[instancia].append({"Tempo": tempo, "Opt": opt, "Semente": _+1, "Log": saida, "Loops": loops})
+            dados_best_solution_time[instancia].append(best_time)  # Adicione essa linha
+            dados[instancia].append({
+                "Tempo": tempo, 
+                "Opt": opt, 
+                "Semente": _+1, 
+                "Log": saida, 
+                "Loops": loops,
+                "Best_solution_time": best_time  # Adicione essa linha
+            })
             print(f"Erro ao processar a instância {instancia} com a semente {_+1}: {str(e)}")
         
     # Criar DataFrame com estatísticas
@@ -171,6 +402,9 @@ for i, instancia in enumerate(instancias):
         "Tempo_medio": [np.mean(dados_tempos[inst]) for inst in instancias[:i+1]],
         "Melhor_tempo": [np.min(dados_tempos[inst]) for inst in instancias[:i+1]],
         "Pior_tempo": [np.max(dados_tempos[inst]) for inst in instancias[:i+1]],
+        "Best_solution_time_medio": [np.mean(dados_best_solution_time[inst]) for inst in instancias[:i+1]],
+        "Best_solution_time_min": [np.min(dados_best_solution_time[inst]) for inst in instancias[:i+1]],
+        "Best_solution_time_max": [np.max(dados_best_solution_time[inst]) for inst in instancias[:i+1]],
     })
 
     # Salvar DataFrame de estatísticas após cada iteração de instância
@@ -187,14 +421,13 @@ df = pd.DataFrame({
     "Tempo_medio": [np.mean(dados_tempos[inst]) for inst in instancias[:i+1]],
     "Melhor_tempo": [np.min(dados_tempos[inst]) for inst in instancias[:i+1]],
     "Pior_tempo": [np.max(dados_tempos[inst]) for inst in instancias[:i+1]],
+    "Best_solution_time_medio": [np.mean(dados_best_solution_time[inst]) for inst in instancias[:i+1]],
+    "Best_solution_time_min": [np.min(dados_best_solution_time[inst]) for inst in instancias[:i+1]],
+    "Best_solution_time_max": [np.max(dados_best_solution_time[inst]) for inst in instancias[:i+1]],
 })
 dados_csv.append((f"{nome}",df))
 
-# Crie um objeto ExcelWriter
-with pd.ExcelWriter(f'../resultados/{nome}/output.xlsx', engine='openpyxl') as writer:
-    for nome_arquivo, df in dados_csv:
-        nome_sheet = nome_arquivo.split("/")[-1].replace(".csv", "")
-        df.to_excel(writer, sheet_name=nome_sheet, index=False)
+
 
 with open(f'../resultados/{nome}/hiperparametros.txt', 'w') as arquivo:
     arquivo.write(f"time_limite: {time_limite} \n"
@@ -203,3 +436,5 @@ with open(f'../resultados/{nome}/hiperparametros.txt', 'w') as arquivo:
                   f"init = {init} \n"
                   f"warm_start = {warm_start} \n"
                   f"h_emph = {h_emph}\n")
+
+

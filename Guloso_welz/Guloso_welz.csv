@@ -1,0 +1,11 @@
+Instancia,solution_medio,Melhor_solution,Pior_solution,Desvio_padrao_solution,Loops_medio,Tempo_medio,Melhor_tempo,Pior_tempo
+i1_pon.txt,1.0,1,1,0.0,121.2,100.2,100,101
+i2_pon.txt,1.0,1,1,0.0,126.8,100.0,100,100
+i4_pon.txt,1.0,1,1,0.0,125.6,100.2,100,101
+Real-world/mona-lisa100k.udc,1.0,1,1,0.0,126.4,100.2,100,101
+Real-world/nyctaxi_2.9M.udc,1.0,1,1,0.0,126.8,100.4,100,101
+Real-world/uber_4.5M.udc,1.0,1,1,0.0,125.8,100.4,100,101
+Real-world/usa_115K.udc,1.0,1,1,0.0,126.2,100.4,100,101
+Real-world/wildfires_1.8M.udc,1.0,1,1,0.0,126.2,100.2,100,101
+Real-world/world_1.9M.udc,1.0,1,1,0.0,126.6,100.0,100,100
+Real-world/hail2015_10M.udc,1.0,1,1,0.0,126.6,100.4,100,101
