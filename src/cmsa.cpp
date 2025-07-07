@@ -22,6 +22,7 @@
 #include "FASTCOVER-PP.h"
 #include "hexa.h"
 #include "Struct.h"
+#include "SEIP.h"
 
 /* // Definições de tipos
 typedef CGAL::Simple_cartesian<double> K;
@@ -332,6 +333,8 @@ void CMSA(float time_limit, int max_age) {
             break;
         }
         aux_solution_cplex = cplex_run();
+        
+        //aux_solution_cplex= findSEIPApproximation(manager,  400);
         //        std::cout << "solucao cplex "<<aux_solution_cplex << std::endl;
 
         // Atualizar melhor solução se encontrada

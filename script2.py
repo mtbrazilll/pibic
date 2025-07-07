@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-nome = "cmsa_brkga_2"
+nome = "cmsa-seip"
 time_limite = "300"
 nsols = "1"
 cpl_abort = "1"
