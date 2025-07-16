@@ -55,3 +55,13 @@ int generate_solution_dr(const std::vector<Ponto>& points,
 int generate_solution_cgal_1(const std::vector<Ponto>& points,
                                double x_max, double y_max,
                                double x_min, double y_min);
+
+int generate_solution_dr_enhanced(const std::vector<Ponto>& points,
+    double x_max, double y_max,
+    double x_min, double y_min);
+
+
+
+int generate_divise_dr(const std::vector<Ponto>& points,
+                               double x_max, double y_max,
+                               double x_min, double y_min);

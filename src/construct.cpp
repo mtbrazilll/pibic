@@ -152,6 +152,7 @@ class Quadrant {
         return solution;
     }
 
+
 int generate_solution_cgal_1(const std::vector<Ponto>& points,
                                double x_max, double y_max,
                                double x_min, double y_min)
@@ -238,98 +239,6 @@ int generate_solution_cgal_1(const std::vector<Ponto>& points,
         return solution;
     }
 
-
-int generate_solution_cgal_manual(const std::vector<Ponto>& points,
-                               double x_max, double y_max,
-                               double x_min, double y_min)
-{
-    std::queue<Quadrant> fila;
-    fila.push(Quadrant(points, x_max, y_max, x_min, y_min));
-
-    int solution = 0;
-
-    while (!fila.empty()) {
-        Quadrant current = fila.front();
-        fila.pop();
-
-        // Escolhe limites aleatórios para subdividir
-        double rand1 = getRandomValue(current.x_min, current.x_max);
-        double rand2 = getRandomValue(current.y_min, current.y_max);
-
-        // Definir novos limites de subquadrantes
-        double XminQ1 = rand1,     YminQ1 = rand2,     XmaxQ1 = current.x_max, YmaxQ1 = current.y_max;
-        double XminQ2 = current.x_min, YminQ2 = rand2,     XmaxQ2 = rand1,     YmaxQ2 = current.y_max;
-        double XminQ3 = current.x_min, YminQ3 = current.y_min, XmaxQ3 = rand1,     YmaxQ3 = rand2;
-        double XminQ4 = rand1,     YminQ4 = current.y_min, XmaxQ4 = current.x_max, YmaxQ4 = rand2;
-
-        // Cria quadrantes vazios
-        Quadrant q1, q2, q3, q4;
-
-        // Distribuir pontos
-        distributePoints(current.points, 
-                         q1, XminQ1, XmaxQ1, YminQ1, YmaxQ1,
-                         q2, XminQ2, XmaxQ2, YminQ2, YmaxQ2,
-                         q3, XminQ3, XmaxQ3, YminQ3, YmaxQ3,
-                         q4, XminQ4, XmaxQ4, YminQ4, YmaxQ4);
-
-        // Lambda para processar um quadrante e decidir se subdivide ou gera componente
-        auto processQuadrant = [&](Quadrant& q, double mx, double my, double mnx, double mny) {
-            if (q.points.size() == 1) {
-                // Já temos um ponto único
-                Point centro = q.getCenter();
-                
-                // Usando for loop ao invés de Fuzzy_sphere_Ponto
-                std::vector<Ponto> neighbors;
-                for (const auto& p : points) {
-                    if (CGAL::squared_distance(centro, p.point) <= raio * raio) {
-                        neighbors.push_back(p);
-                    }
-                }
-
-                Component aux(raio, neighbors, centro);
-                manager.addComponent(aux);
-                solution++;
-            } else {
-                // Distância entre cantos opostos
-                double d = CGAL::squared_distance(
-                    Point(q.x_max, q.y_max),
-                    Point(q.x_min, q.y_min)
-                );
-                // Usa d para decidir se gera componente
-                if (d <= raio2x4) {
-                    Point centro = q.getCenter();
-                    
-                    // Usando for loop ao invés de Fuzzy_sphere_Ponto
-                    std::vector<Ponto> neighbors;
-                    for (const auto& p : points) {
-                        if (CGAL::squared_distance(centro, p.point) <= raio * raio) {
-                            neighbors.push_back(p);
-                        }
-                    }
-
-                    Component aux(raio, neighbors, centro);
-                    manager.addComponent(aux);
-                    solution++;
-                } else {
-                    // Se não couber, subdivide mais
-                    fila.push(Quadrant(q.points, mx, my, mnx, mny));
-                }
-            }
-        };
-
-        // Processa cada subquadrante se não estiver vazio
-        if (!q1.points.empty())
-            processQuadrant(q1, XmaxQ1, YmaxQ1, XminQ1, YminQ1);
-        if (!q2.points.empty())
-            processQuadrant(q2, XmaxQ2, YmaxQ2, XminQ2, YminQ2);
-        if (!q3.points.empty())
-            processQuadrant(q3, XmaxQ3, YmaxQ3, XminQ3, YminQ3);
-        if (!q4.points.empty())
-            processQuadrant(q4, XmaxQ4, YmaxQ4, XminQ4, YminQ4);
-    }
-
-    return solution;
-}
 
 
 int construtivo_brkg(const std::vector<Ponto>& points){
@@ -470,3 +379,344 @@ int generate_solution_dr(const std::vector<Ponto>& points,
 
     return current_solution;
 }
+
+
+// Inicialização dos centros para o algoritmo DR melhorado
+std::vector<Point> init_centers_enhanced(const std::vector<Ponto>& demand_points) {
+    std::vector<Point> centers;
+    
+    if (demand_points.empty()) return centers;
+    
+    // Escolhe um ponto de demanda aleatório como o primeiro centro
+    std::uniform_int_distribution<> distr(0, demand_points.size() - 1);
+    centers.push_back(demand_points[distr(gen)].point);
+    
+    // Filtra os pontos restantes
+    std::vector<Ponto> remaining_points;
+    for (const auto& p : demand_points) {
+        if (p.point != centers[0]) {
+            remaining_points.push_back(p);
+        }
+    }
+    
+    while (!remaining_points.empty()) {
+        // Encontra o ponto com a maior distância até o centro mais próximo
+        double max_squared_dist = -1;
+        Point max_point;
+        int max_idx = -1;
+        
+        for (size_t i = 0; i < remaining_points.size(); ++i) {
+            const Point& p = remaining_points[i].point;
+            double min_squared_dist = std::numeric_limits<double>::max();
+            
+            for (const Point& c : centers) {
+                double squared_dist = CGAL::squared_distance(p, c);
+                min_squared_dist = std::min(min_squared_dist, squared_dist);
+            }
+            
+            if (min_squared_dist > max_squared_dist) {
+                max_squared_dist = min_squared_dist;
+                max_point = p;
+                max_idx = i;
+            }
+        }
+        
+        // Se a maior distância for menor ou igual ao raio², todos os pontos estão cobertos
+        if (max_squared_dist <= raio * raio) {
+            break;
+        }
+        
+        // Adiciona o ponto como novo centro
+        centers.push_back(max_point);
+        
+        // Remove o ponto dos pontos restantes
+        if (max_idx >= 0 && max_idx < remaining_points.size()) {
+            remaining_points[max_idx] = remaining_points.back();
+            remaining_points.pop_back();
+        }
+    }
+    
+    return centers;
+}
+
+// Atribui cada ponto de demanda ao seu centro mais próximo
+std::vector<std::vector<Ponto>> assign_to_clusters_enhanced(
+    const std::vector<Ponto>& demand_points,
+    const std::vector<Point>& centers) {
+    
+    std::vector<std::vector<Ponto>> clusters(centers.size());
+    
+    for (const auto& p : demand_points) {
+        // Encontra o centro mais próximo
+        double min_squared_dist = std::numeric_limits<double>::max();
+        size_t min_idx = 0;
+        
+        for (size_t i = 0; i < centers.size(); ++i) {
+            double squared_dist = CGAL::squared_distance(p.point, centers[i]);
+            if (squared_dist < min_squared_dist) {
+                min_squared_dist = squared_dist;
+                min_idx = i;
+            }
+        }
+        
+        // Adiciona o ponto ao cluster correspondente
+        clusters[min_idx].push_back(p);
+    }
+    
+    return clusters;
+}
+
+void identify_uncovered_points(const std::vector<Ponto>& points, const std::vector<Point>& centers, double raio) {
+    std::cout << "Verificando pontos não cobertos:" << std::endl;
+    int count = 0;
+    for (const auto& p : points) {
+        bool is_covered = false;
+        for (const auto& c : centers) {
+            if (CGAL::squared_distance(p.point, c) <= raio * raio) {
+                is_covered = true;
+                break;
+            }
+        }
+        if (!is_covered) {
+            std::cout << "  Ponto não coberto: (" << p.point << ")" << std::endl;
+            count++;
+        }
+    }
+    //std::cout << "Total de pontos não cobertos: " << count << " de " << points.size() << std::endl;
+}
+
+int generate_solution_dr_enhanced(const std::vector<Ponto>& points,
+    double x_max, double y_max,
+    double x_min, double y_min)
+{
+    // Passo 1: Escolher k centros iniciais
+    auto centers = init_centers_enhanced(points);
+    int k = centers.size();
+    
+    // Melhor solução encontrada até agora
+    int best_k = k;
+    std::vector<Point> best_centers = centers;
+    
+    // Flag para verificar se os centros pararam de mudar
+    bool centers_changed = true;
+    std::vector<Point> previous_centers;
+    
+    // Variáveis para o método melhorado
+    bool first_no_change = true;
+    int last_best_k = best_k;
+    std::vector<Point> last_best_centers = best_centers;
+    
+    double tolerance = 0.001;
+    
+    while (true) {
+        // Salva os centros atuais para comparação
+        previous_centers = centers;
+        
+        // Passo 2: Atribuir pontos de demanda aos centros mais próximos
+        auto clusters = assign_to_clusters_enhanced(points, centers);
+        
+
+
+        // Passo 3: Determinar os centros dos clusters usando Min_circle do CGAL
+    
+        std::vector<double> cluster_radii;
+        centers.clear();
+        for (const auto& cluster : clusters) {
+            if (cluster.empty()) {
+                continue;
+            } else {
+                //std::vector<Point> cluster_points = convertPontosToPoints(cluster);
+
+
+                Min_circle mc(cluster.begin(), cluster.end(), true);
+
+                centers.push_back(mc.circle().center());
+                //std::cout << "Centro do cluster: " << mc.circle().center() << std::endl;
+                cluster_radii.push_back(std::sqrt(mc.circle().squared_radius()));
+            }
+        }
+        
+        
+        // Verifica se os centros mudaram significativamente
+        centers_changed = false;
+        
+        if (centers.size() != previous_centers.size()) {
+            centers_changed = true;
+        } else {
+            for (const auto& c_new : centers) {
+                double min_squared_dist = std::numeric_limits<double>::max();
+                for (const auto& c_old : previous_centers) {
+                    double squared_dist = CGAL::squared_distance(c_new, c_old);
+                    min_squared_dist = std::min(min_squared_dist, squared_dist);
+                }
+                if (min_squared_dist > tolerance * tolerance) {
+                    centers_changed = true;
+                    break;
+                }
+            }
+        }
+        
+        // Passo 4: Calcular rmax(C)
+        if (!cluster_radii.empty()) {
+            double rmax = *std::max_element(cluster_radii.begin(), cluster_radii.end());
+            
+            // Se rmax ≤ r, registrar a solução atual e tentar remover um centro
+            if (rmax <= raio) {
+                best_k = k;
+                best_centers = centers;
+                
+                // Estratégia de remoção - remove o menor círculo
+                if (k > 1) {
+                    auto min_it = std::min_element(cluster_radii.begin(), cluster_radii.end());
+                    size_t idx_to_remove = std::distance(cluster_radii.begin(), min_it);
+                    
+                    centers.erase(centers.begin() + idx_to_remove);
+                    k--;
+                    centers_changed = true;
+                }
+            }
+        }
+
+        // Passo 5: Verificar se os centros pararam de mudar
+        if (!centers_changed) {
+            if (first_no_change) {
+                first_no_change = false;
+                last_best_k = best_k;
+                last_best_centers = best_centers;
+                
+                // Perturbação: substitui o centro do maior cluster por um ponto aleatório
+                if (!cluster_radii.empty() && !clusters.empty()) {
+                    auto max_it = std::max_element(cluster_radii.begin(), cluster_radii.end());
+                    size_t largest_idx = std::distance(cluster_radii.begin(), max_it);
+                    
+                    if (largest_idx < clusters.size() && !clusters[largest_idx].empty()) {
+                        std::uniform_int_distribution<> distr(0, clusters[largest_idx].size() - 1);
+                        int random_idx = distr(gen);
+                        centers[largest_idx] = clusters[largest_idx][random_idx].point;
+                        centers_changed = true;
+                    }
+                }
+            } else {
+                if (best_k != last_best_k || best_centers != last_best_centers) {
+                    last_best_k = best_k;
+                    last_best_centers = best_centers;
+                    
+                    // Nova perturbação
+                    if (!cluster_radii.empty() && !clusters.empty()) {
+                        auto max_it = std::max_element(cluster_radii.begin(), cluster_radii.end());
+                        size_t largest_idx = std::distance(cluster_radii.begin(), max_it);
+                        
+                        if (largest_idx < clusters.size() && !clusters[largest_idx].empty()) {
+                            std::uniform_int_distribution<> distr(0, clusters[largest_idx].size() - 1);
+                            int random_idx = distr(gen);
+                            centers[largest_idx] = clusters[largest_idx][random_idx].point;
+                            centers_changed = true;
+                        }
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+        
+        if (!centers_changed) {
+            break;
+        }
+    }
+    
+    // Cria componentes para a melhor solução encontrada
+    auto clusters = assign_to_clusters_enhanced(points, best_centers);
+    // identify_uncovered_points(points, best_centers, raio);
+    for (int i = 0; i < best_centers.size(); i++)
+    {
+        Component aux(raio, clusters[i], best_centers[i]);
+        manager.addComponent(aux);
+    }
+    
+    //std::cout << "manager.size()" << manager.components.size() << std::endl;
+  
+    
+    return best_centers.size();
+}
+
+
+int generate_divise_dr(const std::vector<Ponto>& points,
+                               double x_max, double y_max,
+                               double x_min, double y_min)
+    {
+        std::queue<Quadrant> fila;
+        
+    
+        fila.push(Quadrant(points, x_max, y_max, x_min, y_min));
+    
+        int solution = 0;
+    
+        while (!fila.empty()) {
+            Quadrant current = fila.front();
+            fila.pop();
+    
+            // Escolhe limites aleatórios para subdividir
+            double rand1 = getRandomValue(current.x_min, current.x_max);
+            double rand2 = getRandomValue(current.y_min, current.y_max);
+    
+            // Definir novos limites de subquadrantes
+            double XminQ1 = rand1,     YminQ1 = rand2,     XmaxQ1 = current.x_max, YmaxQ1 = current.y_max;
+            double XminQ2 = current.x_min, YminQ2 = rand2,     XmaxQ2 = rand1,     YmaxQ2 = current.y_max;
+            double XminQ3 = current.x_min, YminQ3 = current.y_min, XmaxQ3 = rand1,     YmaxQ3 = rand2;
+            double XminQ4 = rand1,     YminQ4 = current.y_min, XmaxQ4 = current.x_max, YmaxQ4 = rand2;
+    
+            // Cria quadrantes vazios
+            Quadrant q1, q2, q3, q4;
+    
+
+            // Distribuir pontos
+            distributePoints(current.points, 
+                             q1, XminQ1, XmaxQ1, YminQ1, YmaxQ1,
+                             q2, XminQ2, XmaxQ2, YminQ2, YmaxQ2,
+                             q3, XminQ3, XmaxQ3, YminQ3, YmaxQ3,
+                             q4, XminQ4, XmaxQ4, YminQ4, YmaxQ4);
+    
+            // Lambda para processar um quadrante e decidir se subdivide ou gera componente
+            auto processQuadrant = [&](Quadrant& q, double mx, double my, double mnx, double mny) {
+                if (q.points.size() == 1) {
+                    // Já temos um ponto único
+                    Point centro = q.getCenter();
+                    Fuzzy_sphere_Ponto sphere(centro, raio);
+                    std::vector<Ponto> neighbors;
+                    tree.search(std::back_inserter(neighbors), sphere);
+    
+                    Component aux(raio, neighbors, centro);
+                    manager.addComponent(aux);
+                    solution++;
+                } else {
+                    // Distância entre cantos opostos
+                    double d = CGAL::squared_distance(
+                        Point(q.x_max, q.y_max),
+                        Point(q.x_min, q.y_min)
+                    );
+                    // Usa d para decidir se gera componente
+                    
+                    if (d <= 4*raio2x4) {
+
+                        generate_solution_dr_enhanced(points, q.x_max, q.y_max, q.x_min, q.y_min);
+                        solution++;
+                    } else {
+                        // Se não couber, subdivide mais
+                        fila.push(Quadrant(q.points, mx, my, mnx, mny));
+                    }
+                }
+            };
+    
+            // Processa cada subquadrante se não estiver vazio
+            if (!q1.points.empty())
+                processQuadrant(q1, XmaxQ1, YmaxQ1, XminQ1, YminQ1);
+            if (!q2.points.empty())
+                processQuadrant(q2, XmaxQ2, YmaxQ2, XminQ2, YminQ2);
+            if (!q3.points.empty())
+                processQuadrant(q3, XmaxQ3, YmaxQ3, XminQ3, YminQ3);
+            if (!q4.points.empty())
+                processQuadrant(q4, XmaxQ4, YmaxQ4, XminQ4, YminQ4);
+        }
+    
+        return solution;
+    }

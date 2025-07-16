@@ -291,17 +291,12 @@ void CMSA(float time_limit, int max_age) {
         for (int na = 0; na < n_of_sols; na++) {
 
 
-            if (loops == 0) {
-
-                int aux_solution1 = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y );
-            }
-            else{
-
-                int aux_solution2 = generate_solution_cgal(pontos, max_x , max_y , min_x , min_y );
-
-            }
           
-           //int aux_solution2 = generate_solution_cgal_manual(pontos, max_x , max_y , min_x , min_y );
+
+            int aux_solution1 = generate_divise_dr(pontos, max_x , max_y , min_x , min_y );
+           
+          
+           //int aux_solution2 = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y );
             //int aux_solution1 = generate_solution_dr(pontos, max_x , max_y , min_x , min_y );
 
            //std::cout << "solucao construtivo "<<aux_solution1 << std::endl;
@@ -333,7 +328,7 @@ void CMSA(float time_limit, int max_age) {
             break;
         }
         aux_solution_cplex = cplex_run();
-        
+
         //aux_solution_cplex= findSEIPApproximation(manager,  400);
         //        std::cout << "solucao cplex "<<aux_solution_cplex << std::endl;
 
