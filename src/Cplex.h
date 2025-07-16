@@ -129,7 +129,7 @@ double cplex_run() {
                 componente_point[i].end();
             }
         }
-        model.add(obj >= bsf*0.8);
+        //model.add(obj >= bsf*0.8);
         model.add(IloMinimize(env, obj));
         obj.end();
 
@@ -160,6 +160,7 @@ double cplex_run() {
         {
             IloNumArray sol(env, manager.getComponentCount());
             solution_cplex = cpl.getObjValue();
+
             //std::cout << solution_cplex << std::endl;
             if (solution_cplex > bsf){
                  
