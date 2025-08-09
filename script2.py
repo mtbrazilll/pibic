@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-nome = "cmsa-seip"
-time_limite = "300"
+nome = "cmsa_teste"
+time_limite = "100"
 nsols = "1"
 cpl_abort = "1"
-init = "1"
+init = "0"
 warm_start = "0"
 h_emph = "2"
 max_age = "0"

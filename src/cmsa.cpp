@@ -23,6 +23,7 @@
 #include "hexa.h"
 #include "Struct.h"
 #include "SEIP.h"
+#include "CONSTRUTIVO.h"
 
 /* // Definições de tipos
 typedef CGAL::Simple_cartesian<double> K;
@@ -60,9 +61,10 @@ double best_solution_time = 0.0; // Tempo em que a melhor solução foi encontra
 
 // CMSA PARAMETERS
 double computation_time_limit = 100.0;
-double cplex_time_limit = 10.0;
+double cplex_time_limit = 0.10;
 double determinism_rate = 0.8;
 double r_limit = 0;
+double cplex_time= 0.1;
 int n_of_sols = 3;
 int age_limit = 1;
 int candidate_list_size = 10;
@@ -93,9 +95,12 @@ std::uniform_real_distribution<> distr2(0, 1);
 std::uniform_real_distribution<> distr3(1, 2);
 std::uniform_int_distribution<int> int_distr(1, 2);
 
+
+
+
 // Declaração de funções
 void CMSA(float time_limit, int max_age);
-void testando();
+bool testando();
 
 double Random(double minVal, double maxVal) {
 	
@@ -229,7 +234,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-        // Exemplo de uso das variáveis (substitua pelo processamento real)
+        
     std::cout << "Caminho do arquivo: " << filePath << "\n";
     std::cout << "Valor de -s: " << seed << "\n";
     std::cout << "Limite de idade: " << age_limit << "\n";
@@ -290,14 +295,14 @@ void CMSA(float time_limit, int max_age) {
         auto construct_start = std::chrono::high_resolution_clock::now();
         for (int na = 0; na < n_of_sols; na++) {
 
+            //cmsa_sbpo();
+            dr_enhanced();
 
-          
-
-            int aux_solution1 = generate_divise_dr(pontos, max_x , max_y , min_x , min_y );
+           // int aux_solution1 = generate_divise_dr(pontos, max_x , max_y , min_x , min_y );
            
           
-           //int aux_solution2 = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y );
-            //int aux_solution1 = generate_solution_dr(pontos, max_x , max_y , min_x , min_y );
+            //int aux_solution2 = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y );
+            //int aux_solution1 = generate_solution_dr_enhanced(pontos, max_x , max_y , min_x , min_y );
 
            //std::cout << "solucao construtivo "<<aux_solution1 << std::endl;
            //int aux_solution2 = construtivo_brkg(pontos);
@@ -329,7 +334,7 @@ void CMSA(float time_limit, int max_age) {
         }
         aux_solution_cplex = cplex_run();
 
-        //aux_solution_cplex= findSEIPApproximation(manager,  400);
+        //aux_solution_cplex= findSEIPApproximation(manager,  100);
         //        std::cout << "solucao cplex "<<aux_solution_cplex << std::endl;
 
         // Atualizar melhor solução se encontrada
@@ -358,20 +363,33 @@ void CMSA(float time_limit, int max_age) {
     total_duration = std::chrono::duration_cast<std::chrono::milliseconds>(total_end - total_start).count();
 
     // Exibição dos resultados
+
+    
     std::cout << "-----------------------------------\n";
     std::cout << "CONSTRUCT time: " << construct_total << "ms\n";
     std::cout << "SOLVE time: " << solve_total << "ms\n";
     std::cout << "ADAPT time: " << adapt_total << "ms\n";
     std::cout << "Total CMSA time: " << total_duration << "ms\n";
-    std::cout << "opt: " << bsf << std::endl;
-    std::cout << "-----------------------------------\n";
-    std::cout << "Loops: " << loops << std::endl;
-    std::cout << "Raio: " << raio << std::endl;
-    std::cout << "Best solution found at: " << best_solution_time << " ms" << std::endl;
+
+    if (testando()){
+        
+        std::cout << "opt: " << bsf << std::endl;
+        std::cout << "-----------------------------------\n";
+        std::cout << "Loops: " << loops << std::endl;
+        std::cout << "Raio: " << raio << std::endl;
+        std::cout << "Best solution found at: " << best_solution_time << " ms" << std::endl;
+    }
+    else{
+        std::cout << "opt: " << 99999999 << std::endl;
+        std::cout << "-----------------------------------\n";
+        std::cout << "Loops: " << loops << std::endl;
+        std::cout << "Raio: " << raio << std::endl;
+        std::cout << "Best solution found at: " << best_solution_time << " ms" << std::endl;
+    }
 
 }
 
-void testando() {
+bool testando() {
     std::vector<Component> sol;
 
     for (const auto& c : manager.components) {
@@ -381,12 +399,11 @@ void testando() {
     }
 
     std::cout << "pontos_vector: " << pontos.size() << std::endl;
-     std::cout << "sol size: " << sol.size() << std::endl;
+    std::cout << "sol size: " << sol.size() << std::endl;
     Teste teste(pontos, sol);
 
-    if (teste.execute())
-        std::cout << "success" << std::endl;
-    teste.writeOutput();
+    return teste.execute();
+    //teste.writeOutput();
 }
 
 

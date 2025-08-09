@@ -13,7 +13,7 @@
 #include "FASTCOVER-PP.h"
 #include <algorithm> // For std::nth_element
 #include "Struct.h"
-
+#include "DistanceCache.h"
 
 
 
@@ -39,6 +39,8 @@ extern std::vector<Ponto> pontos;
 extern double raio2;
 extern double raio2x4;
 extern std::uniform_real_distribution<> distr3;
+extern DistanceCache cache;
+
 
 
 int generate_solution_cgal_manual(const std::vector<Ponto>& points,
@@ -47,7 +49,9 @@ int generate_solution_cgal_manual(const std::vector<Ponto>& points,
 
                                
 int generate_solution_cgal(const std::vector<Ponto>& points, double x_max, double y_max, double x_min, double y_min);
+
 int construtivo_brkg(const std::vector<Ponto>& points);
+
 int generate_solution_dr(const std::vector<Ponto>& points,
     double x_max, double y_max,
     double x_min, double y_min);
@@ -56,9 +60,7 @@ int generate_solution_cgal_1(const std::vector<Ponto>& points,
                                double x_max, double y_max,
                                double x_min, double y_min);
 
-int generate_solution_dr_enhanced(const std::vector<Ponto>& points,
-    double x_max, double y_max,
-    double x_min, double y_min);
+int generate_solution_dr_enhanced(const std::vector<Ponto>& points);
 
 
 

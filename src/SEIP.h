@@ -352,7 +352,7 @@ bool isSuperiorA(const SolutionInfo& infoA, const SolutionInfo& infoB) {
     }
     return false;
 }
-
+/**
 bool isSuperior(const SolutionInfo& infoA, const SolutionInfo& infoB) {
     int costA = infoA.cost;
     int costB = infoB.cost;
@@ -365,10 +365,97 @@ bool isSuperior(const SolutionInfo& infoA, const SolutionInfo& infoB) {
     
     return false;
 }
+*/
 
+bool isSuperior(const SolutionInfo& infoA, const SolutionInfo& infoB) {
+    if ((infoA.cost <= infoB.cost && infoA.fitness > infoB.fitness) ||
+        (infoA.cost < infoB.cost && infoA.fitness >= infoB.fitness)) {
+        return true;
+    }
+    return false;
+}
+
+
+void initializePopulation(std::vector<SolutionInfo>& population, 
+                         const ComponentManager& manager,
+                         const PreprocessedInstance& instance) {
+    // Add current solution
+    BitSet currentSolution(manager.components.size());
+    for (size_t i = 0; i < manager.components.size(); i++) {
+        if (manager.components[i].eh_sol) {
+            currentSolution.set(i);
+        }
+    }
+    population.emplace_back(currentSolution, 
+                           calculateCost(currentSolution), 
+                           mu(currentSolution, instance));
+    
+    // Add greedy solution
+    BitSet greedySol = getGreedySolution(instance);
+    population.emplace_back(greedySol, calculateCost(greedySol), 
+                           mu(greedySol, instance));
+    
+    // Add random solutions with varying density
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    for (int i = 0; i < 5; i++) {
+        BitSet randomSol(manager.components.size());
+        std::uniform_real_distribution<> dist(0.1, 0.5); // 10-50% bits set
+        double density = dist(gen);
+        
+        for (size_t j = 0; j < manager.components.size(); j++) {
+            if (std::uniform_real_distribution<>(0,1)(gen) < density) {
+                randomSol.set(j);
+            }
+        }
+        makeSolutionFeasible(randomSol, instance);
+        population.emplace_back(randomSol, calculateCost(randomSol), 
+                              mu(randomSol, instance));
+    }
+}
+
+const SolutionInfo& tournamentSelection(const std::vector<SolutionInfo>& population, 
+                                       std::mt19937& gen, 
+                                       int tournamentSize = 3) {
+    std::uniform_int_distribution<int> dist(0, population.size() - 1);
+    int bestIdx = dist(gen);
+    int bestCost = population[bestIdx].cost;
+    
+    for (int i = 1; i < tournamentSize; i++) {
+        int idx = dist(gen);
+        if (population[idx].cost < bestCost) {
+            bestIdx = idx;
+            bestCost = population[idx].cost;
+        }
+    }
+    
+    return population[bestIdx];
+}
+
+void localSearch(BitSet& solution, const PreprocessedInstance& instance) {
+    bool improved = true;
+    while (improved) {
+        improved = false;
+        // Try removing each component
+        for (size_t i = 0; i < solution.size(); i++) {
+            if (solution.test(i)) {
+                solution.reset(i);
+                if (isFeasible(solution, instance)) {
+                    improved = true;  // Component was redundant
+                } else {
+                    solution.set(i);  // Restore component
+                }
+            }
+        }
+    }
+}
 /**
+ * 
+ * 
  * Gera uma solução mutada a partir de uma solução existente
  */
+
+
 BitSet mutate(const BitSet& solution) {
     BitSet mutated = solution;
     
@@ -418,8 +505,23 @@ int findSEIPApproximation(ComponentManager& manager, int iterations) {
     std::vector<SolutionInfo> population;
     
     // Inicializar com uma solução vazia
-    population.emplace_back(BitSet(manager.components.size()), 0, 0);
-    
+    // population.emplace_back(BitSet(manager.components.size()), 0, 0);
+
+    // Create a BitSet based on eh_sol status
+    /*
+        BitSet solutionBitSet(manager.components.size());
+        for (size_t i = 0; i < manager.components.size(); i++) {
+            if (manager.components[i].eh_sol) {
+                solutionBitSet.set(i);
+            }
+        }
+
+
+    SolutionInfo initialSolution(solutionBitSet, calculateCost(solutionBitSet), mu(solutionBitSet, instance));
+    population.push_back(initialSolution);
+    */
+    initializePopulation(population,manager,instance);
+
     for (int i = 0; i < iterations; ++i) {
         // Selecionar uma solução aleatória da população
         std::uniform_int_distribution<int> dist(0, population.size() - 1);
@@ -459,7 +561,7 @@ int findSEIPApproximation(ComponentManager& manager, int iterations) {
             population = std::move(next_population); // Substitui a população antiga
         }
         
-        std::cout << "população atual: " << population.size() << std::endl;
+        //std::cout << "população atual: " << population.size() << std::endl;
 
         
         
@@ -484,6 +586,8 @@ int findSEIPApproximation(ComponentManager& manager, int iterations) {
         
     }
 
+    // Final optimization with local search
+    localSearch(final_solution, instance);
     makeSolutionFeasible(final_solution, instance);
     best_cost = calculateCost(final_solution);
     

@@ -18,7 +18,7 @@ extern double raio;
 class Teste {
    const double EPSILON = raio*raio*(1+1e-14);
    std::vector<Ponto> P;
-  
+   
    std::vector<Component> sol;
 
 public:
@@ -30,17 +30,19 @@ public:
         
         int count_pontos = P.size();
         std::vector<int> visitados(count_pontos, 0);
+        bool passou = true;
 
         for (const auto& component : sol) {
 
             for (const auto& ponto: component.points)
             {
                 FT distSquared = CGAL::squared_distance(ponto.point, component.pos);
-                FT raioSquared = component.raio * component.raio;
+                // FT raioSquared = component.raio * component.raio;
 
-                if (std::abs(distSquared) > EPSILON) {
+                if (distSquared > EPSILON) {
                     //std::cout << std::abs(distSquared - raioSquared) << std::endl;
-                    std::cout << "ERRO 1" << std::endl;
+                    //std::cout << "ERRO 1" << std::endl;
+                    passou = false;
                 }
                
               
@@ -56,10 +58,10 @@ public:
             
         }
         if (count_pontos != 0){
-            std::cout << "ERRO 2 " << count_pontos << std::endl;
-            return false;
+            //std::cout << "ERRO 2 " << count_pontos << std::endl;
+            passou = false;
         }
-        return true;     
+        return passou;     
     }
 
 

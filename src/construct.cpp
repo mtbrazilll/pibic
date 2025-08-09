@@ -294,7 +294,6 @@ int construtivo_brkg(const std::vector<Ponto>& points){
     return conjunto_bolas->size();
 }
 
-
 int generate_solution_dr(const std::vector<Ponto>& points,
     double x_max, double y_max,
     double x_min, double y_min)
@@ -355,8 +354,6 @@ int generate_solution_dr(const std::vector<Ponto>& points,
     
    
    
-        // Limpa o manager para esta iteração
-
 
     // Inicializa centros
     std::vector<Point> centers = init_centers(points);
@@ -439,6 +436,8 @@ std::vector<Point> init_centers_enhanced(const std::vector<Ponto>& demand_points
     return centers;
 }
 
+
+
 // Atribui cada ponto de demanda ao seu centro mais próximo
 std::vector<std::vector<Ponto>> assign_to_clusters_enhanced(
     const std::vector<Ponto>& demand_points,
@@ -466,28 +465,426 @@ std::vector<std::vector<Ponto>> assign_to_clusters_enhanced(
     return clusters;
 }
 
-void identify_uncovered_points(const std::vector<Ponto>& points, const std::vector<Point>& centers, double raio) {
-    std::cout << "Verificando pontos não cobertos:" << std::endl;
-    int count = 0;
-    for (const auto& p : points) {
-        bool is_covered = false;
-        for (const auto& c : centers) {
-            if (CGAL::squared_distance(p.point, c) <= raio * raio) {
-                is_covered = true;
-                break;
-            }
-        }
-        if (!is_covered) {
-            std::cout << "  Ponto não coberto: (" << p.point << ")" << std::endl;
-            count++;
+
+
+// int generate_solution_dr_enhanced(const std::vector<Ponto>& points)
+// {
+//     // Passo 1: Escolher k centros iniciais
+//     auto centers = init_centers_enhanced(points);
+//     int k = centers.size();
+    
+//     // Melhor solução encontrada até agora
+//     int best_k = k;
+//     std::vector<Point> best_centers = centers;
+    
+//     // Flag para verificar se os centros pararam de mudar
+//     bool centers_changed = true;
+//     std::vector<Point> previous_centers;
+    
+//     // Variáveis para o método melhorado
+//     bool first_no_change = true;
+//     int last_best_k = best_k;
+//     std::vector<Point> last_best_centers = best_centers;
+    
+//     double tolerance = 0.001;
+    
+//     while (true) {
+//         // Salva os centros atuais para comparação
+//         previous_centers = centers;
+        
+//         // Passo 2: Atribuir pontos de demanda aos centros mais próximos
+//         auto clusters = assign_to_clusters_enhanced(points, centers);
+        
+
+
+//         // Passo 3: Determinar os centros dos clusters usando Min_circle do CGAL
+    
+//         std::vector<double> cluster_radii;
+//         centers.clear();
+//         for (const auto& cluster : clusters) {
+//             if (cluster.empty()) {
+//                 continue;
+//             } else {
+//                 //std::vector<Point> cluster_points = convertPontosToPoints(cluster);
+
+
+//                 Min_circle mc(cluster.begin(), cluster.end(), true);
+
+//                 centers.push_back(mc.circle().center());
+//                 //std::cout << "Centro do cluster: " << mc.circle().center() << std::endl;
+//                 cluster_radii.push_back(std::sqrt(mc.circle().squared_radius()));
+//             }
+//         }
+        
+        
+//         // Verifica se os centros mudaram significativamente
+//         centers_changed = false;
+        
+//         if (centers.size() != previous_centers.size()) {
+//             centers_changed = true;
+//         } else {
+
+//             for(int j = 0; j< centers.size(); j++) {
+//                 double distance_squared = CGAL::squared_distance(centers[j], previous_centers[j]);
+//                 if (distance_squared > tolerance * tolerance) {
+//                     centers_changed = true;
+//                     break;
+//                 }
+//             }
+//             // for (const auto& c_new : centers) {
+//             //     double min_squared_dist = std::numeric_limits<double>::max();
+//             //     for (const auto& c_old : previous_centers) {
+//             //         double squared_dist = CGAL::squared_distance(c_new, c_old);
+//             //         min_squared_dist = std::min(min_squared_dist, squared_dist);
+//             //     }
+//             //     if (min_squared_dist > tolerance * tolerance) {
+//             //         centers_changed = true;
+//             //         break;
+//             //     }
+//             // }
+//         }
+        
+//         // Passo 4: Calcular rmax(C)
+//         if (!cluster_radii.empty()) {
+//             double rmax = *std::max_element(cluster_radii.begin(), cluster_radii.end());
+            
+//             // Se rmax ≤ r, registrar a solução atual e tentar remover um centro
+//             if (rmax <= raio) {
+//                 best_k = k;
+//                 best_centers = centers;
+                
+//                 // Estratégia de remoção - remove o menor círculo
+//                 if (k > 1) {
+//                     auto min_it = std::min_element(cluster_radii.begin(), cluster_radii.end());
+//                     size_t idx_to_remove = std::distance(cluster_radii.begin(), min_it);
+                    
+//                     centers.erase(centers.begin() + idx_to_remove);
+//                     k--;
+//                     centers_changed = true;
+//                 }
+//             }
+//         }
+
+//         // Passo 5: Verificar se os centros pararam de mudar
+//         if (!centers_changed) {
+//             if (first_no_change) {
+//                 first_no_change = false;
+//                 last_best_k = best_k;
+//                 last_best_centers = best_centers;
+                
+//                 // Perturbação: substitui o centro do maior cluster por um ponto aleatório
+//                 if (!cluster_radii.empty() && !clusters.empty()) {
+//                     auto max_it = std::max_element(cluster_radii.begin(), cluster_radii.end());
+//                     size_t largest_idx = std::distance(cluster_radii.begin(), max_it);
+                    
+//                     if (largest_idx < clusters.size() && !clusters[largest_idx].empty()) {
+//                         std::uniform_int_distribution<> distr(0, clusters[largest_idx].size() - 1);
+//                         int random_idx = distr(gen);
+//                         centers[largest_idx] = clusters[largest_idx][random_idx].point;
+//                         centers_changed = true;
+//                     }
+//                 }
+//             } else {
+//                 if (best_k != last_best_k || best_centers != last_best_centers) {
+//                     last_best_k = best_k;
+//                     last_best_centers = best_centers;
+                    
+//                     // Nova perturbação
+//                     if (!cluster_radii.empty() && !clusters.empty()) {
+//                         auto max_it = std::max_element(cluster_radii.begin(), cluster_radii.end());
+//                         size_t largest_idx = std::distance(cluster_radii.begin(), max_it);
+                        
+//                         if (largest_idx < clusters.size() && !clusters[largest_idx].empty()) {
+//                             std::uniform_int_distribution<> distr(0, clusters[largest_idx].size() - 1);
+//                             int random_idx = distr(gen);
+//                             centers[largest_idx] = clusters[largest_idx][random_idx].point;
+//                             centers_changed = true;
+//                         }
+//                     }
+//                 } else {
+//                     break;
+//                 }
+//             }
+//         }
+        
+//         if (!centers_changed) {
+//             break;
+//         }
+//     }
+    
+//     // Cria componentes para a melhor solução encontrada
+//     auto clusters = assign_to_clusters_enhanced(points, best_centers);
+//     // identify_uncovered_points(points, best_centers, raio);
+//     for (int i = 0; i < best_centers.size(); i++)
+//     {
+//         Component aux(raio, clusters[i], best_centers[i]);
+//         manager.addComponent(aux);
+//     }
+    
+//     //std::cout << "manager.size()" << manager.components.size() << std::endl;
+  
+    
+//     return best_centers.size();
+// }
+
+// Inicialização otimizada usando índices
+
+// Versão otimizada combinando o melhor de ambas:
+std::vector<Point> init_centers_enhanced_optimized(const std::vector<Ponto>& demand_points) {
+    std::vector<Point> centers;
+    if (demand_points.empty()) return centers;
+    
+    // Primeiro centro aleatório
+    std::uniform_int_distribution<> distr(0, demand_points.size() - 1);
+    size_t center_idx = distr(gen);
+
+    std::vector<size_t> centers_idx = {center_idx};
+    centers.push_back(demand_points[center_idx].point);
+
+    // Trabalha com índices para evitar cópias desnecessárias
+    std::vector<size_t> remaining_indices;
+    remaining_indices.reserve(demand_points.size() - 1);
+    
+    for (size_t i = 0; i < demand_points.size(); ++i) {
+        if (i != center_idx) {
+            remaining_indices.push_back(i);
         }
     }
-    //std::cout << "Total de pontos não cobertos: " << count << " de " << points.size() << std::endl;
+    
+    
+    
+    while (!remaining_indices.empty()) {
+        double max_squared_dist = -1;
+        size_t best_idx = 0;
+        int best_pos = -1;
+        
+        for (size_t pos = 0; pos < remaining_indices.size(); ++pos) {
+            size_t i = remaining_indices[pos];
+            double min_squared_dist = std::numeric_limits<double>::max();
+            
+            for(size_t atual_idx : centers_idx) {
+                // Use cache SE for mais rápido, senão cálculo direto
+                double squared_dist;
+                if (1) {  // Assumindo método para verificar se cache é válido
+                    squared_dist = cache.getSquaredDistance(i, atual_idx);
+                } else {
+                    squared_dist = CGAL::squared_distance(demand_points[i].point, centers[atual_idx]);
+                }
+                min_squared_dist = std::min(min_squared_dist, squared_dist);
+            }
+            
+            if (min_squared_dist > max_squared_dist) {
+                max_squared_dist = min_squared_dist;
+                best_idx = i;
+                best_pos = pos;
+            }
+        }
+        
+        if (max_squared_dist <= raio2) {
+            break;
+        }
+        
+        centers.push_back(demand_points[best_idx].point);
+        centers_idx.push_back(best_idx);
+
+        // Remove usando swap para O(1)
+        std::swap(remaining_indices[best_pos], remaining_indices.back());
+        remaining_indices.pop_back();
+    }
+    
+    return centers;
 }
 
-int generate_solution_dr_enhanced(const std::vector<Ponto>& points,
-    double x_max, double y_max,
-    double x_min, double y_min)
+
+int generate_solution_dr_enhanced(const std::vector<Ponto>& points)
+{
+    #include <chrono>
+    
+    auto start_total = std::chrono::high_resolution_clock::now();
+    
+    // Medição do Passo 1
+    auto start_init = std::chrono::high_resolution_clock::now();
+    //FASTCOVER_PP fastcover(points);
+    //auto centers = fastcover.execute_dr();
+    auto centers = init_centers_enhanced_optimized(points);
+    auto end_init = std::chrono::high_resolution_clock::now();
+    auto time_init = std::chrono::duration_cast<std::chrono::microseconds>(end_init - start_init).count();
+    
+    int k = centers.size();
+    
+    // Melhor solução encontrada até agora
+    int best_k = k;
+    std::vector<Point> best_centers = centers;
+    
+    // Flag para verificar se os centros pararam de mudar
+    bool centers_changed = true;
+    std::vector<Point> previous_centers;
+    
+    // Variáveis para o método melhorado
+    bool first_no_change = true;
+    int last_best_k = best_k;
+    std::vector<Point> last_best_centers = best_centers;
+    
+    double tolerance = 0.001;
+    
+    // Variáveis para medição de tempo
+    long long total_time_assignment = 0;
+    long long total_time_min_circle = 0;
+    long long total_time_convergence = 0;
+    long long total_time_perturbation = 0;
+    int iterations = 0;
+    
+    while (true) {
+        iterations++;
+        
+        // Salva os centros atuais para comparação
+        previous_centers = centers;
+        
+        // Passo 2: Atribuir pontos de demanda aos centros mais próximos
+        auto start_assignment = std::chrono::high_resolution_clock::now();
+        auto clusters = assign_to_clusters_enhanced(points, centers);
+        auto end_assignment = std::chrono::high_resolution_clock::now();
+        total_time_assignment += std::chrono::duration_cast<std::chrono::microseconds>(end_assignment - start_assignment).count();
+
+        // Passo 3: Determinar os centros dos clusters usando Min_circle do CGAL
+        auto start_min_circle = std::chrono::high_resolution_clock::now();
+        std::vector<double> cluster_radii;
+        centers.clear();
+        for (const auto& cluster : clusters) {
+            if (cluster.empty()) {
+                continue;
+            } else {
+                Min_circle mc(cluster.begin(), cluster.end(), true);
+                centers.push_back(mc.circle().center());
+                cluster_radii.push_back(std::sqrt(mc.circle().squared_radius()));
+            }
+        }
+        auto end_min_circle = std::chrono::high_resolution_clock::now();
+        total_time_min_circle += std::chrono::duration_cast<std::chrono::microseconds>(end_min_circle - start_min_circle).count();
+        
+        // Verifica se os centros mudaram significativamente
+        auto start_convergence = std::chrono::high_resolution_clock::now();
+        centers_changed = false;
+        
+        if (centers.size() != previous_centers.size()) {
+            centers_changed = true;
+        } else {
+            for(int j = 0; j< centers.size(); j++) {
+                double distance_squared = CGAL::squared_distance(centers[j], previous_centers[j]);
+                if (distance_squared > tolerance * tolerance) {
+                    centers_changed = true;
+                    break;
+                }
+            }
+        }
+        
+        // Passo 4: Calcular rmax(C)
+        if (!cluster_radii.empty()) {
+            double rmax = *std::max_element(cluster_radii.begin(), cluster_radii.end());
+            
+            // Se rmax ≤ r, registrar a solução atual e tentar remover um centro
+            if (rmax <= raio) {
+                best_k = k;
+                best_centers = centers;
+                
+                // Estratégia de remoção - remove o menor círculo
+                if (k > 1) {
+                    auto min_it = std::min_element(cluster_radii.begin(), cluster_radii.end());
+                    size_t idx_to_remove = std::distance(cluster_radii.begin(), min_it);
+                    
+                    centers.erase(centers.begin() + idx_to_remove);
+                    k--;
+                    centers_changed = true;
+                }
+            }
+        }
+        auto end_convergence = std::chrono::high_resolution_clock::now();
+        total_time_convergence += std::chrono::duration_cast<std::chrono::microseconds>(end_convergence - start_convergence).count();
+
+        // Passo 5: Verificar se os centros pararam de mudar
+        auto start_perturbation = std::chrono::high_resolution_clock::now();
+        if (!centers_changed) {
+            if (first_no_change) {
+                first_no_change = false;
+                last_best_k = best_k;
+                last_best_centers = best_centers;
+                
+                // Perturbação: substitui o centro do maior cluster por um ponto aleatório
+                if (!cluster_radii.empty() && !clusters.empty()) {
+                    auto max_it = std::max_element(cluster_radii.begin(), cluster_radii.end());
+                    size_t largest_idx = std::distance(cluster_radii.begin(), max_it);
+                    
+                    if (largest_idx < clusters.size() && !clusters[largest_idx].empty()) {
+                        std::uniform_int_distribution<> distr(0, clusters[largest_idx].size() - 1);
+                        int random_idx = distr(gen);
+                        centers[largest_idx] = clusters[largest_idx][random_idx].point;
+                        centers_changed = true;
+                    }
+                }
+            } else {
+                if (best_k != last_best_k || best_centers != last_best_centers) {
+                    last_best_k = best_k;
+                    last_best_centers = best_centers;
+                    
+                    // Nova perturbação
+                    if (!cluster_radii.empty() && !clusters.empty()) {
+                        auto max_it = std::max_element(cluster_radii.begin(), cluster_radii.end());
+                        size_t largest_idx = std::distance(cluster_radii.begin(), max_it);
+                        
+                        if (largest_idx < clusters.size() && !clusters[largest_idx].empty()) {
+                            std::uniform_int_distribution<> distr(0, clusters[largest_idx].size() - 1);
+                            int random_idx = distr(gen);
+                            centers[largest_idx] = clusters[largest_idx][random_idx].point;
+                            centers_changed = true;
+                        }
+                    }
+                } else {
+                    break;
+                }
+            }
+        }
+        auto end_perturbation = std::chrono::high_resolution_clock::now();
+        total_time_perturbation += std::chrono::duration_cast<std::chrono::microseconds>(end_perturbation - start_perturbation).count();
+        
+        if (!centers_changed) {
+            break;
+        }
+    }
+    
+    // Criação dos componentes finais
+    auto start_final = std::chrono::high_resolution_clock::now();
+    auto clusters = assign_to_clusters_enhanced(points, best_centers);
+    for (int i = 0; i < best_centers.size(); i++)
+    {
+        Component aux(raio, clusters[i], best_centers[i]);
+        manager.addComponent(aux);
+    }
+    auto end_final = std::chrono::high_resolution_clock::now();
+    auto time_final = std::chrono::duration_cast<std::chrono::microseconds>(end_final - start_final).count();
+    
+    auto end_total = std::chrono::high_resolution_clock::now();
+    auto time_total = std::chrono::duration_cast<std::chrono::microseconds>(end_total - start_total).count();
+    
+    // Imprimir estatísticas de tempo
+    if (0) {
+        std::cout << "=== Estatísticas de Tempo DR Enhanced ===" << std::endl;
+        std::cout << "Tempo total: " << time_total << " μs" << std::endl;
+        std::cout << "Inicialização: " << time_init << " μs (" << (time_init * 100.0 / time_total) << "%)" << std::endl;
+        std::cout << "Atribuição de clusters (total): " << total_time_assignment << " μs (" << (total_time_assignment * 100.0 / time_total) << "%)" << std::endl;
+        std::cout << "Min_circle (total): " << total_time_min_circle << " μs (" << (total_time_min_circle * 100.0 / time_total) << "%)" << std::endl;
+        std::cout << "Verificação convergência (total): " << total_time_convergence << " μs (" << (total_time_convergence * 100.0 / time_total) << "%)" << std::endl;
+        std::cout << "Perturbações (total): " << total_time_perturbation << " μs (" << (total_time_perturbation * 100.0 / time_total) << "%)" << std::endl;
+        std::cout << "Criação final: " << time_final << " μs (" << (time_final * 100.0 / time_total) << "%)" << std::endl;
+        std::cout << "Número de iterações: " << iterations << std::endl;
+        std::cout << "Tempo médio por iteração: " << (time_total / iterations) << " μs" << std::endl;
+        std::cout << "========================================" << std::endl;
+        
+    }
+    return best_centers.size();
+}
+
+
+int generate_solution_dr_enhanced_leve(const std::vector<Ponto>& points)
 {
     // Passo 1: Escolher k centros iniciais
     auto centers = init_centers_enhanced(points);
@@ -543,17 +940,15 @@ int generate_solution_dr_enhanced(const std::vector<Ponto>& points,
         if (centers.size() != previous_centers.size()) {
             centers_changed = true;
         } else {
-            for (const auto& c_new : centers) {
-                double min_squared_dist = std::numeric_limits<double>::max();
-                for (const auto& c_old : previous_centers) {
-                    double squared_dist = CGAL::squared_distance(c_new, c_old);
-                    min_squared_dist = std::min(min_squared_dist, squared_dist);
-                }
-                if (min_squared_dist > tolerance * tolerance) {
+
+            for(int j = 0; j< centers.size(); j++) {
+                double distance_squared = CGAL::squared_distance(centers[j], previous_centers[j]);
+                if (distance_squared > tolerance * tolerance) {
                     centers_changed = true;
                     break;
                 }
             }
+ 
         }
         
         // Passo 4: Calcular rmax(C)
@@ -639,7 +1034,6 @@ int generate_solution_dr_enhanced(const std::vector<Ponto>& points,
     return best_centers.size();
 }
 
-
 int generate_divise_dr(const std::vector<Ponto>& points,
                                double x_max, double y_max,
                                double x_min, double y_min)
@@ -696,9 +1090,16 @@ int generate_divise_dr(const std::vector<Ponto>& points,
                     );
                     // Usa d para decidir se gera componente
                     
-                    if (d <= 4*raio2x4) {
+                    if (d <= 4*raio2) {
 
-                        generate_solution_dr_enhanced(points, q.x_max, q.y_max, q.x_min, q.y_min);
+                        Point centro = q.getCenter();
+                        Fuzzy_sphere_Ponto sphere(centro, 2*raio);
+                        std::vector<Ponto> neighbors;
+                        tree.search(std::back_inserter(neighbors), sphere);
+    
+
+
+                        generate_solution_dr_enhanced(neighbors);
                         solution++;
                     } else {
                         // Se não couber, subdivide mais

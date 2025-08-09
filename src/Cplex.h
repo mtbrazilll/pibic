@@ -145,7 +145,7 @@ double cplex_run() {
         }
         if (warm_start) cpl.addMIPStart(mipVar, mipVal);
 
-        cpl.setParam(IloCplex::TiLim, r_limit);
+        cpl.setParam(IloCplex::TiLim, cplex_time_limit);
         cpl.setParam(IloCplex::EpGap, 0.0);
         cpl.setParam(IloCplex::EpAGap, 0.0);
         cpl.setParam(IloCplex::Threads, 1);
