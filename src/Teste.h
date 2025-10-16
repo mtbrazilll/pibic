@@ -31,6 +31,7 @@ public:
         int count_pontos = P.size();
         std::vector<int> visitados(count_pontos, 0);
         bool passou = true;
+        int componentes_invalidos = 0;
 
         for (const auto& component : sol) {
 
@@ -43,20 +44,30 @@ public:
                     //std::cout << std::abs(distSquared - raioSquared) << std::endl;
                     //std::cout << "ERRO 1" << std::endl;
                     passou = false;
+                    componentes_invalidos++;
                 }
                
               
-                
-               
-
-                
                 if (!visitados[ponto.indice]){
                     visitados[ponto.indice] = 1;
                     count_pontos--;
                 }
+                
+                
             }
             
         }
+        if (count_pontos != 0){
+            
+            std::cout << "Pontos não cobertos: " << count_pontos << std::endl;
+            passou = false;
+        }
+                
+        
+        if (componentes_invalidos > 0) {
+           std::cout << "Componentes inválidos: " << componentes_invalidos << std::endl;
+       }
+
         if (count_pontos != 0){
             //std::cout << "ERRO 2 " << count_pontos << std::endl;
             passou = false;

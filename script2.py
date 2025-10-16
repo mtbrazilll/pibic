@@ -5,14 +5,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-nome = "cmsa_teste"
-time_limite = "100"
+nome = "tesssste"
+time_limite = "300"
 nsols = "1"
 cpl_abort = "1"
 init = "0"
 warm_start = "0"
 h_emph = "2"
-max_age = "0"
+max_age = "1"
 
 
 # Cria a pasta se ela não existir
@@ -317,7 +317,77 @@ instancias = [
     "../instancias/tsp/u2319.pcd -r 500"
 ]
 
-instancias = instancias10
+perde = [
+    "../instancias/tsp/fl3795.pcd -r 500",
+    "../instancias/tsp/pcb3038.pcd -r 500",
+    "../instancias/tsp/u2152.pcd -r 500",
+    "../instancias/tsp/d2103.pcd -r 1000",
+    "../instancias/tsp/nrw1379.pcd -r 1000",
+    "../instancias/tsp/pcb1173.pcd -r 1000",
+    "../instancias/tsp/pr2392.pcd -r 1000",
+    "../instancias/tsp/rl5915.pcd -r 1000",
+    "../instancias/tsp/u1432.pcd -r 1000"   
+]
+
+competitivas = [
+    "../instancias/tsp/d1291.pcd -r 500",
+    "../instancias/tsp/d1655.pcd -r 500",
+    "../instancias/tsp/d2103.pcd -r 500",
+    "../instancias/tsp/dsj1000.pcd -r 500",
+    "../instancias/tsp/fl1400.pcd -r 500",
+    "../instancias/tsp/fl1577.pcd -r 500",
+    "../instancias/tsp/fl3795.pcd -r 500",
+    "../instancias/tsp/nrw1379.pcd -r 500",
+    "../instancias/tsp/pcb1173.pcd -r 500",
+    "../instancias/tsp/pcb3038.pcd -r 500",
+    "../instancias/tsp/pr1002.pcd -r 500",
+    "../instancias/tsp/pr2392.pcd -r 500",
+    "../instancias/tsp/rl1304.pcd -r 500",
+    "../instancias/tsp/rl1323.pcd -r 500",
+    "../instancias/tsp/rl1889.pcd -r 500",
+    "../instancias/tsp/rl5915.pcd -r 500",
+    "../instancias/tsp/u1060.pcd -r 500",
+    "../instancias/tsp/u1432.pcd -r 500",
+    "../instancias/tsp/u1817.pcd -r 500",
+    "../instancias/tsp/u2152.pcd -r 500",
+    "../instancias/tsp/u2319.pcd -r 500",
+    "../instancias/tsp/vm1084.pcd -r 500",
+    "../instancias/tsp/vm1748.pcd -r 500",
+     "../instancias/tsp/d1291.pcd -r 1000",
+    "../instancias/tsp/d1655.pcd -r 1000",
+    "../instancias/tsp/d2103.pcd -r 1000",
+    "../instancias/tsp/dsj1000.pcd -r 1000",
+    "../instancias/tsp/fl1400.pcd -r 1000",
+    "../instancias/tsp/fl1577.pcd -r 1000",
+    "../instancias/tsp/fl3795.pcd -r 1000",
+    "../instancias/tsp/nrw1379.pcd -r 1000",
+    "../instancias/tsp/pcb1173.pcd -r 1000",
+    "../instancias/tsp/pcb3038.pcd -r 1000",
+    "../instancias/tsp/pr1002.pcd -r 1000",
+    "../instancias/tsp/pr2392.pcd -r 1000",
+    "../instancias/tsp/rl1304.pcd -r 1000",
+    "../instancias/tsp/rl1323.pcd -r 1000",
+    "../instancias/tsp/rl1889.pcd -r 1000",
+    "../instancias/tsp/rl5915.pcd -r 1000",
+    "../instancias/tsp/u1060.pcd -r 1000",
+    "../instancias/tsp/u1432.pcd -r 1000",
+    "../instancias/tsp/u2319.pcd -r 1000",
+    "../instancias/tsp/vm1084.pcd -r 1000",
+    "../instancias/tsp/vm1748.pcd -r 1000",
+    "../instancias/tsp/pr1002.pcd -r  2000",
+    "../instancias/tsp/pr2392.pcd -r  2000",
+    "../instancias/tsp/rl1304.pcd -r  2000",
+    "../instancias/tsp/rl1323.pcd -r  2000",
+    "../instancias/tsp/rl1889.pcd -r  2000",
+    "../instancias/tsp/rl5915.pcd -r  2000",
+    "../instancias/tsp/vm1084.pcd -r  2000",
+    "../instancias/tsp/vm1748.pcd -r  2000"
+    
+]
+
+
+
+instancias = perde
 
 
 # Dicionário para coletar todos os tempos e opts

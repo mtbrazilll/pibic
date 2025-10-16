@@ -51,7 +51,7 @@ public:
         auto it = components.begin();
         std::vector<Component> aux;
         for (auto &temp: components) {
-            if (temp.idade <= max_age) {
+            if (temp.idade < max_age) {
                 aux.push_back(temp);
                 
             }

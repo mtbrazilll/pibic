@@ -295,9 +295,10 @@ void CMSA(float time_limit, int max_age) {
         auto construct_start = std::chrono::high_resolution_clock::now();
         for (int na = 0; na < n_of_sols; na++) {
 
-            //cmsa_sbpo();
-            dr_enhanced();
-
+            cmsa_sbpo();
+            //dr_enhanced();
+            //cmsa_dr_particao();
+            //divide_dr();
            // int aux_solution1 = generate_divise_dr(pontos, max_x , max_y , min_x , min_y );
            
           
@@ -332,8 +333,15 @@ void CMSA(float time_limit, int max_age) {
         if(r_limit < 0.001){
             break;
         }
-        aux_solution_cplex = cplex_run();
-
+        if (loops !=  0){
+            aux_solution_cplex = cplex_colunas_geracao();
+            //aux_solution_cplex = greedySetCover();
+            
+        }
+        else{
+            aux_solution_cplex = cplex_run();
+            //aux_solution_cplex = greedySetCover();
+        }
         //aux_solution_cplex= findSEIPApproximation(manager,  100);
         //        std::cout << "solucao cplex "<<aux_solution_cplex << std::endl;
 
@@ -343,7 +351,7 @@ void CMSA(float time_limit, int max_age) {
             auto current = std::chrono::high_resolution_clock::now();
             best_solution_time = std::chrono::duration_cast<std::chrono::milliseconds>(current - total_start).count();
         }
-        //bsf = guloso();
+        //bsf = greedySetCover() ();
         auto solve_end = std::chrono::high_resolution_clock::now();
         solve_total += std::chrono::duration_cast<std::chrono::milliseconds>(solve_end - solve_start).count();
 
@@ -397,7 +405,7 @@ bool testando() {
             sol.push_back(c);
         }
     }
-
+    std::cout << "Teste" << std::endl;
     std::cout << "pontos_vector: " << pontos.size() << std::endl;
     std::cout << "sol size: " << sol.size() << std::endl;
     Teste teste(pontos, sol);

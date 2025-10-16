@@ -33,19 +33,27 @@ void cmsa_sbpo(){
 }
 
 void dr_enhanced(){
-
-    if (loops == 0) {
-
-        cache.initialize(pontos);
-    }
  
     
     int aux_solution1 = generate_solution_dr_enhanced(pontos);
 }
 
 void divide_dr(){
-    
-    int aux_solution1 = generate_divise_dr(pontos, max_x , max_y , min_x , min_y );
+   
+    int aux_solution1 = generate_divise_dr_profundidade(pontos, max_x , max_y , min_x , min_y, 2);
+    // int aux_solution1 = generate_divise_dr(pontos, max_x , max_y , min_x , min_y);
 }
 
+void cmsa_dr_particao(){
+
+    if (loops % 2 == 0) {
+
+        int aux_solution1 = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y );
+    }
+    else{
+
+        int aux_solution2 = generate_solution_dr_enhanced(pontos);
+
+    }
+}
 #endif
