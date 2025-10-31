@@ -5,14 +5,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-nome = "tesssste"
+nome = "generate_divise_dr_profundidade2"
 time_limite = "300"
-nsols = "1"
+nsols = "2"
 cpl_abort = "1"
 init = "0"
 warm_start = "0"
-h_emph = "2"
+h_emph = "0"
 max_age = "1"
+algo = "2"
+d = "4"
 
 
 # Cria a pasta se ela não existir
@@ -318,6 +320,7 @@ instancias = [
 ]
 
 perde = [
+    "../instancias/tsp/rl5915.pcd -r 1000",
     "../instancias/tsp/fl3795.pcd -r 500",
     "../instancias/tsp/pcb3038.pcd -r 500",
     "../instancias/tsp/u2152.pcd -r 500",
@@ -325,7 +328,6 @@ perde = [
     "../instancias/tsp/nrw1379.pcd -r 1000",
     "../instancias/tsp/pcb1173.pcd -r 1000",
     "../instancias/tsp/pr2392.pcd -r 1000",
-    "../instancias/tsp/rl5915.pcd -r 1000",
     "../instancias/tsp/u1432.pcd -r 1000"   
 ]
 
@@ -387,7 +389,7 @@ competitivas = [
 
 
 
-instancias = perde
+instancias = instancias10
 
 
 # Dicionário para coletar todos os tempos e opts
@@ -403,9 +405,11 @@ dados_csv = []
 
 # Executar o comando para cada instância 10 vezes
 for i, instancia in enumerate(instancias):
+    print()
     print(f"Iniciando a instancia {instancia}")
+    print()
     for _ in range(30):
-        comando = f"./pcdp.run  -i {instancia} -s {_} -nsols {nsols} -init {init} -h_emph {h_emph} -warm_start {warm_start} -cpl_abort {cpl_abort} -t {time_limite} -max_age {max_age}"
+        comando = f"./pcdp.run  -i {instancia} -s {_} -nsols {nsols} -init {init} -h_emph {h_emph} -warm_start {warm_start} -cpl_abort {cpl_abort} -t {time_limite} -max_age {max_age} -algo {algo} -d {d}"
 
         #print(comando)
         print()
@@ -435,6 +439,8 @@ for i, instancia in enumerate(instancias):
                 "Loops": loops,
                 "Best_solution_time": best_time  # Adicione essa linha
             })
+            print(f"{instancia[18:]} sol {opt}  loops {loops} seed {_} time {tempo}")
+
         except Exception as e:
             tempo = 0
             opt = 0

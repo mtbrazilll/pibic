@@ -17,7 +17,7 @@ extern double max_x;
 extern double max_y;
 extern double min_x;
 extern double min_y;
-DistanceCache cache;
+//DistanceCache cache;
 
 void cmsa_sbpo(){
 
@@ -48,12 +48,38 @@ void cmsa_dr_particao(){
 
     if (loops % 2 == 0) {
 
-        int aux_solution1 = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y );
+        cmsa_sbpo();
     }
     else{
 
-        int aux_solution2 = generate_solution_dr_enhanced(pontos);
+        dr_enhanced();
 
     }
+}
+
+void fastCover(){
+
+                //dr_enhanced();
+            //cmsa_dr_particao();
+            //divide_dr();
+           // int aux_solution1 = generate_divise_dr(pontos, max_x , max_y , min_x , min_y );
+           
+          
+            //int aux_solution2 = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y );
+            //int aux_solution1 = generate_solution_dr_enhanced(pontos, max_x , max_y , min_x , min_y );
+
+           //std::cout << "solucao construtivo "<<aux_solution1 << std::endl;
+           //int aux_solution2 = construtivo_brkg(pontos);
+        //std::cout << "solucao construtivo "<<aux_solution << std::endl;
+           //if (bsf > aux_solution) bsf = aux_solution;
+          // mateus_recursive(pontos, max_x + raio, max_y + raio, min_x - raio, min_y -raio);
+           // FASTCOVER ob2(pontos);
+
+          FASTCOVER_PP ob1(pontos);
+           // ob2.execute();
+          ob1.execute();
+            //hexa ob3(pontos);
+            //ob3.execute();
+            //k_center(pontos, manager, raio);
 }
 #endif

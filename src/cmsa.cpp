@@ -61,10 +61,10 @@ double best_solution_time = 0.0; // Tempo em que a melhor solução foi encontra
 
 // CMSA PARAMETERS
 double computation_time_limit = 100.0;
-double cplex_time_limit = 0.10;
+double cplex_time_limit = 0.30;
 double determinism_rate = 0.8;
 double r_limit = 0;
-double cplex_time= 0.1;
+//double cplex_time= 0.1;
 int n_of_sols = 3;
 int age_limit = 1;
 int candidate_list_size = 10;
@@ -72,6 +72,7 @@ bool warm_start = false;
 int heuristic_emphasis = 0;
 bool cplex_abort = false;
 bool init = false;
+int algo = 0;
 
 
 int loops = 0;
@@ -81,6 +82,7 @@ double raio2;
 double raio2x4;
 unsigned long int n_pon = 0;
 PontoTree tree;
+int profundidade = 1;
 
 std::vector<Ponto> pontos;
 std::vector<int> indices;
@@ -89,8 +91,8 @@ ComponentManager bestSolution;
 
 // Gerador de números aleatórios
 std::random_device rd;
-std::mt19937 gen(rd());
-std::uniform_real_distribution<> distr(-raio, raio);
+std::mt19937 gen;
+std::uniform_real_distribution<> distr;
 std::uniform_real_distribution<> distr2(0, 1);
 std::uniform_real_distribution<> distr3(1, 2);
 std::uniform_int_distribution<int> int_distr(1, 2);
@@ -163,7 +165,7 @@ int main(int argc, char* argv[]) {
         }
         else if (strcmp(argv[i], "-cpl_t") == 0) {
             if (i + 1 < argc) {
-                cplex_time_limit = std::atoi(argv[++i]);
+                cplex_time_limit = (std::atoi(argv[++i]))/1000;
             } else {
                 std::cerr << "Erro: Argumento para -t está faltando.\n";
                 return 1;
@@ -229,12 +231,33 @@ int main(int argc, char* argv[]) {
                 return 1;
             }
         }
+        else if (strcmp(argv[i], "-algo") == 0) { // Flag para verbose timing
+            if (i + 1 < argc) {
+                algo = std::atoi(argv[++i]);
+                
+            } else {
+                std::cerr << "Erro: Argumento para -v está faltando (0 ou 1).\n";
+                return 1;
+            }
+        }
+        else if (strcmp(argv[i], "-d") == 0) { // Flag para verbose timing
+            if (i + 1 < argc) {
+                profundidade = std::atoi(argv[++i]);
+                
+            } else {
+                std::cerr << "Erro: Argumento para -v está faltando (0 ou 1).\n";
+                return 1;
+            }
+        }
         else {
             std::cerr << "Aviso: Argumento desconhecido " << argv[i] << " ignorado.\n";
         }
     }
 
         
+    std::cout << "Caminho do arquivo: " << filePath << "\n";
+    std::cout << "profundidade: " << profundidade << "\n";
+    std::cout << "algo: " << algo << "\n";
     std::cout << "Caminho do arquivo: " << filePath << "\n";
     std::cout << "Valor de -s: " << seed << "\n";
     std::cout << "Limite de idade: " << age_limit << "\n";
@@ -248,6 +271,7 @@ int main(int argc, char* argv[]) {
     raio2 = raio * raio;
     raio2x4 = raio2 * 4;
     gen.seed(seed);
+    distr = std::uniform_real_distribution<>(-raio, raio);
 
     read_points(filePath, pontos, max_x, max_y, min_x, min_y, maior_em_modulo);
     indices.resize(pontos.size());
@@ -295,7 +319,32 @@ void CMSA(float time_limit, int max_age) {
         auto construct_start = std::chrono::high_resolution_clock::now();
         for (int na = 0; na < n_of_sols; na++) {
 
-            cmsa_sbpo();
+            
+            if (algo ==0){
+                cmsa_sbpo();
+            }
+            else if (algo ==1){
+                dr_enhanced();
+            }
+             else if (algo ==2){
+                generate_divise_dr_profundidade(pontos, max_x , max_y , min_x , min_y, profundidade);
+            }
+             else if (algo ==3){
+
+                cmsa_dr_particao();
+                
+            }
+             else if (algo ==4){
+                fastCover();
+            }
+            else if (algo == 5){
+                if (loops % 2 == 1){
+                    generate_divise_dr_profundidade(pontos, max_x , max_y , min_x , min_y, profundidade);
+                }
+                else{
+                     cmsa_sbpo();
+                }
+            }
             //dr_enhanced();
             //cmsa_dr_particao();
             //divide_dr();
@@ -333,15 +382,16 @@ void CMSA(float time_limit, int max_age) {
         if(r_limit < 0.001){
             break;
         }
-        if (loops !=  0){
-            aux_solution_cplex = cplex_colunas_geracao();
-            //aux_solution_cplex = greedySetCover();
-            
+        
+        if (true){
+
+            aux_solution_cplex = cplex_run();
         }
         else{
-            aux_solution_cplex = cplex_run();
-            //aux_solution_cplex = greedySetCover();
+            aux_solution_cplex= findSEIPApproximation(manager,  100);
         }
+            //aux_solution_cplex = cplex_run();
+        
         //aux_solution_cplex= findSEIPApproximation(manager,  100);
         //        std::cout << "solucao cplex "<<aux_solution_cplex << std::endl;
 
