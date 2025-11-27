@@ -5,16 +5,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-nome = "generate_divise_dr_profundidade2"
+nome = "cmsa_guloso_2_competetivas_tunning"
 time_limite = "300"
-nsols = "2"
-cpl_abort = "1"
+nsols = "1"
+cpl_abort = "0"
 init = "0"
 warm_start = "0"
 h_emph = "0"
 max_age = "1"
-algo = "2"
+algo = "6"
 d = "4"
+alfa = "68"
+rele = "81"
+cplex_t = "27"
 
 
 # Cria a pasta se ela não existir
@@ -332,12 +335,9 @@ perde = [
 ]
 
 competitivas = [
-    "../instancias/tsp/d1291.pcd -r 500",
+     "../instancias/tsp/d1291.pcd -r 500",
     "../instancias/tsp/d1655.pcd -r 500",
     "../instancias/tsp/d2103.pcd -r 500",
-    "../instancias/tsp/dsj1000.pcd -r 500",
-    "../instancias/tsp/fl1400.pcd -r 500",
-    "../instancias/tsp/fl1577.pcd -r 500",
     "../instancias/tsp/fl3795.pcd -r 500",
     "../instancias/tsp/nrw1379.pcd -r 500",
     "../instancias/tsp/pcb1173.pcd -r 500",
@@ -350,21 +350,8 @@ competitivas = [
     "../instancias/tsp/rl5915.pcd -r 500",
     "../instancias/tsp/u1060.pcd -r 500",
     "../instancias/tsp/u1432.pcd -r 500",
-    "../instancias/tsp/u1817.pcd -r 500",
-    "../instancias/tsp/u2152.pcd -r 500",
-    "../instancias/tsp/u2319.pcd -r 500",
     "../instancias/tsp/vm1084.pcd -r 500",
     "../instancias/tsp/vm1748.pcd -r 500",
-     "../instancias/tsp/d1291.pcd -r 1000",
-    "../instancias/tsp/d1655.pcd -r 1000",
-    "../instancias/tsp/d2103.pcd -r 1000",
-    "../instancias/tsp/dsj1000.pcd -r 1000",
-    "../instancias/tsp/fl1400.pcd -r 1000",
-    "../instancias/tsp/fl1577.pcd -r 1000",
-    "../instancias/tsp/fl3795.pcd -r 1000",
-    "../instancias/tsp/nrw1379.pcd -r 1000",
-    "../instancias/tsp/pcb1173.pcd -r 1000",
-    "../instancias/tsp/pcb3038.pcd -r 1000",
     "../instancias/tsp/pr1002.pcd -r 1000",
     "../instancias/tsp/pr2392.pcd -r 1000",
     "../instancias/tsp/rl1304.pcd -r 1000",
@@ -373,15 +360,16 @@ competitivas = [
     "../instancias/tsp/rl5915.pcd -r 1000",
     "../instancias/tsp/u1060.pcd -r 1000",
     "../instancias/tsp/u1432.pcd -r 1000",
-    "../instancias/tsp/u2319.pcd -r 1000",
     "../instancias/tsp/vm1084.pcd -r 1000",
     "../instancias/tsp/vm1748.pcd -r 1000",
+    "../instancias/tsp/dsj1000.pcd -r  2000",
     "../instancias/tsp/pr1002.pcd -r  2000",
     "../instancias/tsp/pr2392.pcd -r  2000",
     "../instancias/tsp/rl1304.pcd -r  2000",
     "../instancias/tsp/rl1323.pcd -r  2000",
     "../instancias/tsp/rl1889.pcd -r  2000",
     "../instancias/tsp/rl5915.pcd -r  2000",
+    "../instancias/tsp/u1060.pcd -r  2000",
     "../instancias/tsp/vm1084.pcd -r  2000",
     "../instancias/tsp/vm1748.pcd -r  2000"
     
@@ -389,7 +377,7 @@ competitivas = [
 
 
 
-instancias = instancias10
+instancias = competitivas
 
 
 # Dicionário para coletar todos os tempos e opts
@@ -409,7 +397,7 @@ for i, instancia in enumerate(instancias):
     print(f"Iniciando a instancia {instancia}")
     print()
     for _ in range(30):
-        comando = f"./pcdp.run  -i {instancia} -s {_} -nsols {nsols} -init {init} -h_emph {h_emph} -warm_start {warm_start} -cpl_abort {cpl_abort} -t {time_limite} -max_age {max_age} -algo {algo} -d {d}"
+        comando = f"./pcdp.run  -i {instancia} -s {_} -nsols {nsols} -init {init} -h_emph {h_emph} -warm_start {warm_start} -cpl_abort {cpl_abort} -t {time_limite} -max_age {max_age} -algo {algo} -d {d} -alfa {alfa} -cpl_t {cplex_t} -rele {rele}"
 
         #print(comando)
         print()
@@ -506,11 +494,6 @@ dados_csv.append((f"{nome}",df))
 
 
 with open(f'../resultados/{nome}/hiperparametros.txt', 'w') as arquivo:
-    arquivo.write(f"time_limite: {time_limite} \n"
-                  f"nsols: {nsols} \n"
-                  f"cpl_abort = {cpl_abort} \n"
-                  f"init = {init} \n"
-                  f"warm_start = {warm_start} \n"
-                  f"h_emph = {h_emph}\n")
+    arquivo.write(f"-init {init} -h_emph {h_emph} -warm_start {warm_start} -cpl_abort {cpl_abort} -t {time_limite} -max_age {max_age} -algo {algo} -d {d} -alfa {alfa} -cpl_t {cplex_t} -rele {rele}")
 
 

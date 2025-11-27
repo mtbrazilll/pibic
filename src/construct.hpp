@@ -74,3 +74,13 @@ int generate_divise_dr_profundidade(const std::vector<Ponto> &points,
                        double x_max, double y_max,
                        double x_min, double y_min,
                        int max_depth);
+
+
+int generate_solution_guloso(const std::vector<Ponto>& points,
+                               double x_max, double y_max,
+                               double x_min, double y_min);
+
+
+int generate_solution_guloso(const std::vector<Ponto>& points,
+                               double x_max, double y_max,
+                               double x_min, double y_min, double p);

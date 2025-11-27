@@ -61,7 +61,7 @@ double best_solution_time = 0.0; // Tempo em que a melhor solução foi encontra
 
 // CMSA PARAMETERS
 double computation_time_limit = 100.0;
-double cplex_time_limit = 0.30;
+double cplex_time_limit = 0.31;
 double determinism_rate = 0.8;
 double r_limit = 0;
 //double cplex_time= 0.1;
@@ -83,6 +83,9 @@ double raio2x4;
 unsigned long int n_pon = 0;
 PontoTree tree;
 int profundidade = 1;
+int instancia_tamanho;
+double alfa = 0;
+int rele = 145;
 
 std::vector<Ponto> pontos;
 std::vector<int> indices;
@@ -125,6 +128,7 @@ void printHelp() {
     std::cout << "  -warm_start <0|1>     Ativa o warm start (padrão: 0)\n";
     std::cout << "  -init <0|1>           Ativa a inicialização (padrão: 0)\n";
     std::cout << "  -cpl_abort <0|1>      Ativa o aborto do CPLEX (padrão: 0)\n";
+    std::cout << "  -d <int>              define a profundidade (padrão: 1)\n";
 }
 
 int main(int argc, char* argv[]) {
@@ -165,7 +169,15 @@ int main(int argc, char* argv[]) {
         }
         else if (strcmp(argv[i], "-cpl_t") == 0) {
             if (i + 1 < argc) {
-                cplex_time_limit = (std::atoi(argv[++i]))/1000;
+                cplex_time_limit = double(std::atoi(argv[++i]))/100;
+            } else {
+                std::cerr << "Erro: Argumento para -t está faltando.\n";
+                return 1;
+            }
+        }
+        else if (strcmp(argv[i], "-rele") == 0) {
+            if (i + 1 < argc) {
+                rele = (std::atoi(argv[++i]));
             } else {
                 std::cerr << "Erro: Argumento para -t está faltando.\n";
                 return 1;
@@ -240,6 +252,15 @@ int main(int argc, char* argv[]) {
                 return 1;
             }
         }
+        else if (strcmp(argv[i], "-alfa") == 0) { // Flag para verbose timing
+            if (i + 1 < argc) {
+                alfa = double((std::atoi(argv[++i])))/100;
+                
+            } else {
+                std::cerr << "Erro: Argumento para -v está faltando (0 ou 1).\n";
+                return 1;
+            }
+        }
         else if (strcmp(argv[i], "-d") == 0) { // Flag para verbose timing
             if (i + 1 < argc) {
                 profundidade = std::atoi(argv[++i]);
@@ -257,6 +278,8 @@ int main(int argc, char* argv[]) {
         
     std::cout << "Caminho do arquivo: " << filePath << "\n";
     std::cout << "profundidade: " << profundidade << "\n";
+    std::cout << "rele: " << rele << "\n";
+    std::cout << "alfa: " << alfa << "\n";
     std::cout << "algo: " << algo << "\n";
     std::cout << "Caminho do arquivo: " << filePath << "\n";
     std::cout << "Valor de -s: " << seed << "\n";
@@ -312,6 +335,11 @@ void CMSA(float time_limit, int max_age) {
 
     }
 
+    if (algo == 7){
+        FASTCOVER_PP ob1(pontos);
+        instancia_tamanho = ob1.execute();
+    }
+
 
     // ================= CMSA Loop ==========================
     while (total_duration < computation_time_limit) {
@@ -321,12 +349,15 @@ void CMSA(float time_limit, int max_age) {
 
             
             if (algo ==0){
+
                 cmsa_sbpo();
             }
             else if (algo ==1){
+
                 dr_enhanced();
             }
              else if (algo ==2){
+
                 generate_divise_dr_profundidade(pontos, max_x , max_y , min_x , min_y, profundidade);
             }
              else if (algo ==3){
@@ -335,9 +366,11 @@ void CMSA(float time_limit, int max_age) {
                 
             }
              else if (algo ==4){
+
                 fastCover();
             }
             else if (algo == 5){
+
                 if (loops % 2 == 1){
                     generate_divise_dr_profundidade(pontos, max_x , max_y , min_x , min_y, profundidade);
                 }
@@ -345,28 +378,24 @@ void CMSA(float time_limit, int max_age) {
                      cmsa_sbpo();
                 }
             }
-            //dr_enhanced();
-            //cmsa_dr_particao();
-            //divide_dr();
-           // int aux_solution1 = generate_divise_dr(pontos, max_x , max_y , min_x , min_y );
-           
-          
-            //int aux_solution2 = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y );
-            //int aux_solution1 = generate_solution_dr_enhanced(pontos, max_x , max_y , min_x , min_y );
+            else if (algo == 6){
 
-           //std::cout << "solucao construtivo "<<aux_solution1 << std::endl;
-           //int aux_solution2 = construtivo_brkg(pontos);
-        //std::cout << "solucao construtivo "<<aux_solution << std::endl;
-           //if (bsf > aux_solution) bsf = aux_solution;
-          // mateus_recursive(pontos, max_x + raio, max_y + raio, min_x - raio, min_y -raio);
-           // FASTCOVER ob2(pontos);
+                int aux_solution2 = generate_solution_guloso(pontos, max_x , max_y , min_x , min_y, alfa);
+            }
+            else if (algo == 7){
 
-          // FASTCOVER_PP ob1(pontos);
-           // ob2.execute();
-          //ob1.execute();
-            //hexa ob3(pontos);
-            //ob3.execute();
-            //k_center(pontos, manager, raio);
+                if (instancia_tamanho >= 139){
+                    cmsa_sbpo();
+                }
+                else{
+                    dr_enhanced();
+                }
+            }
+            else if (algo == 8){
+                c_brkg();
+            }
+            
+  
         }
         auto construct_end = std::chrono::high_resolution_clock::now();
         construct_total += std::chrono::duration_cast<std::chrono::milliseconds>(construct_end - construct_start).count();
@@ -378,11 +407,11 @@ void CMSA(float time_limit, int max_age) {
         r_limit = r_limit/1000 ; 
         auto solve_start = std::chrono::high_resolution_clock::now();
         
-        double aux_solution_cplex = std::numeric_limits<double>::max();
         if(r_limit < 0.001){
             break;
         }
         
+        double aux_solution_cplex = std::numeric_limits<double>::max();
         if (true){
 
             aux_solution_cplex = cplex_run();
@@ -410,6 +439,11 @@ void CMSA(float time_limit, int max_age) {
         manager.removeOldComponents(max_age);
         auto adapt_end = std::chrono::high_resolution_clock::now();
         adapt_total += std::chrono::duration_cast<std::chrono::milliseconds>(adapt_end - adapt_start).count();
+
+
+        // melhoria local
+
+        
 
 
         auto total_end = std::chrono::high_resolution_clock::now();

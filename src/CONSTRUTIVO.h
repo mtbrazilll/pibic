@@ -19,6 +19,13 @@ extern double min_x;
 extern double min_y;
 //DistanceCache cache;
 
+
+
+
+
+
+
+
 void cmsa_sbpo(){
 
     if (loops == 0) {
@@ -82,4 +89,12 @@ void fastCover(){
             //ob3.execute();
             //k_center(pontos, manager, raio);
 }
+
+
+void c_brkg(){
+     construtivo_brkg(pontos);
+}
 #endif
+
+
+
