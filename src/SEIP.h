@@ -215,8 +215,8 @@ struct PreprocessedInstance {
         // Inicializar bitsets para cada componente
         for (size_t i = 0; i < manager.components.size(); ++i) {
             BitSet cover(pontos.size());
-            for (const auto& point : manager.components[i].points) {
-                cover.set(point.indice);
+            for (int idx : manager.components[i].pontos_indices) {
+                cover.set(idx);
             }
             componentCovers.push_back(cover);
         }

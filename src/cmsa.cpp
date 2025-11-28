@@ -81,7 +81,7 @@ double raio = 1.0; // Declarado antes de ser usado
 double raio2;
 double raio2x4;
 unsigned long int n_pon = 0;
-PontoTree tree;
+IndexTree tree;
 int profundidade = 1;
 int instancia_tamanho;
 double alfa = 0;
@@ -301,7 +301,7 @@ int main(int argc, char* argv[]) {
     std::iota(indices.begin(), indices.end(), 0); 
     
     n_pon = pontos.size();
-    tree.insert(pontos.begin(), pontos.end());
+    tree.insert(indices.begin(), indices.end());
     //build_struct();
     CMSA(cplex_time_limit, age_limit);
     
@@ -403,7 +403,7 @@ void CMSA(float time_limit, int max_age) {
         // SOLVE
         
         auto end = std::chrono::high_resolution_clock::now();
-        r_limit = computation_time_limit - std::chrono::duration_cast<std::chrono::milliseconds>(end - total_start).count();
+        r_limit = computation_time_limit * 1000 - std::chrono::duration_cast<std::chrono::milliseconds>(end - total_start).count();
         r_limit = r_limit/1000 ; 
         auto solve_start = std::chrono::high_resolution_clock::now();
         
@@ -412,13 +412,11 @@ void CMSA(float time_limit, int max_age) {
         }
         
         double aux_solution_cplex = std::numeric_limits<double>::max();
-        if (true){
+      
 
-            aux_solution_cplex = cplex_run();
-        }
-        else{
-            aux_solution_cplex= findSEIPApproximation(manager,  100);
-        }
+        aux_solution_cplex = cplex_run();
+        
+        
             //aux_solution_cplex = cplex_run();
         
         //aux_solution_cplex= findSEIPApproximation(manager,  100);

@@ -39,16 +39,16 @@ class FASTCOVER_PP {
 
     struct BoundingBox {
         double minX, maxX, minY, maxY;
-        std::vector<Ponto> pontos;
+        std::vector<int> pontos_indices;
         BoundingBox() {
             minX = minY = DBL_MAX;
             maxX = maxY = DBL_MIN;
         }
-        explicit BoundingBox(const Point &p, const Ponto &p1) : minX(p.x()), maxX(p.x()), minY(p.y()), maxY(p.y()) {
-            pontos.push_back(p1);
+        explicit BoundingBox(const Point &p, int p1_idx) : minX(p.x()), maxX(p.x()), minY(p.y()), maxY(p.y()) {
+            pontos_indices.push_back(p1_idx);
         }
-        void update(const Point &p, const Ponto &p1) {
-            pontos.push_back(p1);
+        void update(const Point &p, int p1_idx) {
+            pontos_indices.push_back(p1_idx);
             minX = std::min(minX, p.x());
             minY = std::min(minY, p.y());
             maxX = std::max(maxX, p.x());
@@ -80,9 +80,9 @@ class FASTCOVER_PP {
                 (*iterToSourceDisk).second.second = false;
                 iterToTargetDisk->second.second = false;
 
-                iterToTargetDisk->second.first.pontos.insert(iterToTargetDisk->second.first.pontos.end(), iterToSourceDisk->second.first.pontos.begin(), iterToSourceDisk->second.first.pontos.end());
+                iterToTargetDisk->second.first.pontos_indices.insert(iterToTargetDisk->second.first.pontos_indices.end(), iterToSourceDisk->second.first.pontos_indices.begin(), iterToSourceDisk->second.first.pontos_indices.end());
                 Point centro = CGAL::midpoint(lowerLeft, upperRight);
-                Component aux(raio, iterToTargetDisk->second.first.pontos, Point(centro.x() - num1, centro.y() - num2));
+                Component aux(raio, iterToTargetDisk->second.first.pontos_indices, Point(centro.x() - num1, centro.y() - num2));
                 manager.addComponent(aux);
                 ++solution;
                 return true;
@@ -111,7 +111,7 @@ class FASTCOVER_PP {
                 (*iterToSourceDisk).second.second = false;
                 iterToTargetDisk->second.second = false;
 
-                iterToTargetDisk->second.first.pontos.insert(iterToTargetDisk->second.first.pontos.end(), iterToSourceDisk->second.first.pontos.begin(), iterToSourceDisk->second.first.pontos.end());
+                iterToTargetDisk->second.first.pontos_indices.insert(iterToTargetDisk->second.first.pontos_indices.end(), iterToSourceDisk->second.first.pontos_indices.begin(), iterToSourceDisk->second.first.pontos_indices.end());
                 Point centro = CGAL::midpoint(lowerLeft, upperRight);
                 centers_points.push_back(centro);
                 ++solution;
@@ -145,14 +145,14 @@ public:
 
             auto it = H.find(std::make_pair(v, h));
             if (it != H.end()) {
-                it->second.first.update(trans, p);
+                it->second.first.update(trans, p.indice);
                 continue;
             }
 
             if ((trans.x() >= verticalTimesCellSize + sqrt2TimesOnePointFiveMinusOne)) {
                 it = H.find(std::make_pair(v + 1, h));
                 if (it != H.end() && (CGAL::squared_distance(trans, Point(cellSize * (v + 1) + additiveFactor, horizontalTimesCellSize + additiveFactor)) <= raio * raio)) {
-                    it->second.first.update(trans, p);
+                    it->second.first.update(trans, p.indice);
                     continue;
                 }
             }
@@ -160,7 +160,7 @@ public:
             if ((trans.x() <= verticalTimesCellSize - sqrt2TimesZeroPointFivePlusOne)) {
                 it = H.find(std::make_pair(v - 1, h));
                 if (it != H.end() && (CGAL::squared_distance(trans, Point(cellSize * (v - 1) + additiveFactor, horizontalTimesCellSize + additiveFactor)) <= raio * raio)) {
-                    it->second.first.update(trans, p);
+                    it->second.first.update(trans, p.indice);
                     continue;
                 }
             }
@@ -168,7 +168,7 @@ public:
             if ((trans.y() <= horizontalTimesCellSize + sqrt2TimesOnePointFiveMinusOne)) {
                 it = H.find(std::make_pair(v, h - 1));
                 if (it != H.end() && (CGAL::squared_distance(trans, Point(verticalTimesCellSize + additiveFactor, cellSize * (h - 1) + additiveFactor)) <= raio * raio)) {
-                    it->second.first.update(trans, p);
+                    it->second.first.update(trans, p.indice);
                     continue;
                 }
             }
@@ -176,11 +176,11 @@ public:
             if ((trans.y() >= horizontalTimesCellSize - sqrt2TimesZeroPointFivePlusOne)) {
                 it = H.find(std::make_pair(v, h + 1));
                 if (it != H.end() && (CGAL::squared_distance(trans, Point(verticalTimesCellSize + additiveFactor, cellSize * (h + 1) + additiveFactor)) <= raio * raio)) {
-                    it->second.first.update(trans, p);
+                    it->second.first.update(trans, p.indice);
                     continue;
                 }
             }
-            H[std::make_pair(v, h)] = std::make_pair(BoundingBox(trans, p), true);
+            H[std::make_pair(v, h)] = std::make_pair(BoundingBox(trans, p.indice), true);
         }
 
         for (auto iter = H.begin(); iter != H.end(); ++iter) {
@@ -226,7 +226,7 @@ public:
             if (aPair.second.second) {
                 Point centro(aPair.first.first * cellSize + additiveFactor, aPair.first.second * cellSize + additiveFactor);
 
-                Component aux(raio, aPair.second.first.pontos, Point(centro.x() - num1, centro.y() - num2));
+                Component aux(raio, aPair.second.first.pontos_indices, Point(centro.x() - num1, centro.y() - num2));
                 manager.addComponent(aux);
                 solution++;
                 
@@ -252,14 +252,14 @@ public:
 
             auto it = H.find(std::make_pair(v, h));
             if (it != H.end()) {
-                it->second.first.update(trans, p);
+                it->second.first.update(trans, p.indice);
                 continue;
             }
 
             if ((trans.x() >= verticalTimesCellSize + sqrt2TimesOnePointFiveMinusOne)) {
                 it = H.find(std::make_pair(v + 1, h));
                 if (it != H.end() && (CGAL::squared_distance(trans, Point(cellSize * (v + 1) + additiveFactor, horizontalTimesCellSize + additiveFactor)) <= raio * raio)) {
-                    it->second.first.update(trans, p);
+                    it->second.first.update(trans, p.indice);
                     continue;
                 }
             }
@@ -267,7 +267,7 @@ public:
             if ((trans.x() <= verticalTimesCellSize - sqrt2TimesZeroPointFivePlusOne)) {
                 it = H.find(std::make_pair(v - 1, h));
                 if (it != H.end() && (CGAL::squared_distance(trans, Point(cellSize * (v - 1) + additiveFactor, horizontalTimesCellSize + additiveFactor)) <= raio * raio)) {
-                    it->second.first.update(trans, p);
+                    it->second.first.update(trans, p.indice);
                     continue;
                 }
             }
@@ -275,7 +275,7 @@ public:
             if ((trans.y() <= horizontalTimesCellSize + sqrt2TimesOnePointFiveMinusOne)) {
                 it = H.find(std::make_pair(v, h - 1));
                 if (it != H.end() && (CGAL::squared_distance(trans, Point(verticalTimesCellSize + additiveFactor, cellSize * (h - 1) + additiveFactor)) <= raio * raio)) {
-                    it->second.first.update(trans, p);
+                    it->second.first.update(trans, p.indice);
                     continue;
                 }
             }
@@ -283,11 +283,11 @@ public:
             if ((trans.y() >= horizontalTimesCellSize - sqrt2TimesZeroPointFivePlusOne)) {
                 it = H.find(std::make_pair(v, h + 1));
                 if (it != H.end() && (CGAL::squared_distance(trans, Point(verticalTimesCellSize + additiveFactor, cellSize * (h + 1) + additiveFactor)) <= raio * raio)) {
-                    it->second.first.update(trans, p);
+                    it->second.first.update(trans, p.indice);
                     continue;
                 }
             }
-            H[std::make_pair(v, h)] = std::make_pair(BoundingBox(trans, p), true);
+            H[std::make_pair(v, h)] = std::make_pair(BoundingBox(trans, p.indice), true);
         }
 
         for (auto iter = H.begin(); iter != H.end(); ++iter) {

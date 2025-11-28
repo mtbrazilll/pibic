@@ -25,7 +25,7 @@ using namespace std;
 
 
 
-extern PontoTree tree;
+extern IndexTree tree;
 
 extern ComponentManager manager;
 extern int seed;
@@ -60,7 +60,7 @@ int generate_solution_cgal_1(const std::vector<Ponto>& points,
                                double x_max, double y_max,
                                double x_min, double y_min);
 
-int generate_solution_dr_enhanced(const std::vector<Ponto>& points);
+int generate_solution_dr_enhanced(const std::vector<int>& point_indices);
 
 
 

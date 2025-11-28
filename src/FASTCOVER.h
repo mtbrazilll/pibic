@@ -26,7 +26,7 @@ class FASTCOVER {
 
     typedef std::pair<int,int> intPair;
     typedef std::unordered_set<intPair,boost::hash<intPair>> SetOfCells;
-    typedef std::vector<Ponto> VectorType; // Altere para o tipo de vetor que você deseja.
+    typedef std::vector<int> VectorType; // Altere para o tipo de vetor que você deseja.
 
     // Crie um mapa onde a chave é um intPair e o valor é um vetor.
     const double sqrt2 = std::sqrt(2);
@@ -53,14 +53,14 @@ class FASTCOVER {
             int x = floor((p.point.x()+num1)/lado);
             int y = floor((p.point.y()+num2)/lado);
 
-            cellToVectorMap[std::make_pair(x,y)].push_back(p);
+            cellToVectorMap[std::make_pair(x,y)].push_back(p.indice);
             
         
         }
         for(auto& pair : cellToVectorMap){
 
             intPair cell = pair.first;
-            std::vector<Ponto>& pontos_cobertos = pair.second;
+            std::vector<int>& pontos_cobertos = pair.second;
             
             Point centro((pair.first.first*lado+additiveFactor)-num1,(pair.first.second*lado+additiveFactor)-num2);
         

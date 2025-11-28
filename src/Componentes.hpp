@@ -13,7 +13,7 @@ public:
     int vida;
     bool eh_sol;
     double raio;
-    std::vector<Ponto> points;
+    std::vector<int> pontos_indices; // Armazena índices dos pontos
     Point pos;
 
     Component() 
@@ -21,8 +21,8 @@ public:
 
     
     
-        Component( double raio, const std::vector<Ponto>& points, const Point& pos)
-        :  vida(0), idade(0), raio(raio), points(points), pos(pos), eh_sol(false) {}
+        Component( double raio, const std::vector<int>& pontos_indices, const Point& pos)
+        :  vida(0), idade(0), raio(raio), pontos_indices(pontos_indices), pos(pos), eh_sol(false) {}
 };
 
 class ComponentManager {

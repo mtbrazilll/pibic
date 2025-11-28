@@ -21,16 +21,16 @@ class hexa {
 
     struct BoundingBox {
         double minX, maxX, minY, maxY;
-        std::vector<Ponto> pontos;
+        std::vector<int> pontos_indices;
         BoundingBox() {
             minX = minY = DBL_MAX;
             maxX = maxY = DBL_MIN;
         }
-        explicit BoundingBox(const Point &p, const Ponto &p1) : minX(p.x()), maxX(p.x()), minY(p.y()), maxY(p.y()) {
-            pontos.push_back(p1);
+        explicit BoundingBox(const Point &p, int idx) : minX(p.x()), maxX(p.x()), minY(p.y()), maxY(p.y()) {
+            pontos_indices.push_back(idx);
         }
-        void update(const Point &p, const Ponto &p1) {
-            pontos.push_back(p1);
+        void update(const Point &p, int idx) {
+            pontos_indices.push_back(idx);
             minX = std::min(minX, p.x());
             minY = std::min(minY, p.y());
             maxX = std::max(maxX, p.x());
@@ -107,16 +107,16 @@ class hexa {
                 iterToSourceDisk->second.second = false;
                 iterToTargetDisk->second.second = false;
 
-                iterToTargetDisk->second.first.pontos.insert(
-                    iterToTargetDisk->second.first.pontos.end(),
-                    iterToSourceDisk->second.first.pontos.begin(),
-                    iterToSourceDisk->second.first.pontos.end());
+                iterToTargetDisk->second.first.pontos_indices.insert(
+                    iterToTargetDisk->second.first.pontos_indices.end(),
+                    iterToSourceDisk->second.first.pontos_indices.begin(),
+                    iterToSourceDisk->second.first.pontos_indices.end());
 
                 // Calcula o centro do novo disco
                 Point centro((lowerLeft.x() + upperRight.x()) / 2 - num1,
                              (lowerLeft.y() + upperRight.y()) / 2 - num2);
 
-                Component aux(raio, iterToTargetDisk->second.first.pontos, centro);
+                Component aux(raio, iterToTargetDisk->second.first.pontos_indices, centro);
                 manager.addComponent(aux);
 
                 return true;
@@ -147,9 +147,9 @@ public:
             if (CGAL::squared_distance(trans, hexCenter) <= hexRadius * hexRadius) {
                 auto it = H.find(hex);
                 if (it != H.end()) {
-                    it->second.first.update(trans, p);
+                    it->second.first.update(trans, p.indice);
                 } else {
-                    H[hex] = std::make_pair(BoundingBox(trans, p), true);
+                    H[hex] = std::make_pair(BoundingBox(trans, p.indice), true);
                 }
             } else {
                 // Verifica os hexágonos vizinhos
@@ -160,9 +160,9 @@ public:
                     if (CGAL::squared_distance(trans, neighborCenter) <= hexRadius * hexRadius) {
                         auto it = H.find(neighborHex);
                         if (it != H.end()) {
-                            it->second.first.update(trans, p);
+                            it->second.first.update(trans, p.indice);
                         } else {
-                            H[neighborHex] = std::make_pair(BoundingBox(trans, p), true);
+                            H[neighborHex] = std::make_pair(BoundingBox(trans, p.indice), true);
                         }
                         added = true;
                         break;
@@ -170,7 +170,7 @@ public:
                 }
                 if (!added) {
                     // Se o ponto não estiver dentro de nenhum hexágono, crie um novo no hex atual
-                    H[hex] = std::make_pair(BoundingBox(trans, p), true);
+                    H[hex] = std::make_pair(BoundingBox(trans, p.indice), true);
                 }
             }
         }
@@ -194,7 +194,7 @@ public:
                 // Cria o componente para o hexágono atual
                 Point centro = hexToPixel(iter->first.first, iter->first.second);
                 centro = Point(centro.x() - num1, centro.y() - num2);
-                Component aux(raio, iter->second.first.pontos, centro);
+                Component aux(raio, iter->second.first.pontos_indices, centro);
                 manager.addComponent(aux);
             }
         }

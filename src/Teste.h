@@ -35,8 +35,9 @@ public:
 
         for (const auto& component : sol) {
 
-            for (const auto& ponto: component.points)
+            for (int idx : component.pontos_indices)
             {
+                const auto& ponto = P[idx];
                 FT distSquared = CGAL::squared_distance(ponto.point, component.pos);
                 // FT raioSquared = component.raio * component.raio;
 
@@ -92,7 +93,8 @@ public:
             discsFile << component.pos.x() << " " << component.pos.y() << " " << component.raio << " " << disc_id << "\n";
 
             // Escreve os pontos cobertos pelo disco, associando-os ao disco
-            for (const auto& ponto : component.points) {
+            for (int idx : component.pontos_indices) {
+                const auto& ponto = P[idx];
                 pointsFile << ponto.point.x() << " " << ponto.point.y() << " " << ponto.indice << " " << disc_id << "\n";
             }
             disc_id++;

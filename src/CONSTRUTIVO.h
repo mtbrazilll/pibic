@@ -41,8 +41,9 @@ void cmsa_sbpo(){
 
 void dr_enhanced(){
  
-    
-    int aux_solution1 = generate_solution_dr_enhanced(pontos);
+    std::vector<int> indices(pontos.size());
+    for(size_t i=0; i<pontos.size(); ++i) indices[i] = pontos[i].indice;
+    int aux_solution1 = generate_solution_dr_enhanced(indices);
 }
 
 void divide_dr(){
