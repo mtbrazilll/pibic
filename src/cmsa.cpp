@@ -433,9 +433,8 @@ void CMSA(float time_limit, int max_age) {
         if (distr2(gen) < prob) {
           // Component selected. Mark its points as tabu.
           for (int idx : c.pontos_indices) {
-            if (distr2(gen) < 0.5) { // 50% chance for each point
-              tabu_list[idx] = true;
-            }
+
+            tabu_list[idx] = true;
           }
         }
       }
