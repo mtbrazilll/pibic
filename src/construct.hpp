@@ -48,7 +48,7 @@ int generate_solution_cgal_manual(const std::vector<Ponto>& points,
                                double x_min, double y_min);
 
                                
-int generate_solution_cgal(const std::vector<Ponto>& points, double x_max, double y_max, double x_min, double y_min);
+int generate_solution_cgal(const std::vector<Ponto>& points, double x_max, double y_max, double x_min, double y_min, const std::vector<bool>& tabu_list);
 
 int construtivo_brkg(const std::vector<Ponto>& points);
 
@@ -58,7 +58,7 @@ int generate_solution_dr(const std::vector<Ponto>& points,
 
 int generate_solution_cgal_1(const std::vector<Ponto>& points,
                                double x_max, double y_max,
-                               double x_min, double y_min);
+                               double x_min, double y_min, const std::vector<bool>& tabu_list);
 
 int generate_solution_dr_enhanced(const std::vector<int>& point_indices);
 

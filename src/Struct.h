@@ -51,7 +51,7 @@ struct Bola {
     //Point borda_2;
     //Point borda_3;
     std::vector<Point> bordas;
-    std::vector<Ponto> pontos_da_bola; 
+    std::vector<int> pontos_indices; 
     Min_circle *mc = nullptr;
     double raio;
    
@@ -59,14 +59,14 @@ struct Bola {
     
     Bola() : centro(0, 0), raio(0) {}
 
-    Bola(Point centro,  std::vector<Ponto> &pontos_da_bola, double& raio) : centro(centro), pontos_da_bola(pontos_da_bola), raio(raio){}
+    Bola(Point centro,  std::vector<int> &pontos_indices, double& raio) : centro(centro), pontos_indices(pontos_indices), raio(raio){}
 
     operator CGAL::Simple_cartesian<double>::Point_2() const {
         return centro;
     }
 
-    void adicionarPonto(const Ponto& ponto) {
-        pontos_da_bola.push_back(ponto);
+    void adicionarPonto(int idx) {
+        pontos_indices.push_back(idx);
     }
 
           
@@ -95,6 +95,17 @@ struct Bola_to_Point_map {
     }
 };
 
+
+// Mapa de propriedade para acessar o ponto a partir de um índice int
+struct Index_to_Point_map {
+    typedef int key_type;
+    typedef Point value_type;
+    typedef const value_type& reference;
+    typedef boost::readable_property_map_tag category;
+
+    friend inline reference get(const Index_to_Point_map&, const key_type& idx);
+};
+
 typedef CGAL::Search_traits_2<K> Base_traits;
 // Traits para Ponto
 
@@ -107,12 +118,15 @@ typedef CGAL::Search_traits_adapter<Bola, Bola_to_Point_map, Base_traits> BolaTr
 typedef CGAL::Kd_tree<BolaTraits> BolaTree;
 typedef CGAL::Fuzzy_sphere<BolaTraits> Fuzzy_sphere_Bola;
 
+// Traits para Index (int)
+typedef CGAL::Search_traits_adapter<int, Index_to_Point_map, Base_traits> IndexTraits;
+typedef CGAL::Kd_tree<IndexTraits> IndexTree;
+typedef CGAL::Fuzzy_sphere<IndexTraits> Fuzzy_sphere_Index;
 
+extern std::vector<Ponto> pontos;
 
-
-
-
-
-
+inline Index_to_Point_map::reference get(const Index_to_Point_map&, const Index_to_Point_map::key_type& idx) {
+    return pontos[idx].point;
+}
 
 #endif

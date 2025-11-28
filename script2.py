@@ -4,20 +4,26 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import concurrent.futures
+import argparse
 
-nome = "cmsa_guloso_2_competetivas_tunning"
+nome = "cmsa_refatorado_2"
 time_limite = "300"
 nsols = "1"
-cpl_abort = "0"
+cpl_abort = "1"
 init = "0"
 warm_start = "0"
-h_emph = "0"
+h_emph = "2"
 max_age = "1"
-algo = "6"
+algo = "0"
 d = "4"
 alfa = "68"
 rele = "81"
 cplex_t = "27"
+
+parser = argparse.ArgumentParser(description='Run simulation.')
+parser.add_argument('--t', type=int, default=1, help='Maximum number of workers for parallel execution')
+args = parser.parse_args()
 
 
 # Cria a pasta se ela não existir
@@ -381,6 +387,48 @@ instancias = competitivas
 
 
 # Dicionário para coletar todos os tempos e opts
+
+def run_simulation(instancia, seed, nsols, init, h_emph, warm_start, cpl_abort, time_limite, max_age, algo, d, alfa, cplex_t, rele):
+    comando = f"./pcdp.run  -i {instancia} -s {seed} -nsols {nsols} -init {init} -h_emph {h_emph} -warm_start {warm_start} -cpl_abort {cpl_abort} -t {time_limite} -max_age {max_age} -algo {algo} -d {d} -alfa {alfa} -cpl_t {cplex_t} -rele {rele}"
+    try:
+        resultado = subprocess.run(comando, shell=True, capture_output=True, text=True)
+        saida = resultado.stdout
+
+        # Extrair tempo e opt da saída
+        tempo_match = re.search(r"Total CMSA time: (\d+)ms", saida)
+        opt_match = re.search(r"opt: (\d+)", saida)
+        loops_match = re.search(r"Loops: (\d+)", saida)
+        best_time_match = re.search(r"Best solution found at: (\d+) ms", saida)
+
+        tempo = int(tempo_match.group(1)) if tempo_match else 0
+        opt = int(opt_match.group(1)) if opt_match else 0
+        loops = int(loops_match.group(1)) if loops_match else 0
+        best_time = int(best_time_match.group(1)) if best_time_match else 0
+
+        return {
+            "success": True,
+            "instancia": instancia,
+            "Tempo": tempo, 
+            "Opt": opt, 
+            "Semente": seed, 
+            "Log": saida, 
+            "Loops": loops,
+            "Best_solution_time": best_time
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "instancia": instancia,
+            "Tempo": 0, 
+            "Opt": 0, 
+            "Semente": seed, 
+            "Log": str(e), 
+            "Loops": 0,
+            "Best_solution_time": 0,
+            "error": str(e)
+        }
+
 dados_tempos = {instancia: [] for instancia in instancias}
 dados_opts = {instancia: [] for instancia in instancias}
 dados_loops = {instancia: [] for instancia in instancias}
@@ -396,58 +444,33 @@ for i, instancia in enumerate(instancias):
     print()
     print(f"Iniciando a instancia {instancia}")
     print()
-    for _ in range(30):
-        comando = f"./pcdp.run  -i {instancia} -s {_} -nsols {nsols} -init {init} -h_emph {h_emph} -warm_start {warm_start} -cpl_abort {cpl_abort} -t {time_limite} -max_age {max_age} -algo {algo} -d {d} -alfa {alfa} -cpl_t {cplex_t} -rele {rele}"
+    with concurrent.futures.ProcessPoolExecutor(max_workers=args.t) as executor:
+        futures = {executor.submit(run_simulation, instancia, seed, nsols, init, h_emph, warm_start, cpl_abort, time_limite, max_age, algo, d, alfa, cplex_t, rele): seed for seed in range(1, 31)}
+        
+        for future in concurrent.futures.as_completed(futures):
+            seed = futures[future]
+            try:
+                result = future.result()
+                
+                tempo = result["Tempo"]
+                opt = result["Opt"]
+                loops = result["Loops"]
+                best_time = result["Best_solution_time"]
+                
+                dados_tempos[instancia].append(tempo)
+                dados_opts[instancia].append(opt)
+                dados_loops[instancia].append(loops)
+                dados_best_solution_time[instancia].append(best_time)
 
-        #print(comando)
-        print()
-        try:
-            resultado = subprocess.run(comando, shell=True, capture_output=True, text=True)
-            saida = resultado.stdout
+                dados[instancia].append(result)
+                
+                if result["success"]:
+                    print(f"{instancia[18:]} sol {opt}  loops {loops} seed {seed} time {tempo}")
+                else:
+                    print(f"Erro ao processar a instância {instancia} com a semente {seed}: {result.get('error', 'Unknown error')}")
 
-            # Extrair tempo e opt da saída
-            tempo = int(re.search(r"Total CMSA time: (\d+)ms", saida).group(1))
-            opt = int(re.search(r"opt: (\d+)", saida).group(1))
-            loops = int(re.search(r"Loops: (\d+)", saida).group(1))
-            best_time = int(re.search(r"Best solution found at: (\d+) ms", saida).group(1))
-
-            #sol size: 21
-            
-
-            dados_tempos[instancia].append(tempo)
-            dados_opts[instancia].append(opt)
-            dados_loops[instancia].append(loops)
-            dados_best_solution_time[instancia].append(best_time)  # Adicione essa linha
-
-            dados[instancia].append({
-                "Tempo": tempo, 
-                "Opt": opt, 
-                "Semente": _+1, 
-                "Log": saida, 
-                "Loops": loops,
-                "Best_solution_time": best_time  # Adicione essa linha
-            })
-            print(f"{instancia[18:]} sol {opt}  loops {loops} seed {_} time {tempo}")
-
-        except Exception as e:
-            tempo = 0
-            opt = 0
-            loops = 0
-            best_time = 0
-
-            dados_tempos[instancia].append(tempo)
-            dados_opts[instancia].append(opt)
-            dados_loops[instancia].append(loops)
-            dados_best_solution_time[instancia].append(best_time)  # Adicione essa linha
-            dados[instancia].append({
-                "Tempo": tempo, 
-                "Opt": opt, 
-                "Semente": _+1, 
-                "Log": saida, 
-                "Loops": loops,
-                "Best_solution_time": best_time  # Adicione essa linha
-            })
-            print(f"Erro ao processar a instância {instancia} com a semente {_+1}: {str(e)}")
+            except Exception as e:
+                print(f"Generated exception for seed {seed}: {e}")
         
     # Criar DataFrame com estatísticas
 

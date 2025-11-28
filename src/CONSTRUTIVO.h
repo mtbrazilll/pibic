@@ -26,15 +26,15 @@ extern double min_y;
 
 
 
-void cmsa_sbpo(){
+void cmsa_sbpo(const std::vector<bool>& tabu_list){
 
     if (loops == 0) {
 
-        int aux_solution1 = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y );
+        int aux_solution1 = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y, tabu_list);
     }
     else{
 
-        int aux_solution2 = generate_solution_cgal(pontos, max_x , max_y , min_x , min_y );
+        int aux_solution2 = generate_solution_cgal(pontos, max_x , max_y , min_x , min_y, tabu_list);
 
     }
 }
@@ -52,11 +52,11 @@ void divide_dr(){
     // int aux_solution1 = generate_divise_dr(pontos, max_x , max_y , min_x , min_y);
 }
 
-void cmsa_dr_particao(){
+void cmsa_dr_particao(const std::vector<bool>& tabu_list){
 
     if (loops % 2 == 0) {
 
-        cmsa_sbpo();
+        cmsa_sbpo(tabu_list);
     }
     else{
 

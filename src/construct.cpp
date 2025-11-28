@@ -335,11 +335,16 @@ int solve_cgal_grid(bool use_randomness, double x_max, double y_max, double x_mi
 }
 
 // Helper function for optimized CGAL solution
-int solve_cgal_impl(bool use_randomness, double x_max, double y_max, double x_min, double y_min) {
+int solve_cgal_impl(bool use_randomness, double x_max, double y_max, double x_min, double y_min, const std::vector<bool>& tabu_list) {
     std::queue<SimpleQuadrant> fila;
     
-    std::vector<int> initial_indices(pontos.size());
-    for(size_t i=0; i<pontos.size(); ++i) initial_indices[i] = pontos[i].indice;
+    std::vector<int> initial_indices;
+    initial_indices.reserve(pontos.size());
+    for(size_t i=0; i<pontos.size(); ++i) {
+        if (!tabu_list[i]) {
+            initial_indices.push_back(pontos[i].indice);
+        }
+    }
 
     fila.push(SimpleQuadrant(initial_indices, x_max, y_max, x_min, y_min));
 
@@ -456,16 +461,16 @@ int solve_cgal_impl(bool use_randomness, double x_max, double y_max, double x_mi
 
 int generate_solution_cgal(const std::vector<Ponto>& points,
                                double x_max, double y_max,
-                               double x_min, double y_min)
+                               double x_min, double y_min, const std::vector<bool>& tabu_list)
     {
-        return solve_cgal_impl(true, x_max, y_max, x_min, y_min);
+        return solve_cgal_impl(true, x_max, y_max, x_min, y_min, tabu_list);
     }
 
 int generate_solution_cgal_1(const std::vector<Ponto>& points,
                                double x_max, double y_max,
-                               double x_min, double y_min)
+                               double x_min, double y_min, const std::vector<bool>& tabu_list)
     {
-        return solve_cgal_impl(false, x_max, y_max, x_min, y_min);
+        return solve_cgal_impl(false, x_max, y_max, x_min, y_min, tabu_list);
     }
 
 
