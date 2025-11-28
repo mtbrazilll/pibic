@@ -385,12 +385,12 @@ void CMSA(float time_limit, int max_age) {
 
     double aux_solution_cplex = std::numeric_limits<double>::max();
 
-    // aux_solution_cplex = cplex_run();
+    aux_solution_cplex = cplex_run();
 
-    // aux_solution_cplex = cplex_run();
+    // aux_solution_cplex = greedySetCover();
 
-    aux_solution_cplex = findSEIPApproximation(manager, 100);
-    //         std::cout << "solucao cplex "<<aux_solution_cplex << std::endl;
+    // aux_solution_cplex = findSEIPApproximation(manager, 100);
+    //          std::cout << "solucao cplex "<<aux_solution_cplex << std::endl;
 
     // Atualizar melhor solução se encontrada
     if (bsf > aux_solution_cplex) {
@@ -419,7 +419,7 @@ void CMSA(float time_limit, int max_age) {
                        .count();
 
     // melhoria local
-    if (loops_with_no_improval > 100004) {
+    if (loops_with_no_improval > 10) {
       // std::cout << "Ativando Tabu List..." << std::endl;
       double max_vida = 1.0;
       for (const auto &c : manager.components) {

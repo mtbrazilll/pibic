@@ -408,54 +408,89 @@ double guloso() {
 }
 
 int greedySetCover() {
-  // 1. Initialize uncovered elements set
-  std::unordered_set<int> uncovered_elements;
-  for (int i = 0; i < n_pon; ++i) {
-    uncovered_elements.insert(i);
+  // 1. Initialize data structures
+  // Inverted index: point_idx -> list of component indices covering it
+  std::vector<std::vector<int>> point_to_components(n_pon);
+  // Current score of each component (number of uncovered points it covers)
+  std::vector<int> component_score(manager.components.size(), 0);
+  // Track covered points
+  std::vector<bool> is_covered(n_pon, false);
+  int uncovered_count = n_pon;
+
+  // Priority queue to store {-score, component_index}
+  // We use negative score because set sorts in ascending order, and we want max
+  // score. Using set instead of priority_queue to allow efficient updates
+  // (erase/insert).
+  std::set<std::pair<int, int>> pq;
+
+  // 2. Build inverted index and initial scores
+  for (int i = 0; i < manager.components.size(); ++i) {
+    const auto &component = manager.components[i];
+    int score = 0;
+    for (int idx : component.pontos_indices) {
+      point_to_components[idx].push_back(i);
+      score++;
+    }
+    component_score[i] = score;
+    if (score > 0) {
+      pq.insert({-score, i});
+    }
   }
 
   std::vector<int> final_cover_indices;
-  int sol = 0;
 
-  // 2. Main loop: continue until all elements are covered
-  while (!uncovered_elements.empty()) {
-    int best_set_index = -1;
-    int max_covered_count = 0;
+  // 3. Main loop
+  while (uncovered_count > 0 && !pq.empty()) {
+    // Get best component
+    auto best_it = pq.begin();
+    int best_score = -best_it->first;
+    int best_component_idx = best_it->second;
+    pq.erase(best_it);
 
-    // 3. Find the best component in current iteration
-    for (int i = 0; i < manager.components.size(); ++i) {
-      int current_covered_count = 0;
-      // Check how many uncovered elements this component covers
-      for (int idx : manager.components[i].pontos_indices) {
-        if (uncovered_elements.count(idx)) {
-          current_covered_count++;
+    // If best score is 0, we can't cover any more points
+    if (best_score == 0)
+      break;
+
+    // Add to solution
+    final_cover_indices.push_back(best_component_idx);
+
+    // Update state for newly covered points
+    const auto &best_component = manager.components[best_component_idx];
+    for (int point_idx : best_component.pontos_indices) {
+      if (is_covered[point_idx])
+        continue;
+
+      is_covered[point_idx] = true;
+      uncovered_count--;
+
+      // For each component that covers this now-covered point, decrease its
+      // score
+      for (int comp_idx : point_to_components[point_idx]) {
+        if (comp_idx == best_component_idx)
+          continue; // Skip the one we just picked
+
+        // Only update if it's in the PQ (meaning it had score > 0)
+        // We need to find it in PQ. Since we don't know the exact score in PQ
+        // easily without looking it up, we use the stored component_score.
+        int old_score = component_score[comp_idx];
+        if (old_score > 0) {
+          auto it = pq.find({-old_score, comp_idx});
+          if (it != pq.end()) {
+            pq.erase(it);
+            int new_score = old_score - 1;
+            component_score[comp_idx] = new_score;
+            if (new_score > 0) {
+              pq.insert({-new_score, comp_idx});
+            }
+          }
         }
       }
-
-      // If this component covers more new elements than the best found so far
-      if (current_covered_count > max_covered_count) {
-        max_covered_count = current_covered_count;
-        best_set_index = i;
-      }
     }
+  }
 
-    // If no component can cover new elements, something is wrong
-    if (best_set_index == -1 || max_covered_count == 0) {
-      if (!uncovered_elements.empty()) {
-        std::cerr << "Error: Cannot cover all elements in the universe."
-                  << std::endl;
-      }
-      break;
-    }
-
-    // Add the best component to our final solution
-    final_cover_indices.push_back(best_set_index);
-    sol++;
-
-    // Remove newly covered elements from uncovered set
-    for (int idx : manager.components[best_set_index].pontos_indices) {
-      uncovered_elements.erase(idx);
-    }
+  if (uncovered_count > 0) {
+    std::cerr << "Error: Cannot cover all elements in the universe. Uncovered: "
+              << uncovered_count << std::endl;
   }
 
   // Update component states based on solution quality
