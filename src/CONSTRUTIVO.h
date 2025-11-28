@@ -4,11 +4,9 @@
 #pragma once
 
 #include "Componentes.hpp"
+#include "DistanceCache.h"
 #include "Struct.h"
 #include "construct.hpp"
-#include "DistanceCache.h"
-
-
 
 extern double bsf;
 extern std::vector<Ponto> pontos;
@@ -17,85 +15,92 @@ extern double max_x;
 extern double max_y;
 extern double min_x;
 extern double min_y;
-//DistanceCache cache;
+// DistanceCache cache;
 
+void cmsa_sbpo(const std::vector<bool> &tabu_list) {
 
+  if (loops == 0) {
 
+    int aux_solution1 =
+        generate_solution_cgal_1(pontos, max_x, max_y, min_x, min_y, tabu_list);
+  } else {
 
-
-
-
-
-void cmsa_sbpo(const std::vector<bool>& tabu_list){
-
-    if (loops == 0) {
-
-        int aux_solution1 = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y, tabu_list);
-    }
-    else{
-
-        int aux_solution2 = generate_solution_cgal(pontos, max_x , max_y , min_x , min_y, tabu_list);
-
-    }
+    int aux_solution2 =
+        generate_solution_cgal(pontos, max_x, max_y, min_x, min_y, tabu_list);
+  }
 }
 
-void dr_enhanced(){
- 
-    std::vector<int> indices(pontos.size());
-    for(size_t i=0; i<pontos.size(); ++i) indices[i] = pontos[i].indice;
-    int aux_solution1 = generate_solution_dr_enhanced(indices);
+void cmsa_sbpo_grid(const std::vector<bool> &tabu_list) {
+  // Assuming we want to use randomness (true) for the grid version as well,
+  // similar to generate_solution_cgal If loops == 0, maybe we want a
+  // deterministic version? generate_solution_cgal_1 uses solve_cgal_impl(false,
+  // ...) generate_solution_cgal uses solve_cgal_impl(true, ...)
+
+  if (loops == 0) {
+    // Deterministic version for first loop?
+    // solve_cgal_grid(false, ...)
+    int aux_solution =
+        solve_cgal_grid(false, max_x, max_y, min_x, min_y, tabu_list);
+  } else {
+    // Randomized version
+    int aux_solution =
+        solve_cgal_grid(true, max_x, max_y, min_x, min_y, tabu_list);
+  }
 }
 
-void divide_dr(){
-   
-    int aux_solution1 = generate_divise_dr_profundidade(pontos, max_x , max_y , min_x , min_y, 2);
-    // int aux_solution1 = generate_divise_dr(pontos, max_x , max_y , min_x , min_y);
+void dr_enhanced() {
+
+  std::vector<int> indices(pontos.size());
+  for (size_t i = 0; i < pontos.size(); ++i)
+    indices[i] = pontos[i].indice;
+  int aux_solution1 = generate_solution_dr_enhanced(indices);
 }
 
-void cmsa_dr_particao(const std::vector<bool>& tabu_list){
+void divide_dr() {
 
-    if (loops % 2 == 0) {
-
-        cmsa_sbpo(tabu_list);
-    }
-    else{
-
-        dr_enhanced();
-
-    }
+  int aux_solution1 =
+      generate_divise_dr_profundidade(pontos, max_x, max_y, min_x, min_y, 2);
+  // int aux_solution1 = generate_divise_dr(pontos, max_x , max_y , min_x ,
+  // min_y);
 }
 
-void fastCover(){
+void cmsa_dr_particao(const std::vector<bool> &tabu_list) {
 
-                //dr_enhanced();
-            //cmsa_dr_particao();
-            //divide_dr();
-           // int aux_solution1 = generate_divise_dr(pontos, max_x , max_y , min_x , min_y );
-           
-          
-            //int aux_solution2 = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y );
-            //int aux_solution1 = generate_solution_dr_enhanced(pontos, max_x , max_y , min_x , min_y );
+  if (loops % 2 == 0) {
 
-           //std::cout << "solucao construtivo "<<aux_solution1 << std::endl;
-           //int aux_solution2 = construtivo_brkg(pontos);
-        //std::cout << "solucao construtivo "<<aux_solution << std::endl;
-           //if (bsf > aux_solution) bsf = aux_solution;
-          // mateus_recursive(pontos, max_x + raio, max_y + raio, min_x - raio, min_y -raio);
-           // FASTCOVER ob2(pontos);
+    cmsa_sbpo(tabu_list);
+  } else {
 
-          FASTCOVER_PP ob1(pontos);
-           // ob2.execute();
-          ob1.execute();
-            //hexa ob3(pontos);
-            //ob3.execute();
-            //k_center(pontos, manager, raio);
+    dr_enhanced();
+  }
 }
 
+void fastCover() {
 
-void c_brkg(){
-     construtivo_brkg(pontos);
+  // dr_enhanced();
+  // cmsa_dr_particao();
+  // divide_dr();
+  // int aux_solution1 = generate_divise_dr(pontos, max_x , max_y , min_x ,
+  // min_y );
+
+  // int aux_solution2 = generate_solution_cgal_1(pontos, max_x , max_y , min_x
+  // , min_y ); int aux_solution1 = generate_solution_dr_enhanced(pontos, max_x
+  // , max_y , min_x , min_y );
+
+  // std::cout << "solucao construtivo "<<aux_solution1 << std::endl;
+  // int aux_solution2 = construtivo_brkg(pontos);
+  // std::cout << "solucao construtivo "<<aux_solution << std::endl;
+  // if (bsf > aux_solution) bsf = aux_solution;
+  // mateus_recursive(pontos, max_x + raio, max_y + raio, min_x - raio, min_y
+  // -raio); FASTCOVER ob2(pontos);
+
+  FASTCOVER_PP ob1(pontos);
+  // ob2.execute();
+  ob1.execute();
+  // hexa ob3(pontos);
+  // ob3.execute();
+  // k_center(pontos, manager, raio);
 }
+
+void c_brkg() { construtivo_brkg(pontos); }
 #endif
-
-
-

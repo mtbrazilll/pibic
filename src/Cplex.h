@@ -335,6 +335,7 @@ double cplex_run() {
       }
       sol.end();
     }
+
   } catch (IloException &e) {
     cerr << "Concert exception caught: " << e << endl;
   }

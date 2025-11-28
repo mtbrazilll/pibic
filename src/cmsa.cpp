@@ -350,8 +350,8 @@ void CMSA(float time_limit, int max_age) {
           cmsa_sbpo(tabu_list);
         }
       } else if (algo == 6) {
-        int aux_solution2 =
-            generate_solution_guloso(pontos, max_x, max_y, min_x, min_y, alfa);
+        int aux_solution2 = generate_solution_guloso(
+            pontos, max_x, max_y, min_x, min_y, alfa, tabu_list);
       } else if (algo == 7) {
         if (instancia_tamanho >= 139) {
           cmsa_sbpo(tabu_list);
@@ -360,6 +360,8 @@ void CMSA(float time_limit, int max_age) {
         }
       } else if (algo == 8) {
         c_brkg();
+      } else if (algo == 9) {
+        cmsa_sbpo_grid(tabu_list);
       }
     }
     auto construct_end = std::chrono::high_resolution_clock::now();
@@ -383,11 +385,11 @@ void CMSA(float time_limit, int max_age) {
 
     double aux_solution_cplex = std::numeric_limits<double>::max();
 
-    aux_solution_cplex = cplex_run();
+    // aux_solution_cplex = cplex_run();
 
     // aux_solution_cplex = cplex_run();
 
-    // aux_solution_cplex= findSEIPApproximation(manager,  100);
+    aux_solution_cplex = findSEIPApproximation(manager, 100);
     //         std::cout << "solucao cplex "<<aux_solution_cplex << std::endl;
 
     // Atualizar melhor solução se encontrada
@@ -417,7 +419,7 @@ void CMSA(float time_limit, int max_age) {
                        .count();
 
     // melhoria local
-    if (loops_with_no_improval > 4) {
+    if (loops_with_no_improval > 100004) {
       // std::cout << "Ativando Tabu List..." << std::endl;
       double max_vida = 1.0;
       for (const auto &c : manager.components) {
