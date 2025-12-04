@@ -1,27 +1,25 @@
+#include <chrono>
+#include <cmath>
 #include <cstddef>
 #include <cstdlib>
-#include <iostream>
-#include <string>
 #include <fstream>
-#include <chrono>
-#include <unordered_map>
-#include <vector>
+#include <iostream>
 #include <limits>
 #include <random>
-#include <cmath>
-
-
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 // Cabeçalhos personalizados
-#include "Read_data.hpp"
-#include "construct.hpp"
 #include "Componentes.hpp"
 #include "Cplex.h"
-#include "Teste.h"
-#include "FASTCOVER.h"
 #include "FASTCOVER-PP.h"
-#include "hexa.h"
+#include "FASTCOVER.h"
+#include "Read_data.hpp"
 #include "Struct.h"
+#include "Teste.h"
+#include "construct.hpp"
+#include "hexa.h"
 
 /* // Definições de tipos
 typedef CGAL::Simple_cartesian<double> K;
@@ -48,7 +46,8 @@ typedef CGAL::Fuzzy_sphere<Traits> Fuzzy_sphere; */
 using std::vector;
 
 // Variáveis globais
-int loops_with_no_improval = 0; // Controle de loops sem melhora para fugir de ótimos locais
+int loops_with_no_improval =
+    0; // Controle de loops sem melhora para fugir de ótimos locais
 double max_x = std::numeric_limits<double>::lowest();
 double max_y = std::numeric_limits<double>::lowest();
 double min_x = std::numeric_limits<double>::max();
@@ -63,13 +62,12 @@ double cplex_time_limit = 10.0;
 double determinism_rate = 0.8;
 double r_limit = 0;
 int n_of_sols = 3;
-int age_limit = 1;
+int age_limit = 0;
 int candidate_list_size = 10;
 bool warm_start = false;
 int heuristic_emphasis = 0;
 bool cplex_abort = false;
 bool init = false;
-
 
 int loops = 0;
 int seed = 1;
@@ -97,299 +95,309 @@ void CMSA(float time_limit, int max_age);
 void testando();
 
 double Random(double minVal, double maxVal) {
-	
-    double randomValue = distr2(gen); // Número entre 0 e 1
-    return (minVal + randomValue * (maxVal - minVal)); // Mapeia para o intervalo [minVal, maxVal]
+
+  double randomValue = distr2(gen); // Número entre 0 e 1
+  return (minVal +
+          randomValue *
+              (maxVal - minVal)); // Mapeia para o intervalo [minVal, maxVal]
 }
 
 void printHelp() {
-    std::cout << "USO: ./cmsa [OPÇÕES]\n\n";
-    std::cout << "OPÇÕES:\n";
-    std::cout << "  -h, --help            Mostra esta mensagem de ajuda\n";
-    std::cout << "  -s <num>              Define a semente para o gerador de números aleatórios (padrão: 1)\n";
-    std::cout << "  -max_age <num>        Define o limite de idade máxima para componentes (padrão: 1)\n";
-    std::cout << "  -t <num>              Define o limite de tempo de computação em segundos (padrão: 100.0)\n";
-    std::cout << "  -cpl_t <num>          Define o limite de tempo para o CPLEX em segundos (padrão: 10.0)\n";
-    std::cout << "  -i <arquivo>          Define o caminho do arquivo de entrada (padrão: ../instancias/i1.txt)\n";
-    std::cout << "  -r <num>              Define o raio das bolas (padrão: 1.0)\n";
-    std::cout << "  -nsols <num>          Define o número de soluções a serem geradas (padrão: 3)\n";
-    std::cout << "  -h_emph <0|1>         Ativa a ênfase heurística (padrão: 0)\n";
-    std::cout << "  -warm_start <0|1>     Ativa o warm start (padrão: 0)\n";
-    std::cout << "  -init <0|1>           Ativa a inicialização (padrão: 0)\n";
-    std::cout << "  -cpl_abort <0|1>      Ativa o aborto do CPLEX (padrão: 0)\n";
+  std::cout << "USO: ./cmsa [OPÇÕES]\n\n";
+  std::cout << "OPÇÕES:\n";
+  std::cout << "  -h, --help            Mostra esta mensagem de ajuda\n";
+  std::cout << "  -s <num>              Define a semente para o gerador de "
+               "números aleatórios (padrão: 1)\n";
+  std::cout << "  -max_age <num>        Define o limite de idade máxima para "
+               "componentes (padrão: 1)\n";
+  std::cout << "  -t <num>              Define o limite de tempo de computação "
+               "em segundos (padrão: 100.0)\n";
+  std::cout << "  -cpl_t <num>          Define o limite de tempo para o CPLEX "
+               "em segundos (padrão: 10.0)\n";
+  std::cout << "  -i <arquivo>          Define o caminho do arquivo de entrada "
+               "(padrão: ../instancias/i1.txt)\n";
+  std::cout
+      << "  -r <num>              Define o raio das bolas (padrão: 1.0)\n";
+  std::cout << "  -nsols <num>          Define o número de soluções a serem "
+               "geradas (padrão: 3)\n";
+  std::cout
+      << "  -h_emph <0|1>         Ativa a ênfase heurística (padrão: 0)\n";
+  std::cout << "  -warm_start <0|1>     Ativa o warm start (padrão: 0)\n";
+  std::cout << "  -init <0|1>           Ativa a inicialização (padrão: 0)\n";
+  std::cout << "  -cpl_abort <0|1>      Ativa o aborto do CPLEX (padrão: 0)\n";
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
 
+  // Caminho padrão do arquivo
+  std::string filePath = "../instancias/i1.txt";
 
-    // Caminho padrão do arquivo
-    std::string filePath = "../instancias/i1.txt";
-
-    // Lendo argumentos da linha de comando
-    for (int i = 1; i < argc; i++) { // Inicia em 1 para pular o nome do programa
-        if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
-            printHelp();
-            return 0;
-        }
-        if (strcmp(argv[i], "-s") == 0) {
-            if (i + 1 < argc) {
-                seed = std::atoi(argv[++i]);
-            } else {
-                std::cerr << "Erro: Argumento para -s está faltando.\n";
-                return 1;
-            }
-        }
-        else if (strcmp(argv[i], "-max_age") == 0) {
-            if (i + 1 < argc) {
-                age_limit = std::atoi(argv[++i]);
-            } else {
-                std::cerr << "Erro: Argumento para -max_age está faltando.\n";
-                return 1;
-            }
-        }
-        else if (strcmp(argv[i], "-t") == 0) {
-            if (i + 1 < argc) {
-                computation_time_limit = std::atoi(argv[++i]);
-            } else {
-                std::cerr << "Erro: Argumento para -t está faltando.\n";
-                return 1;
-            }
-        }
-        else if (strcmp(argv[i], "-cpl_t") == 0) {
-            if (i + 1 < argc) {
-                cplex_time_limit = std::atoi(argv[++i]);
-            } else {
-                std::cerr << "Erro: Argumento para -t está faltando.\n";
-                return 1;
-            }
-        }
-        else if (strcmp(argv[i], "-i") == 0) {  // Flag para o caminho do arquivo
-            if (i + 1 < argc) {
-                filePath = argv[++i];
-            } else {
-                std::cerr << "Erro: Argumento para -i está faltando.\n";
-                return 1;
-            }
-        }
-        else if (strcmp(argv[i], "-r") == 0) {
-            if (i + 1 < argc) {
-                raio = std::atof(argv[++i]);
-            } else {
-                std::cerr << "Erro: Argumento para -r está faltando.\n";
-                return 1;
-            }
-        }
-        else if (strcmp(argv[i], "-nsols") == 0) {
-            if (i + 1 < argc) {
-                n_of_sols = std::atoi(argv[++i]);
-            } else {
-                std::cerr << "Erro: Argumento para -nsols está faltando.\n";
-                return 1;
-            }
-        }
-        else if (strcmp(argv[i], "-h_emph") == 0) {
-            if (i + 1 < argc) {
-               
-                heuristic_emphasis = std::atoi(argv[++i]);
-            } else {
-                std::cerr << "Erro: Argumento para -h_emph está faltando.\n";
-                return 1;
-            }
-        }
-        else if (strcmp(argv[i], "-warm_start") == 0) {
-            if (i + 1 < argc) {
-                int val = std::atoi(argv[++i]);
-                warm_start = (val == 1);
-            } else {
-                std::cerr << "Erro: Argumento para -warm_start está faltando.\n";
-                return 1;
-            }
-        }
-        else if (strcmp(argv[i], "-init") == 0) {
-            if (i + 1 < argc) {
-                int val = std::atoi(argv[++i]);
-                init = (val == 1);
-            } else {
-                std::cerr << "Erro: Argumento para -warm_start está faltando.\n";
-                return 1;
-            }
-        }
-        else if (strcmp(argv[i], "-cpl_abort") == 0) {
-            if (i + 1 < argc) {
-                int val = std::atoi(argv[++i]);
-                cplex_abort = (val == 1);
-            } else {
-                std::cerr << "Erro: Argumento para -cpl_abort está faltando.\n";
-                return 1;
-            }
-        }
-        else {
-            std::cerr << "Aviso: Argumento desconhecido " << argv[i] << " ignorado.\n";
-        }
+  // Lendo argumentos da linha de comando
+  for (int i = 1; i < argc; i++) { // Inicia em 1 para pular o nome do programa
+    if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "--help") == 0) {
+      printHelp();
+      return 0;
     }
+    if (strcmp(argv[i], "-s") == 0) {
+      if (i + 1 < argc) {
+        seed = std::atoi(argv[++i]);
+      } else {
+        std::cerr << "Erro: Argumento para -s está faltando.\n";
+        return 1;
+      }
+    } else if (strcmp(argv[i], "-max_age") == 0) {
+      if (i + 1 < argc) {
+        age_limit = std::atoi(argv[++i]);
+      } else {
+        std::cerr << "Erro: Argumento para -max_age está faltando.\n";
+        return 1;
+      }
+    } else if (strcmp(argv[i], "-t") == 0) {
+      if (i + 1 < argc) {
+        computation_time_limit = std::atoi(argv[++i]);
+      } else {
+        std::cerr << "Erro: Argumento para -t está faltando.\n";
+        return 1;
+      }
+    } else if (strcmp(argv[i], "-cpl_t") == 0) {
+      if (i + 1 < argc) {
+        cplex_time_limit = std::atoi(argv[++i]);
+      } else {
+        std::cerr << "Erro: Argumento para -t está faltando.\n";
+        return 1;
+      }
+    } else if (strcmp(argv[i], "-i") == 0) { // Flag para o caminho do arquivo
+      if (i + 1 < argc) {
+        filePath = argv[++i];
+      } else {
+        std::cerr << "Erro: Argumento para -i está faltando.\n";
+        return 1;
+      }
+    } else if (strcmp(argv[i], "-r") == 0) {
+      if (i + 1 < argc) {
+        raio = std::atof(argv[++i]);
+      } else {
+        std::cerr << "Erro: Argumento para -r está faltando.\n";
+        return 1;
+      }
+    } else if (strcmp(argv[i], "-nsols") == 0) {
+      if (i + 1 < argc) {
+        n_of_sols = std::atoi(argv[++i]);
+      } else {
+        std::cerr << "Erro: Argumento para -nsols está faltando.\n";
+        return 1;
+      }
+    } else if (strcmp(argv[i], "-h_emph") == 0) {
+      if (i + 1 < argc) {
 
-        // Exemplo de uso das variáveis (substitua pelo processamento real)
-    std::cout << "Caminho do arquivo: " << filePath << "\n";
-    std::cout << "Valor de -s: " << seed << "\n";
-    std::cout << "Limite de idade: " << age_limit << "\n";
-    std::cout << "Limite de tempo do CPLEX: " << cplex_time_limit << "\n";
-    std::cout << "Raio: " << raio << "\n";
-    std::cout << "Número de soluções: " << n_of_sols << "\n";
-    std::cout << "Ênfase heurística: " << heuristic_emphasis << "\n";
-    std::cout << "Warm start: " << (warm_start ? "Sim" : "Não") << "\n";
-    std::cout << "Abortar CPLEX: " << (cplex_abort ? "Sim" : "Não") << "\n";
+        heuristic_emphasis = std::atoi(argv[++i]);
+      } else {
+        std::cerr << "Erro: Argumento para -h_emph está faltando.\n";
+        return 1;
+      }
+    } else if (strcmp(argv[i], "-warm_start") == 0) {
+      if (i + 1 < argc) {
+        int val = std::atoi(argv[++i]);
+        warm_start = (val == 1);
+      } else {
+        std::cerr << "Erro: Argumento para -warm_start está faltando.\n";
+        return 1;
+      }
+    } else if (strcmp(argv[i], "-init") == 0) {
+      if (i + 1 < argc) {
+        int val = std::atoi(argv[++i]);
+        init = (val == 1);
+      } else {
+        std::cerr << "Erro: Argumento para -warm_start está faltando.\n";
+        return 1;
+      }
+    } else if (strcmp(argv[i], "-cpl_abort") == 0) {
+      if (i + 1 < argc) {
+        int val = std::atoi(argv[++i]);
+        cplex_abort = (val == 1);
+      } else {
+        std::cerr << "Erro: Argumento para -cpl_abort está faltando.\n";
+        return 1;
+      }
+    } else {
+      std::cerr << "Aviso: Argumento desconhecido " << argv[i]
+                << " ignorado.\n";
+    }
+  }
 
-    raio2 = raio * raio;
-    raio2x4 = raio2 * 4;
-    gen.seed(seed);
+  // Exemplo de uso das variáveis (substitua pelo processamento real)
+  std::cout << "Caminho do arquivo: " << filePath << "\n";
+  std::cout << "Valor de -s: " << seed << "\n";
+  std::cout << "Limite de idade: " << age_limit << "\n";
+  std::cout << "Limite de tempo do CPLEX: " << cplex_time_limit << "\n";
+  std::cout << "Raio: " << raio << "\n";
+  std::cout << "Número de soluções: " << n_of_sols << "\n";
+  std::cout << "Ênfase heurística: " << heuristic_emphasis << "\n";
+  std::cout << "Warm start: " << (warm_start ? "Sim" : "Não") << "\n";
+  std::cout << "Abortar CPLEX: " << (cplex_abort ? "Sim" : "Não") << "\n";
 
-    read_points(filePath, pontos, max_x, max_y, min_x, min_y, maior_em_modulo);
-    indices.resize(pontos.size());
-    std::iota(indices.begin(), indices.end(), 0); 
-    
-    n_pon = pontos.size();
-    tree.insert(pontos.begin(), pontos.end());
-    //build_struct();
-    CMSA(cplex_time_limit, age_limit);
-    
-    testando();
-    // manager.displayComponents();
+  raio2 = raio * raio;
+  raio2x4 = raio2 * 4;
+  gen.seed(seed);
 
-    // solve(pontos.size());
-    exit(0);
+  read_points(filePath, pontos, max_x, max_y, min_x, min_y, maior_em_modulo);
+  indices.resize(pontos.size());
+  std::iota(indices.begin(), indices.end(), 0);
+
+  n_pon = pontos.size();
+  tree.insert(pontos.begin(), pontos.end());
+  // build_struct();
+  CMSA(cplex_time_limit, age_limit);
+
+  testando();
+  // manager.displayComponents();
+
+  // solve(pontos.size());
+  exit(0);
 }
 
 void CMSA(float time_limit, int max_age) {
-    double opt = std::numeric_limits<double>::max();
-    auto total_start = std::chrono::high_resolution_clock::now();
+  double opt = std::numeric_limits<double>::max();
+  auto total_start = std::chrono::high_resolution_clock::now();
 
-    double construct_total = 0;
-    double solve_total = 0;
-    double adapt_total = 0;
-    double total_duration = 0;
+  double construct_total = 0;
+  double solve_total = 0;
+  double adapt_total = 0;
+  double total_duration = 0;
 
-    if (init){
-        FASTCOVER_PP ob1(pontos);
-        bsf = ob1.execute();
-        auto current = std::chrono::high_resolution_clock::now();
-        best_solution_time = std::chrono::duration_cast<std::chrono::milliseconds>(current - total_start).count();
-        //bsf = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y );
-        for (auto& component : manager.components){
-            component.eh_sol = 1;
-            component.idade = 0;
-        }
-        
-
+  if (init) {
+    FASTCOVER_PP ob1(pontos);
+    bsf = ob1.execute();
+    auto current = std::chrono::high_resolution_clock::now();
+    best_solution_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+                             current - total_start)
+                             .count();
+    // bsf = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y );
+    for (auto &component : manager.components) {
+      component.eh_sol = 1;
+      component.idade = 0;
     }
+  }
 
+  // ================= CMSA Loop ==========================
+  while (total_duration < computation_time_limit) {
+    // CONSTRUCT
+    auto construct_start = std::chrono::high_resolution_clock::now();
+    for (int na = 0; na < n_of_sols; na++) {
 
-    // ================= CMSA Loop ==========================
-    while (total_duration < computation_time_limit) {
-        // CONSTRUCT
-        auto construct_start = std::chrono::high_resolution_clock::now();
-        for (int na = 0; na < n_of_sols; na++) {
+      if (loops == 0) {
 
+        int aux_solution1 =
+            generate_solution_cgal_1(pontos, max_x, max_y, min_x, min_y);
+      } else {
 
-            if (loops == 0) {
+        int aux_solution2 =
+            generate_solution_cgal(pontos, max_x, max_y, min_x, min_y);
+      }
 
-                int aux_solution1 = generate_solution_cgal_1(pontos, max_x , max_y , min_x , min_y );
-            }
-            else{
+      // int aux_solution2 = generate_solution_cgal_manual(pontos, max_x , max_y
+      // , min_x , min_y ); int aux_solution1 = generate_solution_dr(pontos,
+      // max_x , max_y , min_x , min_y );
 
-                int aux_solution2 = generate_solution_cgal(pontos, max_x , max_y , min_x , min_y );
+      // std::cout << "solucao construtivo "<<aux_solution1 << std::endl;
+      // int aux_solution2 = construtivo_brkg(pontos);
+      // std::cout << "solucao construtivo "<<aux_solution << std::endl;
+      // if (bsf > aux_solution) bsf = aux_solution;
+      // mateus_recursive(pontos, max_x + raio, max_y + raio, min_x - raio,
+      // min_y -raio); FASTCOVER ob2(pontos);
 
-            }
-          
-           //int aux_solution2 = generate_solution_cgal_manual(pontos, max_x , max_y , min_x , min_y );
-            //int aux_solution1 = generate_solution_dr(pontos, max_x , max_y , min_x , min_y );
-
-           //std::cout << "solucao construtivo "<<aux_solution1 << std::endl;
-           //int aux_solution2 = construtivo_brkg(pontos);
-        //std::cout << "solucao construtivo "<<aux_solution << std::endl;
-           //if (bsf > aux_solution) bsf = aux_solution;
-          // mateus_recursive(pontos, max_x + raio, max_y + raio, min_x - raio, min_y -raio);
-           // FASTCOVER ob2(pontos);
-
-          // FASTCOVER_PP ob1(pontos);
-           // ob2.execute();
-          //ob1.execute();
-            //hexa ob3(pontos);
-            //ob3.execute();
-            //k_center(pontos, manager, raio);
-        }
-        auto construct_end = std::chrono::high_resolution_clock::now();
-        construct_total += std::chrono::duration_cast<std::chrono::milliseconds>(construct_end - construct_start).count();
-
-        // SOLVE
-        
-        auto end = std::chrono::high_resolution_clock::now();
-        r_limit = computation_time_limit - std::chrono::duration_cast<std::chrono::milliseconds>(end - total_start).count();
-        r_limit = r_limit/1000 ; 
-        auto solve_start = std::chrono::high_resolution_clock::now();
-        
-        double aux_solution_cplex = std::numeric_limits<double>::max();
-        if(r_limit < 0.001){
-            break;
-        }
-        aux_solution_cplex = cplex_run();
-        //        std::cout << "solucao cplex "<<aux_solution_cplex << std::endl;
-
-        // Atualizar melhor solução se encontrada
-        if (bsf > aux_solution_cplex) {
-            bsf = aux_solution_cplex;
-            auto current = std::chrono::high_resolution_clock::now();
-            best_solution_time = std::chrono::duration_cast<std::chrono::milliseconds>(current - total_start).count();
-        }
-        //bsf = guloso();
-        auto solve_end = std::chrono::high_resolution_clock::now();
-        solve_total += std::chrono::duration_cast<std::chrono::milliseconds>(solve_end - solve_start).count();
-
-        // ADAPT
-        auto adapt_start = std::chrono::high_resolution_clock::now();
-        manager.removeOldComponents(max_age);
-        auto adapt_end = std::chrono::high_resolution_clock::now();
-        adapt_total += std::chrono::duration_cast<std::chrono::milliseconds>(adapt_end - adapt_start).count();
-
-
-        auto total_end = std::chrono::high_resolution_clock::now();
-        total_duration = std::chrono::duration_cast<std::chrono::milliseconds>(total_end - total_start).count();
-        loops++;
+      // FASTCOVER_PP ob1(pontos);
+      // ob2.execute();
+      // ob1.execute();
+      // hexa ob3(pontos);
+      // ob3.execute();
+      // k_center(pontos, manager, raio);
     }
+    auto construct_end = std::chrono::high_resolution_clock::now();
+    construct_total += std::chrono::duration_cast<std::chrono::milliseconds>(
+                           construct_end - construct_start)
+                           .count();
+
+    // SOLVE
+
+    auto end = std::chrono::high_resolution_clock::now();
+    r_limit =
+        computation_time_limit -
+        std::chrono::duration_cast<std::chrono::milliseconds>(end - total_start)
+            .count();
+    r_limit = r_limit / 1000;
+    auto solve_start = std::chrono::high_resolution_clock::now();
+
+    double aux_solution_cplex = std::numeric_limits<double>::max();
+    if (r_limit < 0.001) {
+      break;
+    }
+    aux_solution_cplex = cplex_run();
+    //        std::cout << "solucao cplex "<<aux_solution_cplex << std::endl;
+
+    // Atualizar melhor solução se encontrada
+    if (bsf > aux_solution_cplex) {
+      bsf = aux_solution_cplex;
+      auto current = std::chrono::high_resolution_clock::now();
+      best_solution_time =
+          std::chrono::duration_cast<std::chrono::milliseconds>(current -
+                                                                total_start)
+              .count();
+    }
+    // bsf = guloso();
+    auto solve_end = std::chrono::high_resolution_clock::now();
+    solve_total += std::chrono::duration_cast<std::chrono::milliseconds>(
+                       solve_end - solve_start)
+                       .count();
+
+    // ADAPT
+    auto adapt_start = std::chrono::high_resolution_clock::now();
+    manager.removeOldComponents(max_age);
+    auto adapt_end = std::chrono::high_resolution_clock::now();
+    adapt_total += std::chrono::duration_cast<std::chrono::milliseconds>(
+                       adapt_end - adapt_start)
+                       .count();
 
     auto total_end = std::chrono::high_resolution_clock::now();
-    total_duration = std::chrono::duration_cast<std::chrono::milliseconds>(total_end - total_start).count();
+    total_duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+                         total_end - total_start)
+                         .count();
+    loops++;
+  }
 
-    // Exibição dos resultados
-    std::cout << "-----------------------------------\n";
-    std::cout << "CONSTRUCT time: " << construct_total << "ms\n";
-    std::cout << "SOLVE time: " << solve_total << "ms\n";
-    std::cout << "ADAPT time: " << adapt_total << "ms\n";
-    std::cout << "Total CMSA time: " << total_duration << "ms\n";
-    std::cout << "opt: " << bsf << std::endl;
-    std::cout << "-----------------------------------\n";
-    std::cout << "Loops: " << loops << std::endl;
-    std::cout << "Raio: " << raio << std::endl;
-    std::cout << "Best solution found at: " << best_solution_time << " ms" << std::endl;
+  auto total_end = std::chrono::high_resolution_clock::now();
+  total_duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+                       total_end - total_start)
+                       .count();
 
+  // Exibição dos resultados
+  std::cout << "-----------------------------------\n";
+  std::cout << "CONSTRUCT time: " << construct_total << "ms\n";
+  std::cout << "SOLVE time: " << solve_total << "ms\n";
+  std::cout << "ADAPT time: " << adapt_total << "ms\n";
+  std::cout << "Total CMSA time: " << total_duration << "ms\n";
+  std::cout << "opt: " << bsf << std::endl;
+  std::cout << "-----------------------------------\n";
+  std::cout << "Loops: " << loops << std::endl;
+  std::cout << "Raio: " << raio << std::endl;
+  std::cout << "Best solution found at: " << best_solution_time << " ms"
+            << std::endl;
 }
 
 void testando() {
-    std::vector<Component> sol;
+  std::vector<Component> sol;
 
-    for (const auto& c : manager.components) {
-        if (c.eh_sol) {
-            sol.push_back(c);
-        }
+  for (const auto &c : manager.components) {
+    if (c.eh_sol) {
+      sol.push_back(c);
     }
+  }
 
-    std::cout << "pontos_vector: " << pontos.size() << std::endl;
-     std::cout << "sol size: " << sol.size() << std::endl;
-    Teste teste(pontos, sol);
+  std::cout << "pontos_vector: " << pontos.size() << std::endl;
+  std::cout << "sol size: " << sol.size() << std::endl;
+  Teste teste(pontos, sol);
 
-    if (teste.execute())
-        std::cout << "success" << std::endl;
-    teste.writeOutput();
+  if (teste.execute())
+    std::cout << "success" << std::endl;
+  teste.writeOutput();
 }
-
-
-
