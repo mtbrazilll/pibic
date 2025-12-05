@@ -38,7 +38,7 @@ extern int seed;
 
 ILOSTLBEGIN
 
-ILOHEURISTICCALLBACK2(RandomizedRoundingCallback, IloIntVarArray, vars_x,
+ILOHEURISTICCALLBACK2(RandomizedRoundingCallback, IloNumVarArray, vars_x,
                       IloNum, dummy) {
   try {
     int numSets = vars_x.getSize();
@@ -122,7 +122,7 @@ ILOHEURISTICCALLBACK2(RandomizedRoundingCallback, IloIntVarArray, vars_x,
   }
 }
 
-ILOHEURISTICCALLBACK2(GreedySetCoverCallback, IloIntVarArray, vars_x, IloNum,
+ILOHEURISTICCALLBACK2(GreedySetCoverCallback, IloNumVarArray, vars_x, IloNum,
                       dummy) {
   if (false)
     return;
@@ -213,11 +213,12 @@ ILOMIPINFOCALLBACK2(Callback, IloBool, aborted, IloNum, sol) {
   }
 }
 
-ILOSOLVECALLBACK2(abortCallback, IloCplex::Aborter &, abo, int &, curbest) {
+ILOMIPINFOCALLBACK1(abortCallback, int, curbest) {
   if (hasIncumbent()) {
     IloNum nv = getIncumbentObjValue();
-    if (curbest > int(nv))
-      abo.abort();
+    if (curbest > int(nv)) {
+      abort();
+    }
   }
 }
 
@@ -284,7 +285,7 @@ double cplex_run() {
     if (cplex_abort) {
       IloCplex::Aborter abo(env);
       cpl.use(abo);
-      cpl.use(abortCallback(env, abo, aux_bsf));
+      cpl.use(abortCallback(env, aux_bsf));
     }
 
     if (warm_start) {
@@ -299,6 +300,10 @@ double cplex_run() {
     cpl.setParam(IloCplex::Threads, 1);
     cpl.setParam(IloCplex::Param::Emphasis::MIP, heuristic_emphasis);
     cpl.setWarning(env.getNullStream());
+
+    // Register callbacks
+    // cpl.use(RandomizedRoundingCallback(env, x, 0.0));
+    // cpl.use(GreedySetCoverCallback(env, x, 0.0));
 
     // calling CPLEX to solve the model
     cpl.solve();
