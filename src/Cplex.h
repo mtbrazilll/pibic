@@ -499,12 +499,14 @@ int greedySetCover() {
     for (auto &component : manager.components) {
       component.eh_sol = false;
       component.idade = component.idade + 1;
+      component.vida = component.vida + 1;
     }
 
     // Mark selected components as solution
     for (int idx : final_cover_indices) {
       manager.components[idx].eh_sol = true;
       manager.components[idx].idade = 0;
+      manager.components[idx].vida = manager.components[idx].vida + 1;
     }
 
     return final_cover_indices.size();
@@ -515,6 +517,7 @@ int greedySetCover() {
         component.idade = 0;
       } else {
         component.idade = component.idade + 1;
+        component.vida = component.vida + 1;
       }
     }
 

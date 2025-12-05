@@ -63,6 +63,7 @@ double computation_time_limit = 100.0;
 double cplex_time_limit = 0.31;
 double determinism_rate = 0.8;
 double r_limit = 0;
+double lista_limiar = 237;
 // double cplex_time= 0.1;
 int n_of_sols = 3;
 int age_limit = 1;
@@ -233,6 +234,16 @@ int main(int argc, char *argv[]) {
         std::cerr << "Erro: Argumento para -cpl_abort está faltando.\n";
         return 1;
       }
+
+    } else if (strcmp(argv[i], "-lista_limiar") == 0) {
+      if (i + 1 < argc) {
+        int val = std::atoi(argv[++i]);
+        lista_limiar = val;
+      } else {
+        std::cerr << "Erro: Argumento para -lista_limiar está faltando.\n";
+        return 1;
+      }
+
     } else if (strcmp(argv[i], "-algo") == 0) { // Flag para verbose timing
       if (i + 1 < argc) {
         algo = std::atoi(argv[++i]);
@@ -419,7 +430,7 @@ void CMSA(float time_limit, int max_age) {
                        .count();
 
     // melhoria local
-    if (loops_with_no_improval > 10) {
+    if (loops_with_no_improval > lista_limiar) {
       // std::cout << "Ativando Tabu List..." << std::endl;
       double max_vida = 1.0;
       for (const auto &c : manager.components) {
