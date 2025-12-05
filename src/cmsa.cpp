@@ -398,11 +398,6 @@ void CMSA(float time_limit, int max_age) {
 
     aux_solution_cplex = cplex_run();
 
-    // aux_solution_cplex = greedySetCover();
-
-    // aux_solution_cplex = findSEIPApproximation(manager, 100);
-    //          std::cout << "solucao cplex "<<aux_solution_cplex << std::endl;
-
     // Atualizar melhor solução se encontrada
     if (bsf > aux_solution_cplex) {
       bsf = aux_solution_cplex;

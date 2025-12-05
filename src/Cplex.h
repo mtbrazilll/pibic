@@ -289,7 +289,7 @@ double cplex_run() {
     }
 
     if (warm_start) {
-      cpl.addMIPStart(mipVar, mipVal);
+      cpl.addMIPStart(mipVar, mipVal, IloCplex::MIPStartAuto);
       mipVar.end();
       mipVal.end();
     }
@@ -299,6 +299,7 @@ double cplex_run() {
     cpl.setParam(IloCplex::EpAGap, 0.0);
     cpl.setParam(IloCplex::Threads, 1);
     cpl.setParam(IloCplex::Param::Emphasis::MIP, heuristic_emphasis);
+
     cpl.setWarning(env.getNullStream());
 
     // Register callbacks
