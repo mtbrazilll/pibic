@@ -231,7 +231,7 @@ ILOSIMPLEXCALLBACK0(MyCallback) {
   }
 }
 
-double cplex_run() {
+double cplex_run(double time_limit) {
   double solution_cplex = std::numeric_limits<double>::max();
 
   IloEnv env;
@@ -294,7 +294,7 @@ double cplex_run() {
       mipVal.end();
     }
 
-    cpl.setParam(IloCplex::TiLim, cplex_time_limit);
+    cpl.setParam(IloCplex::TiLim, time_limit);
     cpl.setParam(IloCplex::EpGap, 0.0);
     cpl.setParam(IloCplex::EpAGap, 0.0);
     cpl.setParam(IloCplex::Threads, 1);

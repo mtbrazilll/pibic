@@ -119,7 +119,7 @@ void printHelp() {
   std::cout << "  -max_age <num>        Define o limite de idade máxima para "
                "componentes (padrão: 1)\n";
   std::cout << "  -t <num>              Define o limite de tempo de computação "
-               "em segundos (padrão: 100.0)\n";
+               "em milissegundos (padrão: 100.0)\n";
   std::cout << "  -cpl_t <num>          Define o limite de tempo para o CPLEX "
                "em segundos (padrão: 10.0)\n";
   std::cout << "  -i <arquivo>          Define o caminho do arquivo de entrada "
@@ -163,7 +163,7 @@ int main(int argc, char *argv[]) {
       }
     } else if (strcmp(argv[i], "-t") == 0) {
       if (i + 1 < argc) {
-        computation_time_limit = std::atoi(argv[++i]);
+        computation_time_limit = std::atof(argv[++i]);
       } else {
         std::cerr << "Erro: Argumento para -t está faltando.\n";
         return 1;
@@ -383,20 +383,31 @@ void CMSA(float time_limit, int max_age) {
     // SOLVE
 
     auto end = std::chrono::high_resolution_clock::now();
-    r_limit =
-        computation_time_limit * 1000 -
+    double current_elapsed_ms =
         std::chrono::duration_cast<std::chrono::milliseconds>(end - total_start)
             .count();
-    r_limit = r_limit / 1000;
-    auto solve_start = std::chrono::high_resolution_clock::now();
 
-    if (r_limit < 0.001) {
+    // Check remaining time
+    double remaining_ms = computation_time_limit - current_elapsed_ms;
+
+    if (remaining_ms < 1.0) { // If less than 1ms left, stop
       break;
     }
 
+    double remaining_seconds = remaining_ms / 1000.0;
+    double effective_cplex_limit =
+        std::min(cplex_time_limit, remaining_seconds);
+
+    // Ensure we don't pass a negative or zero time limit to CPLEX if something
+    // went wrong with calculation
+    if (effective_cplex_limit <= 0.0)
+      break;
+
+    auto solve_start = std::chrono::high_resolution_clock::now();
+
     double aux_solution_cplex = std::numeric_limits<double>::max();
 
-    aux_solution_cplex = cplex_run();
+    aux_solution_cplex = cplex_run(effective_cplex_limit);
 
     // Atualizar melhor solução se encontrada
     if (bsf > aux_solution_cplex) {
